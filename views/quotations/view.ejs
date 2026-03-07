@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+</head>
+<body>
+<div class="container fluid">
+  <div class="row position-sticky">
+    <%- include('../sidebar') %>
+    <main class="col-md-9 col-lg-10 p-4">
+        <h2>Quotation #<%= quotation.id %> - <%= quotation.title %></h2>
+        <p>Grand Total: Rs.<%= Number(quotation.grand_total).toLocaleString('en-US',{minimumFractionDigits:2}) %></p>
+        <p>Profit: Rs. <%= Number(quotation.profit).toLocaleString('en-US',{minimumFractionDigits:2}) %></p>
+        <p>Margin: <%= Number(quotation.margin).toFixed(2) %>%</p>
+
+        <h4>Items</h4>
+        <div class="table-responsive">
+        <table class="table table-bordered">
+        <thead>
+        <tr>
+        <th>Product</th>
+        <th>Category</th>
+        <th>Quantity</th>
+        <th>Cost Price</th>
+        <th>Sale Price</th>
+        <th>Profit</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% items.forEach(i => { %>
+        <tr>
+        <td><%= i.name %></td>
+        <td><%= i.category %></td>
+        <td><%= i.quantity %></td>
+        <td>Rs. <%= Number(i.cost_price).toLocaleString('en-US',{minimumFractionDigits:2}) %></td>
+        <td>Rs. <%= Number(i.sale_price).toLocaleString('en-US',{minimumFractionDigits:2}) %></td>
+        <td>Rs. <%= Number((i.sale_price - i.cost_price)*i.quantity).toLocaleString('en-US',{minimumFractionDigits:2}) %></td>
+        </tr>
+        <% }) %>
+        </tbody>
+        </table>
+        </div>
+    </main>
+ </div>
+</div>
+</body>
+</html>

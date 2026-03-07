@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <div class="container mt-4">
+                        <div class="card p-4">
+                            <h4>Sales Order #<%= order.id %>
+                            </h4>
+
+                            <hr>
+
+                            <h6>Customer Details</h6>
+
+                            <p><b>Name:</b>
+                                <%= order.customer_name %>
+                            </p>
+                            <p><b>Phone:</b>
+                                <%= order.phone || '-' %>
+                            </p>
+                            <p><b>Address:</b>
+                                <%= order.address || '-' %>
+                            </p>
+
+                            <hr>
+
+                            <h6>Order Info</h6>
+
+                            <p><b>Status:</b> <span class="badge bg-info">
+                                    <%= order.status %>
+                                </span></p>
+                            <p><b>Total Amount:</b>
+                                <%= Number(order.total_amount).toLocaleString() %>
+                            </p>
+                            <p><b>Total Profit:</b>
+                                <%= Number(order.profit).toLocaleString() %>
+                            </p>
+                            <p><b>Date:</b>
+                                <%= new Date(order.date).toLocaleString() %>
+                            </p>
+
+                            <hr>
+
+                            <h6>Order Items</h6>
+
+                            <table class="table table-bordered">
+
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    <% items.forEach(item=> { %>
+                                        <tr>
+                                            <td>
+                                                <%= item.product_name %>
+                                            </td>
+                                            <td>
+                                                <%= item.quantity %>
+                                            </td>
+                                            <td>
+                                                <%= Number(item.sale_price).toLocaleString() %>
+                                            </td>
+                                            <td>
+                                                <%= (item.quantity * item.sale_price).toLocaleString() %>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+
+                                </tbody>
+
+                            </table>
+
+                            <a href="/sales/orders" class="btn btn-secondary mt-3">
+                                Back
+                            </a>
+
+                        </div>
+                    </div>
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>

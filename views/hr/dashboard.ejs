@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <div class="container-fluid">
+
+                        <h3 class="mb-4">HR Dashboard</h3>
+
+                        <div class="row">
+
+                            <!-- Total Employees -->
+                            <div class="col-md-3">
+                                <div class="card shadow-sm mb-3">
+                                    <div class="card-body text-center">
+                                        <h6>Total Employees</h6>
+                                        <h3>
+                                            <%= stats.totalEmployees %>
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- New Hires -->
+                            <div class="col-md-3">
+                                <div class="card shadow-sm mb-3">
+                                    <div class="card-body text-center">
+                                        <h6>New Hires This Month</h6>
+                                        <h3>
+                                            <%= stats.newHires %>
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Total Payroll -->
+                            <div class="col-md-3">
+                                <div class="card shadow-sm mb-3">
+                                    <div class="card-body text-center">
+                                        <h6>Total Payroll Expense</h6>
+                                        <h3>Rs. <%= Number(stats.totalPayroll).toFixed(2) %>
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Departments Count -->
+                            <div class="col-md-3">
+                                <div class="card shadow-sm mb-3">
+                                    <div class="card-body text-center">
+                                        <h6>Departments</h6>
+                                        <h3>
+                                            <%= stats.departmentCount %>
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body">
+
+                                <h5 class="mb-3">Quick Actions</h5>
+
+                                <a href="/hr/add" class="btn btn-primary me-2 mb-2">
+                                    Add Employee
+                                </a>
+
+                                <a href="/hr/list" class="btn btn-success me-2 mb-2">
+                                    View Employees
+                                </a>
+
+                                <a href="/hr/payroll/add" class="btn btn-warning me-2 mb-2">
+                                    Add Payroll
+                                </a>
+
+                                <a href="/hr/payroll/list" class="btn btn-info me-2 mb-2">
+                                    View Payroll
+                                </a>
+
+                            </div>
+                        </div>
+
+                        <!-- Department Wise Count Table -->
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+
+                                <h5 class="mb-3">Department Wise Employees</h5>
+
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped">
+
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>Department</th>
+                                                <th>Employees</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+
+                                            <% stats.departmentWise.forEach(d=>{ %>
+                                                <tr>
+                                                    <td>
+                                                        <%= d.name %>
+                                                    </td>
+                                                    <td>
+                                                        <%= d.count %>
+                                                    </td>
+                                                </tr>
+                                                <% }) %>
+
+                                        </tbody>
+
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>

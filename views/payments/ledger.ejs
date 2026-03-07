@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <div class="container mt-4">
+
+                        <h3 class="mb-4">
+                            <%= account.name %> Ledger
+                        </h3>
+
+                        <div class="card shadow-sm border-0">
+
+                            <div class="card-body">
+
+                                <table class="table table-hover table-bordered">
+
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Description</th>
+                                            <th class="text-end">Debit</th>
+                                            <th class="text-end">Credit</th>
+                                            <th class="text-end">Balance</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                        <% entries.forEach(e=>{ %>
+
+                                            <tr>
+                                                <td>
+                                                    <%= e.date ? new Date(e.date).toLocaleDateString() : '' %>
+                                                </td>
+                                                <td>
+                                                    <%= e.name || '-' %>
+                                                </td>
+
+                                                <td class="text-end">
+                                                    <%= Number(e.debit || 0).toLocaleString() %>
+                                                </td>
+
+                                                <td class="text-end">
+                                                    <%= Number(e.credit || 0).toLocaleString() %>
+                                                </td>
+
+                                                <td class="text-end fw-bold">
+                                                    <%= Number(e.balance || 0).toLocaleString() %>
+                                                </td>
+
+                                            </tr>
+
+                                            <% }) %>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>

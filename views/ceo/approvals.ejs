@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Approval Requests</title>
+</head>
+<body>
+    <div class="container-fluid">
+  <div class="row position-sticky">
+    <%- include('../sidebar') %>
+    <main class="col-md-9 col-lg-10 p-4">
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Approval id</th>
+      <th scope="col">Role name</th>
+      <th scope="col">Username</th>
+      <th scope="col">Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% approvals.forEach(function(approval) { %>
+      <tr>
+        <td><%= approval.id %></td>
+        <td><%= approval.requested_role %></td>
+        <td><%= approval.username %></td>
+        <td><%= approval.email %></td>
+        <td>
+          <form action="/admin/approve/<%= approval.id %>" method="POST">
+            <button type="submit" class="btn btn-primary">Approve</button>
+          </form>
+        </td>
+      </tr>
+    <% }); %>
+  </tbody>
+</table>
+</main>
+</div>
+</div>
+</body>
+</html>

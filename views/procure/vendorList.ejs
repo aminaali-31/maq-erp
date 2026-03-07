@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+</head>
+<body>
+<div class="container fluid">
+  <div class="row position-sticky">
+    <%- include('../sidebar') %>
+    <main class="col-md-9 col-lg-10 p-4">
+       <div class="container mt-5">
+            <h2 class="mb-4">All Vendors</h2>
+              <a href="/procure/addVendor" class="btn btn-primary mb-3">Add Vednor</a>
+            <% if (message) { %>
+                <div class="alert alert-success"><%= message %></div>
+            <% } %>
+                <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Payment Terms</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% if (vendors.length === 0) { %>
+                    <tr>
+                    <td colspan="6" class="text-center">No vendors found</td>
+                    </tr>
+                <% } else { %>
+                    <% vendors.forEach(vendor => { %>
+                    <tr>
+                        <td><%= vendor.id %></td>
+                        <td><%= vendor.name %></td>
+                        <td><%= vendor.phone %></td>
+                        <td><%= vendor.email %></td>
+                        <td><%= vendor.address %></td>
+                        <td><%= vendor.payment_terms %></td>
+                    </tr>
+                    <% }) %>
+                <% } %>
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </main>
+ </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+</head>
+<body>
+<div class="container fluid">
+  <div class="row position-sticky">
+    <%- include('../sidebar') %>
+    <main class="col-md-9 col-lg-10 p-4">
+        <div class="container mt-5">
+            <h2 class="mb-4">Add Purchase Order</h2>
+
+            <% if (message) { %>
+                <div class="alert alert-success"><%= message %></div>
+            <% } %>
+
+            <form id="addPOForm" method="POST" action="/procure/purchase-orders/add">
+                <!-- Vendor Selection -->
+                <div class="mb-3">
+                <label for="vendor_id" class="form-label">Select Vendor</label>
+                <select class="form-select" id="vendor_id" name="vendor_id" required>
+                    <option value="">-- Select Vendor --</option>
+                    <% vendors.forEach(vendor => { %>
+                    <option value="<%= vendor.id %>"><%= vendor.name %></option>
+                    <% }) %>
+                </select>
+                </div>
+
+                <!-- Order Date -->
+                <div class="mb-3">
+                <label for="po_date" class="form-label">Order Date</label>
+                <input type="date" class="form-control" id="po_date" name="po_date" value="<%= new Date().toISOString().split('T')[0] %>">
+                </div>
+
+                <!-- Items Section -->
+                <h4>Items</h4>
+                <table class="table table-bordered" id="itemsTable">
+                <thead class="table-dark">
+                    <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsBody">
+                    <!-- Items will be added dynamically -->
+                </tbody>
+                </table>
+                <div class="mb-3 text-end">
+                  <strong>Total Amount: Rs. <span id="grandTotal">0.00</span></strong>
+                </div>
+                <button type="button" class="btn btn-secondary mb-3" id="addItemBtn">Add Item</button>
+                <br>
+                <input type="hidden" id="total_amount" name="total_amount" value="0">
+                <button type="submit" class="btn btn-primary">Create Purchase Order</button>
+            </form>
+            </div>
+    </main>
+ </div>
+</div>
+<script>
+  const products = <%- JSON.stringify(products) %>;
+  let itemIndex = 0;
+
+  const itemsBody = document.getElementById('itemsBody');
+  const addItemBtn = document.getElementById('addItemBtn');
+  const totalAmountInput = document.getElementById('total_amount');
+  const grandTotalSpan = document.getElementById('grandTotal');
+
+  document.getElementById('addPOForm').addEventListener('submit', function(e) {
+      if (itemsBody.querySelectorAll('tr').length === 0) {
+        e.preventDefault();
+        alert('Please add at least one item!');
+      }
+    });
+    function updateTotalAmount() {
+    let total = 0;
+    itemsBody.querySelectorAll('tr').forEach(row => {
+      const qty = parseFloat(row.querySelector('.quantity').value) || 0;
+      const price = parseFloat(row.querySelector('.unit_price').value) || 0;
+      const rowTotal = qty * price;
+      row.querySelector('.total').innerText = rowTotal.toFixed(2); // Update row total
+      total += rowTotal;
+    });
+    grandTotalSpan.innerText = total.toFixed(2);
+    totalAmountInput.value = total.toFixed(2);
+  }
+
+  function addItemRow() {
+    const row = document.createElement('tr');
+
+    row.innerHTML = `
+      <td>
+        <select name="items[${itemIndex}][product_id]" class="form-select" required>
+          <option value="">-- Select Product --</option>
+          ${products.map(p => `<option value="${p.id}" data-price="${p.sale_price}">${p.name}</option>`).join('')}
+        </select>
+      </td>
+      <td><input type="number" name="items[${itemIndex}][quantity]" class="form-control quantity" value="1" min="1" required></td>
+      <td><input type="number" name="items[${itemIndex}][unit_price]" class="form-control unit_price" step="0.01" value="0" required></td>
+      <td class="total">0</td>
+      <td><button type="button" class="btn btn-danger btn-sm removeBtn">Remove</button></td>
+    `;
+
+    itemsBody.appendChild(row);
+
+    const quantityInput = row.querySelector('.quantity');
+    const unitPriceInput = row.querySelector('.unit_price');
+    const totalCell = row.querySelector('.total');
+    const productSelect = row.querySelector('select');
+
+        quantityInput.addEventListener('input', updateTotalAmount);
+        unitPriceInput.addEventListener('input', updateTotalAmount);
+
+        productSelect.addEventListener('change', function() {
+          const selected = productSelect.selectedOptions[0];
+          const price = selected.dataset.price || 0;
+          unitPriceInput.value = price;
+          updateTotalAmount();
+        });
+
+        row.querySelector('.removeBtn').addEventListener('click', () => {
+          row.remove();
+          updateTotalAmount();
+        });
+
+        itemIndex++;
+  }
+
+  addItemBtn.addEventListener('click', addItemRow);
+</script>
+</body>
+</html>

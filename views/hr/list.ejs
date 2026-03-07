@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <h2>Employees List</h2>
+
+                    <a href="/hr/add" class="btn btn-primary mb-3">
+                        Add Employee
+                    </a>
+                    <table class="table table-bordered">
+
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Salary</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <% if(employees.length===0){ %>
+                                <tr>
+                                    <td colspan="4" class="text-center">No Employees Found</td>
+                                </tr>
+                                <% } %>
+
+                                    <% employees.forEach(e=>{ %>
+                                        <tr>
+                                            <td>
+                                                <%= e.id %>
+                                            </td>
+                                            <td>
+                                                <%= e.name %>
+                                            </td>
+                                            <td>
+                                                <%= e.department_name || 'N/A' %>
+                                            </td>
+                                            <td>Rs.<%= e.salary %>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+
+                        </tbody>
+
+                    </table>
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>

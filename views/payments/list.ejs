@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <div class="container mt-4">
+
+                        <h3>All Payments</h3>
+                        <a href="/payments/add" class="btn btn-primary mb-3">Add Payment</a>
+                        <table class="table table-bordered table-striped">
+
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Type</th>
+                                    <th>Reference</th>
+                                    <th>Account</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <% payments.forEach(p=> { %>
+
+                                    <tr>
+                                        <td>
+                                            <%= p.id %>
+                                        </td>
+
+                                        <td class="text-capitalize">
+                                            <%= p.payment_type %>
+                                        </td>
+
+                                        <td>
+                                            <%= p.reference_id ? p.reference_id : '-' %>
+                                        </td>
+
+                                        <td>
+                                            <%= p.account_name %>
+                                        </td>
+
+                                        <td>
+                                            <%= Number(p.amount).toLocaleString() %>
+                                        </td>
+
+                                        <td>
+                                            <%= p.payment_date %>
+                                        </td>
+
+                                        <td>
+                                            <%= p.notes || '-' %>
+                                        </td>
+
+                                    </tr>
+
+                                    <% }) %>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>

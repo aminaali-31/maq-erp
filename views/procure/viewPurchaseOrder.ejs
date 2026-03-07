@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+</head>
+<body>
+<div class="container fluid">
+  <div class="row position-sticky">
+    <%- include('../sidebar') %>
+    <main class="col-md-9 col-lg-10 p-4">
+        <div class="container mt-5">
+            <h2>Purchase Order #<%= po.id %></h2>
+            <p><strong>Vendor:</strong> <%= po.vendor_name %></p>
+            <p><strong>Order Date:</strong> <%= po.order_date.toISOString().split('T')[0] %></p>
+            <p><strong>Status:</strong> <%= po.status %></p>
+
+            <h4>Items</h4>
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% items.forEach(item => { %>
+                    <tr>
+                    <td><%= item.product_name %></td>
+                    <td><%= item.quantity %></td>
+                    <td>Rs.<%= Number(item.unit_price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></td>
+                    <td>Rs.<%= Number(item.total).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></td>
+                    </tr>
+                <% }) %>
+                </tbody>
+            </table>
+            </div>
+    </main>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Approval Requests</title>
+        <link rel="stylesheet" href="/static/dash.css">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+
+                    <div class="container-fluid mt-4" style="padding:20px">
+
+                        <!-- ============================= -->
+                        <!-- 1. Key Summary Cards -->
+                        <!-- ============================= -->
+
+                        <div class="row g-3 mb-4">
+
+                        <div class="col-lg-3 col-md-6">
+                        <div class="metric-card">
+                        <div class="metric-icon bg-blue">💰</div>
+                        <div>
+                        <p class="metric-title">Total Sales</p>
+                        <h4>PKR <%= summary.totalSales %></h4>
+                        </div>
+                        </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                        <div class="metric-card">
+                        <div class="metric-icon bg-green">📦</div>
+                        <div>
+                        <p class="metric-title">Sales Orders</p>
+                        <h4><%= summary.totalOrders %></h4>
+                        </div>
+                        </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                        <div class="metric-card">
+                        <div class="metric-icon bg-yellow">💳</div>
+                        <div>
+                        <p class="metric-title">Pending Receivables</p>
+                        <h4>PKR <%= summary.pendingReceivables %></h4>
+                        </div>
+                        </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                        <div class="metric-card">
+                        <div class="metric-icon bg-purple">📈</div>
+                        <div>
+                        <p class="metric-title">Total Profit</p>
+                        <h4>PKR <%= summary.totalProfit %></h4>
+                        </div>
+                        </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                        <div class="metric-card">
+                        <div class="metric-icon bg-red">🧾</div>
+                        <div>
+                        <p class="metric-title">Purchase Orders</p>
+                        <h4><%= summary.totalPO %></h4>
+                        </div>
+                        </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                        <div class="metric-card">
+                        <div class="metric-icon bg-orange">💸</div>
+                        <div>
+                        <p class="metric-title">Pending Payables</p>
+                        <h4>PKR <%= summary.pendingPayables %></h4>
+                        </div>
+                        </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                        <div class="metric-card">
+                        <div class="metric-icon bg-yellow">⚠️</div>
+                        <div>
+                        <p class="metric-title">Low Stock Items</p>
+                        <h4><%= summary.lowStockCount %></h4>
+                        </div>
+                        </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                        <div class="metric-card">
+                        <div class="metric-icon bg-dark">📦</div>
+                        <div>
+                        <p class="metric-title">Total Products</p>
+                        <h4><%= summary.totalProducts %></h4>
+                        </div>
+                        </div>
+                        </div>
+
+                        </div>
+                        <!-- ============================= -->
+                        <!-- Action Buttons Section -->
+                        <!-- ============================= -->
+
+                    <div class="row g-3 mb-4 mt-4 d-flex align-items-center">
+                    <div class="row g-2 text-center">
+
+                    <div class="col-md-2 col-6">
+                    <a href="/sales/orders/new" class="btn btn-primary w-100">
+                    ➕ Add Sale
+                    </a>
+                    </div>
+
+                    <div class="col-md-2 col-6">
+                    <a href="/sales/orders" class="btn btn-success w-100">
+                    📦 Sales Orders
+                    </a>
+                    </div>
+
+                    <div class="col-md-2 col-6">
+                    <a href="/procure/purchase-orders/add" class="btn btn-warning w-100">
+                    🛒 Purchase Order
+                    </a>
+                    </div>
+
+                    <div class="col-md-2 col-6">
+                    <a href="/procure/purchase-orders" class="btn btn-danger w-100">
+                    🏭 Procurement
+                    </a>
+                    </div>
+
+                    <div class="col-md-2 col-6">
+                    <a href="/inventory/allProducts" class="btn btn-info w-100">
+                    📊 Inventory
+                    </a>
+                    </div>
+                    </div>
+                    </div>
+
+                        <!-- ============================= -->
+                        <!-- Charts Analytics Section -->
+                        <!-- ============================= -->
+
+                        <div class="row mb-4" >
+
+                            <div class="col-md-6">
+                                <div class="card shadow-sm">
+                                <div class="card-body">
+                                <h6 class="text-muted mb-3">Sales vs Purchase Analytics</h6>
+                                <div class="chart-container">
+                                <canvas id="financeChart"></canvas>
+                                </div>
+                                </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="card shadow-sm">
+                            <div class="card-body">
+                            <h6 class="text-muted mb-3">Order Distribution</h6>
+                            <div class="chart-container">
+                            <canvas id="orderChart"></canvas>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                            <div class="col-lg-12 mt-4">
+                            <div class="card shadow-sm ">
+                            <div class="card-body">
+                            <h6 class="text-muted mb-3">Sales Analytics</h6>
+                            <div class="chart-container">
+                             <canvas id="salesTrendChart"></canvas>
+                             </div>
+                            </div>
+                            </div>
+                            </div>
+
+
+                        </div>
+
+                        <!-- ============================= -->
+                        <!-- Latest Orders Tables -->
+                        <!-- ============================= -->
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <div class="card">
+
+                                    <div class="card-header bg-primary text-white">
+                                        Latest Sales Orders
+                                    </div>
+
+                                    <div class="card-body p-0">
+
+                                        <table class="table table-striped mb-0">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Customer</th>
+                                                    <th>Amount</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                <% recentSalesOrders.forEach(order=> { %>
+
+                                                    <tr>
+                                                        <td>
+                                                            <%= order.id %>
+                                                        </td>
+                                                        <td>
+                                                            <%= order.customer %>
+                                                        </td>
+                                                        <td>PKR <%= order.total_amount %>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-info">
+                                                                <%= order.status %>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+
+                                                    <% }) %>
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="card">
+
+                                    <div class="card-header bg-success text-white">
+                                        Latest Purchase Orders
+                                    </div>
+
+                                    <div class="card-body p-0">
+
+                                        <table class="table table-striped mb-0">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Vendor</th>
+                                                    <th>Amount</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                <% recentPOs.forEach(po=> { %>
+
+                                                    <tr>
+                                                        <td>
+                                                            <%= po.id %>
+                                                        </td>
+                                                        <td>
+                                                            <%= po.vendor %>
+                                                        </td>
+                                                        <td>PKR <%= po.total_amount %>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-warning">
+                                                                <%= po.status %>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+
+                                                    <% }) %>
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </main>
+
+                <!-- ============================= -->
+                <!-- Chart.js Analytics Script -->
+                <!-- ============================= -->
+
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+                <script>
+
+                    /*
+                    Finance Chart
+                    */
+                    const financeCtx = document.getElementById('financeChart');
+
+                    new Chart(financeCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Sales', 'Profit', 'Payables', 'Receivables'],
+                            datasets: [{
+                                label: 'Financial Overview',
+                                data: [
+                                    <%= summary.totalSales %>,
+                                    <%= summary.totalProfit %>,
+                                    <%= summary.pendingPayables %>,
+                                    <%= summary.pendingReceivables %>
+                                ],
+                                backgroundColor: [
+                                    '#4CAF50',
+                                    '#2196F3',
+                                    '#FF9800',
+                                    '#F44336'
+                                ],
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+
+                    /*
+                    Order Distribution Chart
+                    */
+                    const orderCtx = document.getElementById('orderChart');
+
+                    new Chart(orderCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Sales Orders', 'Purchase Orders'],
+                        datasets: [{
+                            label: 'Orders',
+                            data: [
+                                <%= summary.totalOrders %>,
+                                <%= summary.totalPO %>
+                            ],
+                            backgroundColor: [
+                                '#36A2EB',
+                                '#FF6384'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+                   const salesTrendCtx = document.getElementById('salesTrendChart');
+
+                    const months = [
+                    <% monthlySales.forEach(m => { %>
+                    "<%= m.month %>",
+                    <% }) %>
+                    ];
+
+                    const salesAmounts = [
+                    <% monthlySales.forEach(m => { %>
+                    <%= m.totalSales %>,
+                    <% }) %>
+                    ];
+
+                    const salesCounts = [
+                    <% monthlySales.forEach(m => { %>
+                    <%= m.totalOrders %>,
+                    <% }) %>
+                    ];
+
+                    new Chart(salesTrendCtx, {
+                    type: 'line',
+                    data: {
+                    labels: months,
+                    datasets: [
+                        {
+                        label: 'Sales Amount',
+                        data: salesAmounts,
+                        borderColor: '#4CAF50',
+                        backgroundColor: '#4CAF50',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        fill: false
+                        },
+                        {
+                        label: 'Number of Orders',
+                        data: salesCounts,
+                        borderColor: '#FF9800',
+                        backgroundColor: '#FF9800',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        fill: false
+                        }
+                        ]
+                    },
+                    options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                    }
+                    });
+                </script>
+        </div>
+    </div>
+</body>
+
+</html>

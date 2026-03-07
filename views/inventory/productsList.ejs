@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+</head>
+<body>
+    <div class="container fluid">
+    <div class="row position-sticky">
+    <%- include('../sidebar') %>
+    <main class="col-md-9 col-lg-10 p-4">
+       <div class="container mt-5">
+            <h2 class="mb-4">All Products</h2>
+            <a href="/inventory/add" class="btn btn-primary mb-3">Add Product</a>
+            <% if (message) { %>
+                <div class="alert alert-success"><%= message %></div>
+            <% } %>
+            <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Sale Price</th>
+                    <th>Reorder Level</th>
+                    <th>Stock Quantity</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% if (products.length === 0) { %>
+                    <tr>
+                    <td colspan="7" class="text-center">No products found</td>
+                    </tr>
+                <% } else { %>
+                    <% products.forEach(product => { %>
+                    <tr>
+                        <td><%= product.id %></td>
+                        <td><%= product.name %></td>
+                        <td><%= product.category_name %></td>
+                        <td><%= Number(product.sale_price).toFixed(2) %></td>
+                        <td><%= product.reorder_level %></td>
+                        <td><%= product.quantity %></td>
+                        <td><%= product.is_active %></td>
+                        <td>
+                            <a href="/inventory/products/<%= product.id %>/edit" 
+                            class="btn btn-sm btn-primary">
+                            Edit
+                            </a>
+                        </td>
+
+                    </tr>
+                    <% }) %>
+                <% } %>
+                </tbody>
+            </table>
+            </div>
+            </div>
+    </main>
+    </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+</head>
+<body>
+    <div class="container fluid">
+    <div class="row position-sticky">
+    <%- include('../sidebar') %>
+    <main class="col-md-9 col-lg-10 p-4">
+        <div class="container mt-5">
+      <h2>Stock Movements</h2>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Product</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Cost Price</th>
+                    <th>Reference</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+            <% if (movements.length === 0) { %>
+                <tr>
+                    <td colspan="7" class="text-center">No stock movements found</td>
+                </tr>
+            <% } else { %>
+                <% movements.forEach(m => { %>
+                <tr>
+                    <td><%= m.id %></td>
+                    <td><%= m.product_name %></td>
+                    <td>
+                        <% if (m.movement_type === 'IN') { %>
+                            <span class="badge bg-success">IN</span>
+                        <% } else { %>
+                            <span class="badge bg-danger">OUT</span>
+                        <% } %>
+                    </td>
+                    <td><%= m.quantity %></td>
+                    <td>
+                        Rs.<%= Number(m.cost_price).toLocaleString('en-US', { minimumFractionDigits: 2 }) %>
+                    </td>
+                    <td>
+                        <%= m.reference_type %> #<%= m.reference_id %>
+                    </td>
+                    <td>
+                        <%= new Date(m.date).toLocaleString() %>
+                    </td>
+                </tr>
+                <% }) %>
+            <% } %>
+            </tbody>
+        </table>
+        </div>
+        </div>
+    </main>
+    </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+</head>
+<body>
+<div class="container fluid">
+  <div class="row position-sticky">
+    <%- include('../sidebar') %>
+    <main class="col-md-9 col-lg-10 p-4">
+        <h2>New Quotation</h2>
+            <form method="POST" action="/sales/quotations/add">
+            <div class="mb-3">
+            <label>Title</label>
+            <input type="text" name="title" class="form-control" required>
+            </div>
+
+            <h4>Items</h4>
+            <table class="table table-bordered" id="itemsTable">
+            <thead>
+            <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Sale Price</th>
+            <th>Total</th>
+            <th>Action</th>
+            </tr>
+            </thead>
+            <tbody id="itemsBody"></tbody>
+            </table>
+
+            <button type="button" id="addItemBtn" class="btn btn-secondary mb-3">Add Item</button>
+            <br>
+            <button type="submit" class="btn btn-primary">Create Quotation</button>
+            </form>
+            <script>
+                const products = <%- JSON.stringify(products) %>;
+                let itemIndex = 0;
+
+                function addItemRow() {
+                    const row = document.createElement('tr');
+                    const idx = itemIndex;
+                    row.innerHTML = `
+                        <td>
+                            <select name="items[${idx}][product_id]" class="form-select" required>
+                            <option value="">--Select Product--</option>
+                            ${products.map(p => `<option value="${p.id}" data-name="${p.name}" data-cat="${p.category_id}" data-sale="${p.sale_price}">${p.name}</option>`).join('')}
+                            </select>
+                        </td>
+                        <td><input type="number" name="items[${idx}][quantity]" class="form-control quantity" value="1" min="1" required></td>
+                        <td><input type="number" name="items[${idx}][sale_price]" class="form-control sale_price" step="0.01" value="0" required></td>
+                        <td class="total">0</td>
+                        <td><button type="button" class="btn btn-danger btn-sm removeBtn">Remove</button></td>
+                    `;
+
+                    itemsBody.appendChild(row);
+
+                    const select = row.querySelector('select');
+                    const quantityInput = row.querySelector('.quantity');
+                    const salePriceInput = row.querySelector('.sale_price');
+                    const totalCell = row.querySelector('.total');
+
+                    // Function to update total
+                    function updateTotal() {
+                        const qty = parseFloat(quantityInput.value) || 0;
+                        const price = parseFloat(salePriceInput.value) || 0;
+                        totalCell.innerText = (qty * price).toFixed(2);
+                    }
+                   select.addEventListener('change', () => {
+                        const selectedOption = select.selectedOptions[0];
+                        const sale = selectedOption.dataset.sale || 0;
+                        salePriceInput.value = parseFloat(sale).toFixed(2);
+
+                        // Remove previous hidden inputs
+                        row.querySelector(`input[name="items[${idx}][name]"]`)?.remove();
+                        row.querySelector(`input[name="items[${idx}][category_id]"]`)?.remove();
+
+                        // Add hidden name
+                        const hiddenName = document.createElement('input');
+                        hiddenName.type = 'hidden';
+                        hiddenName.name = `items[${idx}][name]`;
+                        hiddenName.value = selectedOption.dataset.name;
+                        row.appendChild(hiddenName);
+
+                        // Add hidden category
+                        const hiddenCat = document.createElement('input');
+                        hiddenCat.type = 'hidden';
+                        hiddenCat.name = `items[${idx}][category_id]`;
+                        hiddenCat.value = selectedOption.dataset.cat;
+                        row.appendChild(hiddenCat);
+
+                        updateTotal();
+                    });
+                    // Update total when quantity or price changes
+                    quantityInput.addEventListener('input', updateTotal);
+                    salePriceInput.addEventListener('input', updateTotal);
+
+                    // Remove row
+                    row.querySelector('.removeBtn').addEventListener('click', () => row.remove());
+
+                    itemIndex++;
+                }
+
+                document.getElementById('addItemBtn').addEventListener('click', addItemRow);
+                </script>
+          
+    </main>
+ </div>
+</div>
+</body>
+</html>

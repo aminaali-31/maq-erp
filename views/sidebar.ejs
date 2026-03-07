@@ -1,0 +1,107 @@
+<nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+      <div class="position-sticky pt-3">
+
+        <h5 class="text-white text-center">ERP Panel</h5>
+
+        <ul class="nav flex-column">
+          <% if(user && Number(user.role_id) === 1){ %>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="/admin/approvals">
+              Role Approvals
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link text-white" href="/auth/users">
+              Users
+            </a>
+          </li>
+          <% } %>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="/auth/customers">
+              Customers
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="/sales/orders/">Sale Orders</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="/sales/invoices/">Invoices</a>
+          </li>
+           <li class="nav-item">
+            <a class="nav-link text-white" href="/procure/purchase-orders/all">
+              Purchase Orders
+            </a>
+          </li>
+           <li class="nav-item">
+            <a class="nav-link text-white" href="/sales/quotations/">
+              Quotations
+            </a>
+          </li>
+           <li class="nav-item">
+            <a class="nav-link text-white" href="/accounts/summary">
+              Accounts
+            </a>
+          </li>
+           <li class="nav-item">
+            <a class="nav-link text-white" href="/hr/dashboard">
+              Human Resource
+            </a>
+          </li>
+           <li class="nav-item">
+            <a class="nav-link text-white" href="/procure/dashboard">
+                Manager Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="/inventory/allProducts">
+              All Products
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="/procure/allVendors">
+              Vendors
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="/inventory/stock-movements">
+              Stock Movements
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="/payments/">
+              Payments
+            </a>
+          </li>
+            <li class="nav-item">
+            <a class="nav-link text-white" href="/inventory/category">
+              Add cateogory
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-danger" href="/auth/logout">
+              Logout
+            </a>
+          </li>
+
+        </ul>
+      </div>
+    </nav>
+
+<nav class="mobile-navbar d-md-none p-2 bg-dark text-white">
+    <div class="d-flex justify-content-between align-items-center">
+
+        <button onclick="toggleSidebar()" class="btn btn-outline-light btn-sm">
+            ☰ Menu
+        </button>
+
+        <h6 class="m-0">ERP System</h6>
+
+    </div>
+</nav>
+
+<script>
+function toggleSidebar(){
+    document.querySelector('#sidebar').classList.toggle('active');
+}
+</script>

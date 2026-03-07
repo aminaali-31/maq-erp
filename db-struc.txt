@@ -1,0 +1,368 @@
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(150) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    status ENUM('active','inactive') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    role_id INT,
+
+    UNIQUE KEY unique_email (email)
+);
+
+
+CREATE TABLE roles (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ name VARCHAR(100) NOT NULL
+);
+
+ALTER TABLE users
+MODIFY role_id INT NULL,
+ADD CONSTRAINT fk_user_role
+FOREIGN KEY (role_id) REFERENCES roles(id)
+ON DELETE SET NULL;
+
+CREATE TABLE permissions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(200) NOT NULL
+);
+
+CREATE TABLE role_permissions (
+ role_id INT,
+ per_id  INT,
+ FOREIGN KEY (role_id) REFERENCES roles(id),
+ FOREIGN KEY (per_id) REFERENCES  permissions(id)
+);
+
+INSERT INTO permissions(name) 
+VALUES 
+('finance management'),
+('stock management'),
+('sale/purchase management'),
+('employee management');
+
+INSERT INTO roles(name)
+VALUES
+('ceo'),
+('accountant'),
+('manager'),
+('HR');
+
+INSERT INTO role_permissions (role_id, per_id) 
+VALUES 
+(1,1),
+(1,2),
+(1,3),
+(1,4),
+(2,1),
+(3,2),
+(3,3),
+(4,4);
+
+CREATE TABLE role_approvals (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    requested_role_id INT NOT NULL,
+    requested_by INT NOT NULL, -- who requested (can be self or manager)
+    status ENUM('pending','approved','rejected') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_ra_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_ra_role FOREIGN KEY (requested_role_id) REFERENCES roles(id) ON DELETE CASCADE
+);
+
+--- Inventory tables -----
+CREATE TABLE categories (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	name VARCHAR(100) NOT NULL
+);
+CREATE TABLE products (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	name VARCHAR(255) NOT NULL,
+	category_id INT NOT NULL,
+	cost_price DECIMAL(10,2) NOT NULL,
+	sale_price DECIMAL(10,2) NOT NULL,
+	reorder_level INT,
+	is_active Enum('yes','no') NOT NULL DEFAULT 'yes',
+	FOREIGN KEY (category_id) REFERENCES categories(id)
+); 
+
+CREATE TABLE inventory_level (
+	product_id INT NOT NULL PRIMARY KEY,
+	quantity INT NOT NULL DEFAULT 1,
+	FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+CREATE TABLE stock_mov (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	product_id INT NOT NULL,
+	movement_type ENUM('IN','OUT') NOT NULL DEFAULT 'IN',
+	quantity INT NOT NULL,
+	date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	reference_type VARCHAR(100) NOT NULL,
+	reference_id INT NOT NULL,
+	FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+ALTER TABLE inventory_level
+ADD CONSTRAINT fk_product
+FOREIGN KEY (product_id) REFERENCES products(id)
+ON DELETE CASCADE;
+
+ALTER TABLE stock_mov
+ADD CONSTRAINT fk_product_mov
+FOREIGN KEY (product_id) REFERENCES products(id)
+ON DELETE CASCADE;
+
+ALTER TABLE products
+ADD CONSTRAINT unique_product_name UNIQUE (name);
+
+---- Procurement Module ----
+CREATE TABLE vendors (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    phone VARCHAR(255),
+    email VARCHAR(150),
+    address VARCHAR(255),
+    payment_terms VARCHAR(50) DEFAULT 'Net 30'  -- optional, default payment term
+);
+
+CREATE TABLE purchase_orders (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    vendor_id INT NOT NULL,
+    order_date DATE NOT NULL,
+    status ENUM('Pending','Received','Paid') DEFAULT 'Pending',
+    total_amount DECIMAL(10,2) NOT NULL
+);
+CREATE TABLE po_items (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    po_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    unit_price DECIMAL(10,2) NOT NULL,
+    total DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (po_id) REFERENCES purchase_orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+	
+ALTER TABLE purchase_orders
+ADD CONSTRAINT fk_product_order
+FOREIGN KEY (vendor_id) REFERENCES vendors(id);
+
+ALTER TABLE vendors
+ADD CONSTRAINT unique_product_name UNIQUE (name);
+
+ALTER TABLE products DROP COLUMN cost_price;
+ALTER TABLE stock_mov ADD COLUMN cost_price DECIMAL(10,2) NOT NULL;
+
+
+---- Sales Module ----
+CREATE TABLE customers (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	name VARCHAR(100) NOT NULL,
+	phone VARCHAR(255),
+	address VARCHAR(255),
+	description VARCHAR(255)
+);
+
+CREATE TABLE quotations (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	grand_total DECIMAL(10,2),
+	margin DECIMAL(10,2),
+	profit DECIMAL(10,2),
+	is_published ENUM('yes','no') DEFAULT 'no',
+	date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	last_updated TIMESTAMP,
+	title VARCHAR(200) NOT NULL
+);
+
+CREATE TABLE qo_items (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	qo_id INT NOT NULL,
+	product_id INT NOT NULL,
+	quantity INT NOT NULL,
+	name VARCHAR(200) NOT NULL,
+	category VARCHAR(100),
+	cost_price DECIMAL(10,2),
+	sale_price DECIMAL(10,2),
+	FOREIGN KEY (qo_id) REFERENCES quotations(id),
+	FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+CREATE TABLE sales_orders (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	customer_id INT NOT NULL,
+	date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	status ENUM('pending','payment pending','completed') DEFAULT 'pending',
+	total_amount DECIMAL(10,2) NOT NULL,
+	profit DECIMAL(10,2) NOT NULL,
+	FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+
+CREATE TABLE so_items (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	so_id INT NOT NULL,
+	p_id INT NOT NULL,
+	quantity INT NOT NULL,
+	sale_price DECIMAL(10,2),
+	FOREIGN KEY (p_id) REFERENCES products(id),
+	FOREIGN KEY (so_id) REFERENCES sales_orders(id)
+);
+
+
+DELIMITER $$
+
+CREATE TRIGGER trg_stock_mov_after_insert
+AFTER INSERT ON stock_mov
+FOR EACH ROW
+BEGIN
+
+    DECLARE stock_qty INT;
+
+    -- Calculate inventory balance
+    SELECT
+        IFNULL(SUM(CASE WHEN movement_type='IN' THEN quantity ELSE 0 END),0) -
+        IFNULL(SUM(CASE WHEN movement_type='OUT' THEN quantity ELSE 0 END),0)
+    INTO stock_qty
+    FROM stock_mov
+    WHERE product_id = NEW.product_id;
+
+    -- Update inventory stock table
+    UPDATE inventory_level
+    SET quantity = stock_qty
+    WHERE product_id = NEW.product_id;
+
+END$$
+
+DELIMITER ;
+	
+
+----- Accounts Module -------
+
+CREATE TABLE accounts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    type ENUM('asset','liability','equity','income','expense')
+);
+CREATE TABLE journal (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	name VARCHAR(100),
+	date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	total_debit DECIMAL(10,2) NOT NULL,
+	total_credit DECIMAL(10,2) NOT NULL
+);
+
+CREATE TABLE journal_entries (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    journal_id INT NOT NULL,
+    account_id INT NOT NULL,
+    debit DECIMAL(10,2) DEFAULT 0,
+    credit DECIMAL(10,2) DEFAULT 0,
+    reference_id INT NOT NULL,
+    reference_type VARCHAR(100),
+    
+    FOREIGN KEY (journal_id) REFERENCES journal(id)
+);
+
+ALTER TABLE journal DROP COLUMN total_debit, total_credit;
+
+CREATE TABLE sales_invoices (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sales_order_id INT,
+    invoice_date DATE,
+    total_amount DECIMAL(12,2),
+    status VARCHAR(50) DEFAULT 'draft',
+    reference VARCHAR(100),
+
+    FOREIGN KEY (sales_order_id)
+    REFERENCES sales_orders(id)
+);
+
+CREATE TABLE invoice_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    invoice_id INT,
+    product_id INT,
+    quantity INT,
+    price DECIMAL(12,2),
+    total DECIMAL(12,2),
+
+    FOREIGN KEY (invoice_id)
+    REFERENCES sales_invoices(id)
+);
+
+CREATE TABLE payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    invoice_id INT,
+    payment_date DATE,
+    amount DECIMAL(12,2),
+    method VARCHAR(50),
+    reference VARCHAR(100)
+);
+
+INSERT INTO accounts (name,type) VALUES 
+('sales revenue', 'income'),
+('accounts payable', 'liability'),
+('accounts receivable','asset'),
+('cash', 'asset');
+
+ALTER TABLE journal_entries DROP COLUMN reference_type;
+ALTER TABLE journal_entries DROP COLUMN reference_id;
+ALTER TABLE journal ADD COLUMN reference_type VARCHAR(100);
+ALTER TABLE journal ADD COLUMN reference_id INT;
+
+ALTER TABLE sales_invoices ADD COLUMN customer_id INT;
+
+ALTER TABLE sales_invoices ADD FOREIGN KEY (customer_id) REFERENCES customers(id);
+
+ALTER TABLE payments ADD COLUMN payment_type ENUM('INCOME','EXPENSE');
+ALTER TABLE payments ADD COLUMN reference_id INT NULL;
+ALTER TABLE payments ADD COLUMN party_type VARCHAR(50) NULL;
+ALTER TABLE payments ADD COLUMN	party_id INT NULL;
+ALTER TABLE payments DROP COLUMN invoice_id;
+ALTER TABLE payments ADD COLUMN account_id INT; 
+ALTER TABLE payments ADD FOREIGN KEY (account_id) REFERENCES accounts(id);
+
+INSERT INTO accounts (name,type) VALUES ('expense','expense');
+
+ALTER TABLE payments
+MODIFY payment_type ENUM('sale','purchase','expense');
+
+INSERT INTO accounts (name,type) VALUES ('stock account', 'asset');
+
+
+---- HR Module ---- 
+CREATE TABLE departments (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE employees (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    depart_id INT,
+    salary DECIMAL(10,2) NOT NULL,
+    hire_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('active','inactive') DEFAULT 'active',
+
+    FOREIGN KEY (depart_id) REFERENCES departments(id)
+);
+
+CREATE TABLE payroll (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	emp_id INT,
+	date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	basic_salary DECIMAL(10,2) NOT NULL,
+	deductions DECIMAL(10,2) DEFAULT 0,
+	allowance DECIMAL(10,2) DEFAULT 0,
+	overtime DECIMAL(10,2) DEFAULT 0,
+	net_salary DECIMAL(10,2) GENERATED ALWAYS AS (
+        basic_salary + allowance + overtime - deductions
+    	) STORED,
+	FOREIGN KEY (emp_id) REFERENCES employees(id)
+);
+
+INSERT INTO departments (name) VALUES
+('electrican'),
+('installation team'),
+('manager');

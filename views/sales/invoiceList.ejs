@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <div class="container mt-4">
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <h4>Invoices</h4>
+                            <a href="/sales/invoices/add" class="btn btn-primary">
+                                + Create Invoice
+                            </a>
+                        </div>
+
+                        <% if(success){ %>
+                            <div class="alert alert-success">
+                                Operation Successful
+                            </div>
+                            <% } %>
+
+                                <div class="table-responsive">
+
+                                    <table class="table table-bordered table-striped table-hover">
+
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Date</th>
+                                                <th>Customer</th>
+                                                <th class="text-end">Total Amount</th>
+                                                <th>Status</th>
+                                                <th class="text-center">Action</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+
+                                            <% invoices.forEach(inv=>{ %>
+
+                                                <tr>
+                                                    <td>
+                                                        <%= inv.id %>
+                                                    </td>
+
+                                                    <td>
+                                                        <%= new Date(inv.invoice_date).toISOString().split('T')[0] %>
+                                                    </td>
+
+                                                    <td>
+                                                        <%= inv.customer_name || 'N/A' %>
+                                                    </td>
+
+                                                    <td class="text-end fw-bold">
+                                                        <%= Number(inv.total_amount || 0).toFixed(2) %>
+                                                    </td>
+
+                                                    <td>
+                                                        <% if(inv.status==='paid' ){ %>
+                                                            <span class="badge bg-success">Paid</span>
+                                                            <% } else if(inv.status==='posted' ){ %>
+                                                                <span class="badge bg-primary">Posted</span>
+                                                                <% } else { %>
+                                                                    <span class="badge bg-secondary">
+                                                                        <%= inv.status %>
+                                                                    </span>
+                                                                    <% } %>
+                                                    </td>
+
+                                                    <td class="text-center">
+
+                                                        <a href="/invoices/view/<%= inv.id %>"
+                                                            class="btn btn-sm btn-info">
+                                                            View
+                                                        </a>
+
+                                                    </td>
+                                                </tr>
+
+                                                <% }) %>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+                    </div>
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>

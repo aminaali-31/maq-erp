@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Register</title>
+</head>
+
+<body>
+    <%- include('../sidebar') %>
+    <div class="header" style="background-color: #f8f7f7;">
+        <div class="container mt-4">
+            <div class="container mt-4">
+            <h3>Edit Customer</h3>
+            <form action="/customers/update/<%= customer.id %>" method="POST">
+            <div class="card p-4">
+
+            <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" name="name" class="form-control"
+            value="<%= customer.name %>" required>
+            </div>
+
+            <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <input type="text" name="phone" class="form-control"
+            value="<%= customer.phone %>">
+            </div>
+
+            <div class="mb-3">
+            <label class="form-label">Address</label>
+            <textarea name="address" class="form-control"><%= customer.address %></textarea>
+            </div>
+
+            <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control"><%= customer.description %></textarea>
+            </div>
+
+            <button class="btn btn-primary">Update Customer</button>
+
+            <a href="/customers" class="btn btn-secondary">Cancel</a>
+
+            </div>
+
+            </form>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

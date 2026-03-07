@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <h2>Add Payroll</h2>
+
+                    <form method="POST" action="/hr/payroll/add" class="row">
+
+                        <div class="col-md-4 mb-3">
+                            <label>Employee</label>
+                            <select name="emp_id" class="form-control" required>
+                                <option value="">Select Employee</option>
+
+                                <% employees.forEach(emp=>{ %>
+                                    <option value="<%= emp.id %>">
+                                        <%= emp.name %>
+                                    </option>
+                                    <% }) %>
+
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label>Payroll Date</label>
+                            <input type="date" name="payroll_date" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label>Basic Salary</label>
+                            <input type="number" name="basic_salary" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>Allowance</label>
+                            <input type="number" name="allowance" value="0" class="form-control">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>Overtime</label>
+                            <input type="number" name="overtime" value="0" class="form-control">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>Deductions</label>
+                            <input type="number" name="deductions" value="0" class="form-control">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label> </label>
+                            <button class="btn btn-primary w-100 mt-2">
+                                Save Payroll
+                            </button>
+                        </div>
+
+                    </form>
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>

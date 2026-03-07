@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+</head>
+<body>
+<div class="container fluid">
+  <div class="row position-sticky">
+    <%- include('../sidebar') %>
+    <main class="col-md-9 col-lg-10 p-4">
+       <h2>Add Employee</h2>
+        <form method="POST" action="/hr/add">
+        <label>Name</label>
+        <input type="text" name="name" class="form-control" required>
+
+        <label>Department</label>
+        <select name="depart_id" class="form-control">
+            <option value="">Select Department</option>
+
+            <% departments.forEach(d=>{ %>
+                <option value="<%= d.id %>">
+                    <%= d.name %>
+                </option>
+            <% }) %>
+
+        </select>
+        <label>Salary</label>
+        <input type="number" name="salary" class="form-control" required>
+        <br>
+        <button class="btn btn-primary">Save Employee</button>
+        </form>
+    </main>
+ </div>
+</div>
+</body>
+</html>

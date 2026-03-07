@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+</head>
+<body>
+<div class="container fluid">
+  <div class="row position-sticky">
+    <%- include('../sidebar') %>
+    <main class="col-md-9 col-lg-10 p-4">
+      <div class="container mt-5">
+      <h2>Quotations</h2>
+        <a href="/sales/quotations/add" class="btn btn-primary mb-3">New Quotation</a>
+        <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+        <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Grand Total</th>
+        <th>Profit</th>
+        <th>Margin %</th>
+        <th>Date</th>
+        <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% if (quotations.length === 0) { %>
+        <tr><td colspan="7" class="text-center">No quotations found</td></tr>
+        <% } else { %>
+        <% quotations.forEach(q => { %>
+        <tr>
+        <td><%= q.id %></td>
+        <td><%= q.title %></td>
+        <td>Rs. <%= Number(q.grand_total).toLocaleString('en-US', {minimumFractionDigits:2}) %> </td>
+        <td>Rs. <%= Number(q.profit).toLocaleString('en-US', {minimumFractionDigits:2}) %></td>
+        <td><%= Number(q.margin).toFixed(2) %>%</td>
+        <td><%= new Date(q.date).toLocaleDateString() %></td>
+        <td><a href="/sales/quotations/<%= q.id %>" class="btn btn-sm btn-primary">View</a></td>
+        </tr>
+        <% }) %>
+        <% } %>
+        </tbody>
+        </table>
+        </div>
+        </div>
+    </main>
+ </div>
+</div>
+</body>
+</html>

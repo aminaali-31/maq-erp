@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Register</title>
+</head>
+
+<body>
+    <%- include('../sidebar') %>
+
+<div class="main-content">
+    <div class="header" style="background-color: #f8f7f7;">
+        <div class="container mt-4">
+
+            <h3 class="mb-4">Add New Customer</h3>
+
+            <% if (success) { %>
+            <div class="alert alert-success">
+                <%= success %>
+            </div>
+            <% } %>
+
+            <% if (error) { %>
+            <div class="alert alert-danger">
+                <%= error %>
+            </div>
+            <% } %>
+
+            <form action="/auth/addCustomer" method="POST">
+                <div class="card p-4">
+
+                    <div class="mb-3">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" name="name" class="form-control"
+                            placeholder="Enter customer name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text" name="phone" class="form-control"
+                            placeholder="Enter phone number" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <textarea name="address" class="form-control" rows="3"
+                            placeholder="Enter customer address"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="3"
+                            placeholder="Additional notes about the customer"></textarea>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            Save Customer
+                        </button>
+
+                        <a href="/customers" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<style>
+.main-content{
+    margin-left: 250px; /* Match sidebar width */
+    padding: 20px;
+}
+</style>
+</body>
+</html>

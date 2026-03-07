@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <div class="container mt-5">
+                        <h2 class="mb-4">All Purchase Orders</h2>
+                        <a href="/procure/purchase-orders/add" class="btn btn-primary mb-3">Add Purchase Order</a>
+                        <% if (message) { %>
+                            <div class="alert alert-success">
+                                <%= message %>
+                            </div>
+                            <% } %>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>PO ID</th>
+                                                <th>Vendor</th>
+                                                <th>Order Date</th>
+                                                <th>Status</th>
+                                                <th>Total Amount</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% if (pos.length===0) { %>
+                                                <tr>
+                                                    <td colspan="6" class="text-center">No purchase orders found</td>
+                                                </tr>
+                                                <% } else { %>
+                                                    <% pos.forEach(po=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= po.id %>
+                                                            </td>
+                                                            <td>
+                                                                <%= po.vendor_name %>
+                                                            </td>
+                                                            <td>
+                                                                <%= po.order_date.toISOString().split('T')[0] %>
+                                                            </td>
+                                                            <td>
+                                                                <form method="GET"
+                                                                    action="/procure/purchase-orders/change-status/<%= po.id %>"
+                                                                    style="display:inline-block">
+
+                                                                    <select name="status"
+                                                                        class="form-select form-select-sm d-inline-block"
+                                                                        style="width:auto"
+                                                                        onchange="this.form.submit()">
+
+                                                                        <% const
+                                                                            statuses=['Pending','Received','Paid'];
+                                                                            statuses.forEach(s=> {
+                                                                            %>
+
+                                                                            <option value="<%= s %>" <%=po.status===s
+                                                                                ? 'selected' : '' %>>
+                                                                                <%= s %>
+                                                                            </option>
+
+                                                                            <% }) %>
+
+                                                                    </select>
+                                                                </form>
+                                                            </td>
+                                                            <td>Rs.<%= Number(po.total_amount).toFixed(2) %>
+                                                            </td>
+                                                            <td>
+                                                                <a href="/procure/purchase-orders/view/<%= po.id %>"
+                                                                    class="btn btn-info btn-sm">View</a>
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+                                                            <% } %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                    </div>
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>

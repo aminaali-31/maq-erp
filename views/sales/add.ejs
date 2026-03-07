@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <div class="container mt-4">
+                        <h3 class="mb-4">Create Sales Order</h3>
+                        <form action="/sales/orders/new" method="POST">
+                            <div class="card p-3 mb-4">
+                            <% if (success) { %>
+                                <div class="alert alert-success">
+                                    <%= success %>
+                                </div>
+                                <% } %>
+
+                                <% if (error) { %>
+                                <div class="alert alert-danger">
+                                    <%= error %>
+                                </div>
+                                <% } %>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Customer</label>
+                                        <select name="customer_id" class="form-control" required>
+                                            <option value="">Select Customer</option>
+                                            <% customers.forEach(customer=> { %>
+                                                <option value="<%= customer.id %>">
+                                                    <%= customer.name %>
+                                                </option>
+                                                <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Status</label>
+                                        <select name="status" class="form-control">
+                                            <option value="pending">Pending</option>
+                                            <option value="payment pending">Payment Pending</option>
+                                            <option value="completed">Completed</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Order Items -->
+                            <div class="card p-3">
+                                <h5 class="mb-3">Order Items</h5>
+                                <table class="table table-bordered" id="itemsTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width:35%">Product</th>
+                                            <th style="width:20%">Price</th>
+                                            <th style="width:20%">Quantity</th>
+                                            <th style="width:20%">Total</th>
+                                            <th style="width:5%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="itemsBody">
+                                        <tr>
+                                            <td>
+                                                <select name="items[0][product_id]" class="form-control product-select"
+                                                    required>
+                                                    <option value="">Select Product</option>
+                                                    <% products.forEach(p=> { %>
+                                                        <option 
+                                                        value="<%= p.id %>"
+                                                        data-stock="<%= p.available_qty %>"
+                                                        data-price="<%= p.sale_price %>"
+                                                        >
+                                                        <%= p.name %> (Stock: <%= p.available_qty %>)
+                                                        </option>
+                                                        <% }) %>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="number" step="0.01" name="items[0][sale_price]"
+                                                    class="form-control price">
+                                            </td>
+                                            <td>
+                                                <input type="number" name="items[0][quantity]" class="form-control qty"
+                                                    value="1">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control total" readonly>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger btn-sm removeRow">X</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <button type="button" class="btn btn-secondary mb-3" id="addRow">
+                                    Add Product
+                                </button>
+                                <div class="text-end">
+                                    <h5>
+                                        Grand Total:
+                                        <span id="grandTotal">0</span>
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button type="submit" class="btn btn-primary">Create Sales Order</button>
+                            </div>
+                        </form>
+                    </div>
+                </main>
+        </div>
+    </div>
+
+    <script>
+
+        let rowIndex = 1;
+
+        document.getElementById("addRow").addEventListener("click", function () {
+
+            const tbody = document.getElementById("itemsBody");
+
+            const row = `
+<tr>
+
+<td>
+<select name="items[${rowIndex}][product_id]" class="form-control product-select">
+<option value="">Select Product</option>
+<% products.forEach(product => { %>
+<option  value="<%= product.id %>" data-stock="<%= product.available_qty %>"  data-price="<%= product.sale_price %>">
+<%= product.name %> (Stock: <%= product.available_qty %>)
+</option>
+<% }) %>
+</select>
+</td>
+
+<td>
+<input type="number" step="0.01" name="items[${rowIndex}][sale_price]" class="form-control price">
+</td>
+
+<td>
+<input type="number" name="items[${rowIndex}][quantity]" class="form-control qty" value="1">
+</td>
+
+<td>
+<input type="text" class="form-control total" readonly>
+</td>
+
+<td>
+<button type="button" class="btn btn-danger btn-sm removeRow">X</button>
+</td>
+
+</tr>
+`;
+
+            tbody.insertAdjacentHTML("beforeend", row);
+
+            rowIndex++;
+
+        });
+
+        document.addEventListener("change", function (e) {
+
+            if (e.target.classList.contains("product-select")) {
+
+                const price = e.target.selectedOptions[0].dataset.price;
+                const row = e.target.closest("tr");
+
+                row.querySelector(".price").value = price;
+
+                calculateRow(row);
+
+            }
+
+        });
+
+        document.addEventListener("input", function (e) {
+
+            if (e.target.classList.contains("qty") || e.target.classList.contains("price")) {
+
+                const row = e.target.closest("tr");
+                calculateRow(row);
+
+            }
+
+        });
+        function validateStock(productStock, quantity){
+            return quantity <= productStock;
+        }
+        function calculateRow(row) {
+
+            const price = parseFloat(row.querySelector(".price").value) || 0;
+            const qty = parseFloat(row.querySelector(".qty").value) || 0;
+
+            const total = price * qty;
+
+            row.querySelector(".total").value = total;
+
+            calculateGrandTotal();
+
+        }
+
+
+        function calculateGrandTotal() {
+
+            let grandTotal = 0;
+
+            document.querySelectorAll(".total").forEach(el => {
+
+                grandTotal += parseFloat(el.value) || 0;
+
+            });
+
+            document.getElementById("grandTotal").innerText = grandTotal;
+
+        }
+
+
+        document.addEventListener("click", function (e) {
+
+            if (e.target.classList.contains("removeRow")) {
+
+                e.target.closest("tr").remove();
+                calculateGrandTotal();
+
+            }
+
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <div class="container mt-5">
+                    <h3>Sales Orders</h3>
+                    <a href="/sales/orders/new" class="btn btn-primary mb-3">New Order</a>
+                    <% if(success){ %>
+                        <div class="alert alert-success">
+                            <%= success %>
+                        </div>
+                        <% } %>
+                            <% if(error){ %>
+                                <div class="alert alert-danger">
+                                    <%= error %>
+                                </div>
+                                <% } %>
+                                    <div class="card p-3">
+                                        <div class="table-responsive">
+                                        <table class="table table-bordered table-hover">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Customer</th>
+                                                    <th>Total Amount</th>
+                                                    <th>Status</th>
+                                                    <th>Date</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% orders.forEach(order=> { %>
+                                                    <tr>
+                                                        <td>
+                                                            <%= order.id %>
+                                                        </td>
+                                                        <td>
+                                                            <%= order.customer_name %>
+                                                        </td>
+                                                        <td>
+                                                            <%= Number(order.total_amount).toLocaleString() %>
+                                                        </td>
+                                                        <td>
+                                                            <form action="/sales/orders/status" method="POST"
+                                                                class="d-flex gap-2">
+                                                                <input type="hidden" name="order_id"
+                                                                    value="<%= order.id %>">
+                                                                <select name="status"
+                                                                    class="form-select form-select-sm">
+                                                                    <option value="pending" <%=order.status==='pending'
+                                                                        ?'selected':'' %>>Pending</option>
+                                                                    <option value="completed"
+                                                                        <%=order.status==='completed' ?'selected':'' %>
+                                                                        >Completed</option>
+                                                                    <option value="payment pending"
+                                                                        <%=order.status==='payment pending' ?'selected':'' %>
+                                                                        >Payment Pending</option>
+                                                                </select>
+                                                                <button class="btn btn-sm btn-primary">
+                                                                    Update
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                        <td>
+                                                            <%= new Date(order.date).toLocaleDateString() %>
+                                                        </td>
+                                                        <td>
+                                                            <a href="/sales/orders/view/<%= order.id %>" class="btn btn-primary">View</a>
+                                                        </td>
+                                                    </tr>
+                                                    <% }) %>
+                                            </tbody>
+                                        </table>
+                                        </div>
+                                    </div>
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>

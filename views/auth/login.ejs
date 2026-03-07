@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Login</title>
+</head>
+<body>
+<div class="header" style="background-color: #f8f7f7;">
+    <h2>Login to your Account</h2>
+    <% if (error) { %>
+        <div class="alert alert-danger">
+            <%= error %>
+        </div>
+        <% } %>
+    <form method="POST" action="/auth/login" class="form">
+        <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" name="email" placeholder="Email" required>
+        </div>
+        <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-control" name="password" placeholder="Password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+        <p>Don't have an account.<a href="/auth/register">Create an account</a></p>
+    </form>
+</div>
+</body>
+</html>

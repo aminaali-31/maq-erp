@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <div class="container mt-4">
+
+                        <div class="card shadow-sm">
+
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Create Invoice</h5>
+                            </div>
+
+                            <div class="card-body">
+
+                                <form method="POST" action="/sales/invoices/create">
+
+                                    <div class="row">
+                                        <!-- Sales Order -->
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-semibold">
+                                                Or Select Sales Order
+                                            </label>
+
+                                            <select name="sales_order_id" class="form-select">
+
+                                                <option value="">Select Sales Order</option>
+
+                                                <% salesOrders.forEach(o=> { %>
+                                                    <option value="<%= o.id %>">
+                                                        Order #<%= o.id %>
+                                                            - Amount <%= o.total_amount %>
+                                                    </option>
+                                                    <% }) %>
+
+                                            </select>
+                                        </div>
+
+                                        <!-- Invoice Date -->
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-semibold">
+                                                Invoice Date
+                                            </label>
+
+                                            <input type="date" name="invoice_date" class="form-control" required>
+                                        </div>
+
+                                        <!-- Total Amount -->
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-semibold">
+                                                Total Amount
+                                            </label>
+
+                                            <input type="number" step="0.01" name="total_amount" class="form-control"
+                                                required>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="text-end mt-3">
+                                        <a href="/invoices" class="btn btn-secondary me-2">
+                                            Cancel
+                                        </a>
+
+                                        <button type="submit" class="btn btn-primary">
+                                            Create Invoice
+                                        </button>
+                                    </div>
+
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>
