@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+</head>
+<body>
+    <%- include('nav') %>
+    <div class="container">
+    <h2>All Purchase Orders</h2>
+
+    <% if (orders.length === 0) { %>
+        <p class="text-muted">No orders found.</p>
+    <% } else { %>
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Order Date</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% orders.forEach(order => { %>
+                <tr>
+                    <td><%= order.id %></td>
+                    <td><%= order.order_date.toISOString().split('T')[0] %></td>
+                    <td><%= order.total_amount %></td>
+                    <td><%= order.status %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    <% } %>
+</div>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const pool = require("../../config/db");
-
+const axios = require('axios');
 
 exports.register_roles = async (req,res) => {
      try {
@@ -17,9 +17,21 @@ exports.register_roles = async (req,res) => {
 }
 exports.register = async (req, res) => {
   const roleId = parseInt(req.body.role_id, 10);
-  const { username, email, password} = req.body;
+  const { username, email, password, 'g-recaptcha-response': captcha } = req.body;
+  if (!captcha) {
+        return res.send('Please complete the CAPTCHA');
+    }
 
   try {
+
+    const secretKey = '6LdGwYUsAAAAAHZ74p7oasm49MV1lTQBm9Hkl5_d';
+    const response = await axios.post(
+            `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${captcha}`
+        );
+
+    if (!response.data.success) {
+        return res.send('CAPTCHA verification failed');
+    }
     // Check if email exists
     const [existing] = await pool.query(
       "SELECT id FROM users WHERE email = ?",
@@ -82,12 +94,39 @@ exports.login = async (req, res) => {
     // Create session
     req.session.user = {
       id: user.id,
+      customer_id: user.customer_id,
+      vendor_id: user.vendor_id,
       full_name: user.username,
       email: user.email,
       role_id: user.role_id
     };
 
-    res.redirect("/admin/approvals");
+    // 1️⃣ Customer portal
+    if (user.customer_id) {
+        return res.redirect("/customer/portal");
+    }
+
+    // 2️⃣ Vendor portal
+    if (user.vendor_id) {
+        return res.redirect("/vendor/dashboard");
+    }
+
+    switch (user.role_id) {
+        case 1: // Admin
+            return res.redirect("/admin/approvals");
+
+        case 2: // Accounts
+            return res.redirect("/accounts/summary");
+
+        case 3: // Procurement
+            return res.redirect("/procure/dashboard");
+
+        case 4: // HR
+            return res.redirect("/hr/dashboard");
+
+        default:
+            return res.redirect("/dashboard");
+    }
 
   } catch (error) {
     console.error(error);
@@ -158,18 +197,19 @@ exports.getPendingApprovals = async (req, res) => {
  
 
 exports.addCustomer = async (req, res) => {
-    const conn = await pool.getConnection(); // use getConnection for transaction
+    const conn = await pool.getConnection();
 
     try {
-        const { name, password, phone, address, description } = req.body;
+        const { name, email,  password, phone, address, description } = req.body;
+
         const hashedPassword = await bcrypt.hash(password, 12);
 
         await conn.beginTransaction();
 
         // 1️⃣ Insert Customer
         const [customerResult] = await conn.execute(
-            `INSERT INTO customers (name, password,  phone, address, description)
-             VALUES (?, ?,  ?, ?, ?)`,
+            `INSERT INTO customers (name, password, phone, address, description)
+             VALUES (?, ?, ?, ?, ?)`,
             [name, hashedPassword, phone, address, description]
         );
 
@@ -191,11 +231,19 @@ exports.addCustomer = async (req, res) => {
             [accountId, customerId]
         );
 
-        await conn.commit(); // commit transaction
+        // 4️⃣ Create User Login for Customer
+        await conn.execute(
+            `INSERT INTO users (username, password, email, role_id, customer_id, status)
+             VALUES (?, ?, ?, 6, ?, 'active')`,
+            [name, hashedPassword, email, customerId]
+        );
+
+        await conn.commit();
+
         res.redirect('/auth/addCustomer?success=Customer added successfully');
 
     } catch (err) {
-        await conn.rollback(); // rollback if any step fails
+        await conn.rollback();
         console.error(err);
         res.redirect('/auth/addCustomer?error=Unable to add customer');
     } finally {

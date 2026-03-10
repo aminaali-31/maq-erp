@@ -371,12 +371,6 @@ INSERT INTO departments (name) VALUES
 
 ALTER TABLE stock_mov
 ADD COLUMN batch_id INT NULL AFTER product_id;
-ALTER TABLE stock_mov
-ADD CONSTRAINT fk_stock_mov_batch
-FOREIGN KEY (batch_id)
-REFERENCES inventory_batches(id)
-ON DELETE SET NULL
-ON UPDATE CASCADE;
 CREATE TABLE inventory_batches (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT NOT NULL,
@@ -396,6 +390,13 @@ CREATE TABLE inventory_batches (
     CONSTRAINT uniq_product_batch
         UNIQUE (product_id, batch_no)
 );
+
+ALTER TABLE stock_mov
+ADD CONSTRAINT fk_stock_mov_batch
+FOREIGN KEY (batch_id)
+REFERENCES inventory_batches(id)
+ON DELETE SET NULL
+ON UPDATE CASCADE;
 
 ALTER TABLE sales_orders ADD COLUMN progress ENUM('pending','happening','halted','signed off') DEFAULT 'pending';
 
@@ -429,4 +430,40 @@ ALTER TABLE vendors ADD COLUMN password VARCHAR(255);
 ALTER TABLE vendors ADD COLUMN account_id INT;
 ALTER TABLE vendors ADD FOREIGN KEY (account_id) REFERENCES accounts(id);
 
+ALTER TABLE payments
+DROP FOREIGN KEY payments_ibfk_1;
+DELETE FROM accounts WHERE id = 3;
+DELETE FROM accounts WHERE id = 2;
+
 ALTER TABLE payroll ADD COLUMN month VARCHAR(100);
+
+
+/// From 10 march
+
+ALTER TABLE users
+ADD COLUMN customer_id INT NULL,
+ADD COLUMN vendor_id INT NULL,
+ADD CONSTRAINT fk_users_customer
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+    ON DELETE SET NULL,
+ADD CONSTRAINT fk_users_vendor
+    FOREIGN KEY (vendor_id) REFERENCES vendors(id)
+    ON DELETE SET NULL;
+
+INSERT INTO roles (name) VALUES ('customer'),('vendor');
+
+
+CREATE TABLE complaints (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    message VARCHAR(255) NOT NULL,
+    status ENUM('pending','processing','completed') DEFAULT 'pending',
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    customer_id INT,
+
+    CONSTRAINT fk_complaint_customer
+        FOREIGN KEY (customer_id) REFERENCES customers(id)
+        ON DELETE CASCADE
+);
+
+ALTER TABLE complaints ADD COLUMN feedback TINYINT UNSIGNED DEFAULT NULL;
+ALTER TABLE sales_orders ADD COLUMN feedback TINYINT UNSIGNED DEFAULT NULL;

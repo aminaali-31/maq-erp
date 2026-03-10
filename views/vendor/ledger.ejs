@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+</head>
+<body>
+    <%- include('nav') %>
+<div class="container">
+    <h2>Vendor Ledger</h2>
+
+    <% if (ledgerEntries.length === 0) { %>
+        <p class="text-muted">No ledger entries found.</p>
+    <% } else { %>
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Debit</th>
+                    <th>Credit</th>
+                    <th>Running Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% ledgerEntries.forEach(entry => { %>
+                <tr>
+                    <td><%= new Date(entry.date).toISOString().split('T')[0] %></td>
+                    <td><%= entry.debit %></td>
+                    <td><%= entry.credit %></td>
+                    <td><%= entry.running_balance %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    <% } %>
+</div>
+
+</body>
+</html>
+

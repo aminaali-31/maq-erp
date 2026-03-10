@@ -16,3 +16,16 @@ exports.isAuthenticated = (req, res, next) => {
   }
   next();
 };
+
+exports.isCustomer = (req, res, next) => {
+
+    if (!req.session.user) {
+        return res.redirect("/login");
+    }
+
+    if (!req.session.user.customer_id) {
+        return res.redirect("/login");
+    }
+
+    next();
+};

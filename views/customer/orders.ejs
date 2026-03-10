@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+    <style>
+        .star-rating {
+            font-size: 1.5rem;
+            color: #e3dbdb;
+            cursor: pointer;
+        }
+        .star-rating input {
+            display: none;
+        }
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: rgb(240, 212, 27);
+        }
+    </style>
+</head>
+<body>
+    <%- include('nav') %>
+    <!-- Orders Content -->
+    <div class="container my-5">
+        <h1 class="mb-4 text-center">My Orders</h1>
+
+        <% if (orders.length === 0) { %>
+            <div class="alert alert-info text-center">You have no orders yet.</div>
+        <% } else { %>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <% orders.forEach(order => { %>
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">Order #<%= order.id %></h5>
+                                <p class="card-text mb-1"><strong>Date:</strong> <%= new Date(order.date).toLocaleDateString() %></p>
+                                <p class="card-text mb-1"><strong>Total Amount:</strong> Rs. <%= Number(order.total_amount).toFixed(2) %></p>
+                                <p class="card-text mb-3">
+                                    <strong>Status:</strong> 
+                                    <% if(order.status === 'pending') { %>
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    <% } else if(order.status === 'payment pending') { %>
+                                        <span class="badge bg-info text-dark">Payment Pending</span>
+                                    <% } else if(order.status === 'completed') { %>
+                                        <span class="badge bg-success">Completed</span>
+                                    <% } else if(order.status === 'cancelled') { %>
+                                        <span class="badge bg-danger">Cancelled</span>
+                                    <% } else { %>
+                                        <span class="badge bg-secondary"><%= order.status %></span>
+                                    <% } %>
+                                </p>
+                                <!-- Star feedback -->
+                                <div class="mt-auto">
+                                    <% if (order.feedback) { %>
+                                        <!-- Show existing feedback -->
+                                        <div class="star-rating">
+                                            <% for(let i = 1; i <= 5; i++) { %>
+                                                <span class="<%= i <= order.feedback ? 'text-warning' : 'text-secondary' %>">&#9733;</span>
+                                            <% } %>
+                                            <small class="ms-2">Your Rating</small>
+                                        </div>
+                                    <% } else { %>
+                                        <!-- Allow user to submit -->
+                                        <form action="/customer/orders/<%= order.id %>/feedback" method="POST" class="star-rating d-flex justify-content-start">
+                                            <input type="radio" name="rating" id="star5-<%= order.id %>" value="5"><label for="star5-<%= order.id %>">&#9733;</label>
+                                            <input type="radio" name="rating" id="star4-<%= order.id %>" value="4"><label for="star4-<%= order.id %>">&#9733;</label>
+                                            <input type="radio" name="rating" id="star3-<%= order.id %>" value="3"><label for="star3-<%= order.id %>">&#9733;</label>
+                                            <input type="radio" name="rating" id="star2-<%= order.id %>" value="2"><label for="star2-<%= order.id %>">&#9733;</label>
+                                            <input type="radio" name="rating" id="star1-<%= order.id %>" value="1"><label for="star1-<%= order.id %>">&#9733;</label>
+                                            <button type="submit" class="btn btn-sm btn-primary ms-2">Submit</button>
+                                        </form>
+                                    <% } %>
+                                </div>
+                                <a href="/customer/orders/<%= order.id %>" class="btn btn-primary mt-auto">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>

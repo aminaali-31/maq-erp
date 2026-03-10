@@ -8,7 +8,7 @@ exports.addVendor = async (req, res) => {
     try {
         const { name, password, phone, email, address, payment_terms } = req.body;
         // Basic validation
-        if (!name || name.trim() === '' ||  !password ) {
+        if (!name || name.trim() === '' ||  !password || !email) {
             return res.redirect('/procure/addVendor?message=Vendor name and password are required');
         }
         const hashedPassword = await bcrypt.hash(password, 12);
@@ -18,7 +18,7 @@ exports.addVendor = async (req, res) => {
         const [result] = await conn.execute(
             `INSERT INTO vendors (name, password,  phone, email, address, payment_terms)
              VALUES (?, ?,?, ?, ?, ?)`,
-            [name.trim(), hashedPassword, phone || null, email || null, address || null, payment_terms || 'Net 30']
+            [name.trim(), hashedPassword, phone || null, email, address || null, payment_terms || 'Net 30']
         );
 
          const venId = result.insertId;
@@ -39,6 +39,12 @@ exports.addVendor = async (req, res) => {
             [accountId, venId]
         );
 
+        await conn.execute(
+            `INSERT INTO users (username, password, email, role_id, vendor_id, customer_id, status)
+            VALUES (?, ?, ?, 7, ?, NULL, 'active')`,
+            [name, hashedPassword, email, venId]
+        );
+
         await conn.commit(); // commit transaction
         res.redirect('/procure/addVendor?message=Vendor added successfully');
 
@@ -47,7 +53,7 @@ exports.addVendor = async (req, res) => {
         console.error('Error adding vendor:', err);
         // Handle duplicate vendor name if you add UNIQUE constraint
         if (err.code === 'ER_DUP_ENTRY') {
-            return res.redirect('/procure/addVendor?message=Vendor name already exists');
+            return res.redirect('/procure/addVendor?message=Vendor name or email already exists');
         }
 
         res.status(500).send('Server error');

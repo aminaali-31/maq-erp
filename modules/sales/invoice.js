@@ -149,7 +149,7 @@ exports.listInvoices = async (req,res)=>{
             ORDER BY i.id DESC
         `);
 
-        res.render("sales/invoicelist",{
+        res.render("sales/invoiceList",{
             invoices,
             success:req.query.success
         });

@@ -1,0 +1,98 @@
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+    <style>
+        .star-rating {
+            font-size: 1.5rem;
+            color: #e3dbdb;
+            cursor: pointer;
+        }
+        .star-rating input {
+            display: none;
+        }
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: rgb(240, 212, 27);
+        }
+    </style>
+</head>
+<body>
+    <%- include('nav') %>
+    <!-- Order Details -->
+    <div class="container my-5">
+        <h1 class="mb-4 text-center">Order #<%= order.id %> Details</h1>
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <p><strong>Order Date:</strong> <%= new Date(order.order_date).toLocaleDateString() %></p>
+                <p><strong>Status:</strong> 
+                    <% if(order.status === 'pending') { %>
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    <% } else if(order.status === 'payment pending') { %>
+                        <span class="badge bg-info text-dark">Payment Pending</span>
+                    <% } else if(order.status === 'completed') { %>
+                        <span class="badge bg-success">Completed</span>
+                    <% } else if(order.status === 'cancelled') { %>
+                        <span class="badge bg-danger">Cancelled</span>
+                    <% } else { %>
+                        <span class="badge bg-secondary"><%= order.status %></span>
+                    <% } %>
+                </p>
+                <p><strong>Total Amount:</strong> $<%= Number(order.total_amount).toFixed(2) %></p>
+
+                <!-- Feedback Section -->
+                <div class="card mb-4 shadow-sm p-3">
+                    <h5>Feedback</h5>
+                    <% if(order.feedback) { %>
+                        <p>Your rating:</p>
+                        <div class="star-rating">
+                            <% for(let i = 1; i <= 5; i++) { %>
+                                <span class="<%= i <= order.feedback ? 'text-warning' : 'text-secondary' %>">&#9733;</span>
+                            <% } %>
+                        </div>
+                    <% } else { %>
+                        <form action="/customer/orders/<%= order.id %>/feedback" method="POST" class="star-rating d-flex align-items-center">
+                            <input type="radio" name="rating" id="star5-<%= order.id %>" value="5"><label for="star5-<%= order.id %>">&#9733;</label>
+                            <input type="radio" name="rating" id="star4-<%= order.id %>" value="4"><label for="star4-<%= order.id %>">&#9733;</label>
+                            <input type="radio" name="rating" id="star3-<%= order.id %>" value="3"><label for="star3-<%= order.id %>">&#9733;</label>
+                            <input type="radio" name="rating" id="star2-<%= order.id %>" value="2"><label for="star2-<%= order.id %>">&#9733;</label>
+                            <input type="radio" name="rating" id="star1-<%= order.id %>" value="1"><label for="star1-<%= order.id %>">&#9733;</label>
+                            <button type="submit" class="btn btn-sm btn-primary ms-2">Submit</button>
+                        </form>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Items -->
+<h3>Items</h3>
+<% if(items.length === 0) { %>
+    <div class="alert alert-info">No items found for this order.</div>
+<% } else { %>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price (Rs.)</th>
+                    <th>Total (Rs.)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% items.forEach(item => { %>
+                    <tr>
+                        <td><%= item.name %></td>
+                        <td><%= item.quantity %></td>
+                        <td><%= Number(item.sale_price).toFixed(2) %></td>
+                        <td><%= Number(item.sale_price * item.quantity).toFixed(2) %></td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+<% } %>
+</body>
+</html>

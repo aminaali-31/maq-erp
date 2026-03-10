@@ -5,7 +5,7 @@
     <title>Login</title>
 </head>
 <body>
-<div class="header" style="background-color: #f8f7f7;">
+    <div class="container mt-4">
     <h2>Login to your Account</h2>
     <% if (error) { %>
         <div class="alert alert-danger">
@@ -21,9 +21,9 @@
         <label class="form-label">Password</label>
         <input type="password" class="form-control" name="password" placeholder="Password" required>
         </div>
-        <button type="submit" class="btn btn-primary">Login</button>
+        <button type="submit" class="btn btn-primary mb-1">Login</button>
         <p>Don't have an account.<a href="/auth/register">Create an account</a></p>
     </form>
-</div>
+    </div>
 </body>
 </html>

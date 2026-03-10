@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+</head>
+<body>
+    <%- include('nav') %>
+    <div class="container">
+
+    <!-- Ledger Summary -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">Ledger Summary</div>
+        <div class="card-body">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Total Debit</th>
+                        <th>Total Credit</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><%= ledger.total_debit %></td>
+                        <td><%= ledger.total_credit %></td>
+                        <td><%= ledger.balance %></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pending Purchase Orders -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">Pending Purchase Orders</div>
+        <div class="card-body">
+            <% if (pendingOrders.length === 0) { %>
+                <p class="text-muted">No pending orders.</p>
+            <% } else { %>
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Order Date</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% pendingOrders.forEach(order => { %>
+                        <tr>
+                            <td><%= order.id %></td>
+                            <td><%= order.order_date.toISOString().split('T')[0] %></td>
+                            <td><%= order.total_amount %></td>
+                            <td><%= order.status %></td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

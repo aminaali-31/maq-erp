@@ -3,7 +3,6 @@ const path = require('path');
 const express = require('express');
 const MySQLStore = require("express-mysql-session")(session);
 const pool = require("./config/db");
-const { isAuthenticated } = require("./middlewares/auth");
 const sessionStore = new MySQLStore({}, pool);
 const authRoutes = require("./routes/auth.routes");
 const ceoRoutes = require("./routes/ceo.routes");
@@ -13,7 +12,10 @@ const salesRoutes = require('./routes/sales');
 const paymentRoutes = require('./routes/payments')
 const accountRoutes = require('./routes/accounts');
 const hrRoutes = require('./routes/hr.routes');
-const bcrypt = require("bcrypt");
+const customerRoutes = require('./routes/customer');
+const vendorRoutes = require('./routes/vendor');
+
+
 const app = express();
 // Body parsing
 app.use(express.urlencoded({ extended: true }));
@@ -52,6 +54,8 @@ app.use('/procure', procureRoutes);
 app.use('/sales', salesRoutes);
 app.use('/payments', paymentRoutes);
 app.use('/accounts', accountRoutes);
+app.use('/customer', customerRoutes);
+app.use('/vendor', vendorRoutes)
 app.use('/hr', hrRoutes);
 const PORT = process.env.PORT || 3000;
 
