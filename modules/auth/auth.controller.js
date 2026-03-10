@@ -155,24 +155,53 @@ exports.getPendingApprovals = async (req, res) => {
     }
 };
 
-exports.addCutomer = async (req,res) => {
-  const  {name , phone , address , description} = req.body;
+ 
 
-  if ( !name || !phone )
-  {
-    res.redirect('/auth/addCustomer', {message: 'Name and phone cannot be empty'});
-  }
-  try {
-    const [result] = await pool.query(`INSERT INTO customers (name,phone,address,description)
-      VALUES (?,?,?,?)`, [name,phone,address,description]);
+exports.addCustomer = async (req, res) => {
+    const conn = await pool.getConnection(); // use getConnection for transaction
 
-    res.redirect('/auth/addCustomer?success=Cusomter added successfully');
+    try {
+        const { name, password, phone, address, description } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 12);
 
-  } catch (e)
-  {
-    res.redirect('/auth/addCustomer?error=Unable to add cusomter');
-  }
-}
+        await conn.beginTransaction();
+
+        // 1️⃣ Insert Customer
+        const [customerResult] = await conn.execute(
+            `INSERT INTO customers (name, password,  phone, address, description)
+             VALUES (?, ?,  ?, ?, ?)`,
+            [name, hashedPassword, phone, address, description]
+        );
+
+        const customerId = customerResult.insertId;
+
+        // 2️⃣ Auto-create Account for Customer
+        const accountName = `${name}`;
+        const [accountResult] = await conn.execute(
+            `INSERT INTO accounts (name, type)
+             VALUES (?, ?)`,
+            [accountName, 'asset']
+        );
+
+        const accountId = accountResult.insertId;
+
+        // 3️⃣ Link Account to Customer
+        await conn.execute(
+            `UPDATE customers SET account_id=? WHERE id=?`,
+            [accountId, customerId]
+        );
+
+        await conn.commit(); // commit transaction
+        res.redirect('/auth/addCustomer?success=Customer added successfully');
+
+    } catch (err) {
+        await conn.rollback(); // rollback if any step fails
+        console.error(err);
+        res.redirect('/auth/addCustomer?error=Unable to add customer');
+    } finally {
+        conn.release();
+    }
+};
 
 
 exports.listCustomers = async (req, res) => {

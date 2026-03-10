@@ -33,4 +33,8 @@ router.post("/invoices/create", invoiceController.createInvoice);
 
 router.get("/invoices", invoiceController.listInvoices);
 
+router.get('/orders/edit/:id', salesController.editOrderForm);
+
+router.post('/orders/edit/:id', salesController.updateEditOrder);
+
 module.exports = router;

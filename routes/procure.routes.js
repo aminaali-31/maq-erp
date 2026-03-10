@@ -20,6 +20,9 @@ router.get('/purchase-orders/add', authenticateAndAuthorize([1,3]), poController
 router.post('/purchase-orders/add', authenticateAndAuthorize([1,3]), poController.addPurchaseOrder);
 // List all purchase orders
 router.get('/purchase-orders/all', authenticateAndAuthorize([1,3]), poController.listAllPOs);
+router.get('/orders/edit/:id', authenticateAndAuthorize([1,3]), poController.editPendingPOForm);
+
+router.post('/orders/edit/:id', authenticateAndAuthorize([1,3]), poController.updatePendingPO);
 // View single purchase order
 router.get('/purchase-orders/view/:id', authenticateAndAuthorize([1,3]), poController.viewPO);
 

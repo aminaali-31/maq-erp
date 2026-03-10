@@ -1,20 +1,21 @@
 const db = require('../../config/db');
 
+
 exports.addPayroll = async (req, res) => {
     const connection = await db.getConnection();
 
     try {
-        const { emp_id, payroll_date, basic_salary, allowance, overtime, deductions } = req.body;
+        const { emp_id, month, account, basic_salary, allowance, overtime, deductions } = req.body;
 
         const net_salary = Number(basic_salary) + Number(allowance || 0) + Number(overtime || 0) - Number(deductions || 0);
 
         await connection.beginTransaction();
-
+        const account_id = parseInt(account);
         // 1️⃣ Insert payroll record
         const [payrollResult] = await connection.execute(
-            `INSERT INTO payroll (emp_id, date, basic_salary, allowance, overtime, deductions)
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [emp_id, payroll_date, basic_salary, allowance, overtime, deductions]
+            `INSERT INTO payroll (emp_id, date, month, basic_salary, allowance, overtime, deductions)
+             VALUES (?, NOW(), ?,?, ?, ?, ?)`,
+            [emp_id, month, basic_salary, allowance, overtime, deductions]
         );
 
         const payrollId = payrollResult.insertId;
@@ -28,12 +29,7 @@ exports.addPayroll = async (req, res) => {
 
         const journalId = journalResult.insertId;
 
-        // 3️⃣ Post Journal Entries
-        // Debit → Salary Expense (account_id: SALARY_EXPENSE_ACCOUNT)
-        // Credit → Cash/Bank (account_id: CASH_ACCOUNT)
-
         const SALARY_EXPENSE_ACCOUNT = 5; // change according to your chart of accounts
-        const CASH_ACCOUNT = 4;
 
         await connection.execute(
             `INSERT INTO journal_entries (journal_id, account_id, debit, credit)
@@ -44,7 +40,7 @@ exports.addPayroll = async (req, res) => {
         await connection.execute(
             `INSERT INTO journal_entries (journal_id, account_id, debit, credit)
              VALUES (?, ?, 0, ?)`,
-            [journalId, CASH_ACCOUNT, net_salary]
+            [journalId, account_id, net_salary]
         );
 
         await connection.commit();
@@ -66,7 +62,10 @@ exports.showPayrollForm = async (req,res) => {
         "SELECT id,name FROM employees"
         );
 
-        res.render("hr/payroll", { employees });
+        const [accounts] = await db.execute(`
+            SELECT * FROM accounts`);
+
+        res.render("hr/payroll", { employees, accounts });
     }
     catch (e) {
         res.status(500).send('Server error');

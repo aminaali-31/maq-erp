@@ -178,7 +178,7 @@ exports.listStockMovements = async (req, res) => {
                 sm.date
             FROM stock_mov sm
             JOIN products p ON sm.product_id = p.id
-            ORDER BY sm.date DESC
+            ORDER BY sm.id DESC
         `);
 
         res.render('inventory/stock-movements', {

@@ -366,3 +366,67 @@ INSERT INTO departments (name) VALUES
 ('electrican'),
 ('installation team'),
 ('manager');
+
+/// latest
+
+ALTER TABLE stock_mov
+ADD COLUMN batch_id INT NULL AFTER product_id;
+ALTER TABLE stock_mov
+ADD CONSTRAINT fk_stock_mov_batch
+FOREIGN KEY (batch_id)
+REFERENCES inventory_batches(id)
+ON DELETE SET NULL
+ON UPDATE CASCADE;
+CREATE TABLE inventory_batches (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    batch_no INT NOT NULL,
+    qty_received INT NOT NULL,
+    qty_remaining INT NOT NULL,
+    cost_price DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Foreign key to products
+    CONSTRAINT fk_inventory_batches_product
+        FOREIGN KEY (product_id) REFERENCES products(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+        
+    -- Ensure batch numbers are unique per product
+    CONSTRAINT uniq_product_batch
+        UNIQUE (product_id, batch_no)
+);
+
+ALTER TABLE sales_orders ADD COLUMN progress ENUM('pending','happening','halted','signed off') DEFAULT 'pending';
+
+ALTER TABLE qo_items ADD COLUMN batch_id INT;
+ALTER TABLE qo_items ADD FOREIGN KEY (batch_id) REFERENCES inventory_batches(id);
+ALTER TABLE so_items
+ADD COLUMN batch_id INT,
+ADD FOREIGN KEY (batch_id) REFERENCES inventory_batches(id);
+
+ALTER TABLE so_items ADD COLUMN warranty DATE DEFAULT NULL;
+
+INSERT INTO roles (name) VALUES ('admin');
+
+
+ALTER TABLE payments MODIFY COLUMN payment_type ENUM('sale','purchase','expense','transfer');
+
+CREATE TABLE expenses (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(150),
+    amount DECIMAL(12,2),
+    expense_date DATE,
+    status ENUM('UNPAID','PAID') DEFAULT 'UNPAID',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE customers ADD COLUMN password VARCHAR(255);
+ALTER TABLE customers ADD COLUMN account_id INT;
+ALTER TABLE customers ADD FOREIGN KEY (account_id) REFERENCES accounts(id);
+
+ALTER TABLE vendors ADD COLUMN password VARCHAR(255);
+ALTER TABLE vendors ADD COLUMN account_id INT;
+ALTER TABLE vendors ADD FOREIGN KEY (account_id) REFERENCES accounts(id);
+
+ALTER TABLE payroll ADD COLUMN month VARCHAR(100);

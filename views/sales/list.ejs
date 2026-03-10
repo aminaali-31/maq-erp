@@ -32,7 +32,8 @@
                                                     <th>ID</th>
                                                     <th>Customer</th>
                                                     <th>Total Amount</th>
-                                                    <th>Status</th>
+                                                    <th>Payment Status</th>
+                                                    <th>Order Status</th>
                                                     <th>Date</th>
                                                     <th>Action</th>
                                                 </tr>
@@ -65,9 +66,40 @@
                                                                         <%=order.status==='payment pending' ?'selected':'' %>
                                                                         >Payment Pending</option>
                                                                 </select>
+                                                            </td>
+                                                            <td>
+                                                                <input type="hidden" name="order_id"
+                                                                    value="<%= order.id %>">
+                                                                    <div class="d-flex align-items-center gap-2">
+                                                                    <div class="d-flex align-items-center gap-2">
+
+                                                                <select name="progress" class="form-select form-select-sm">
+
+                                                                    <option value="pending"
+                                                                    <%= order.progress === 'pending' ? 'selected' : '' %>>
+                                                                    Pending
+                                                                    </option>
+
+                                                                    <option value="happening"
+                                                                    <%= order.progress === 'happening' ? 'selected' : '' %>>
+                                                                    Happening
+                                                                    </option>
+
+                                                                    <option value="halted"
+                                                                    <%= order.progress === 'halted' ? 'selected' : '' %>>
+                                                                    Halted
+                                                                    </option>
+
+                                                                    <option value="signed off"
+                                                                    <%= order.progress === 'signed off' ? 'selected' : '' %>>
+                                                                    Signed off
+                                                                    </option>
+
+                                                                    </select>
                                                                 <button class="btn btn-sm btn-primary">
                                                                     Update
                                                                 </button>
+                                                                </div>
                                                             </form>
                                                         </td>
                                                         <td>
@@ -75,6 +107,11 @@
                                                         </td>
                                                         <td>
                                                             <a href="/sales/orders/view/<%= order.id %>" class="btn btn-primary">View</a>
+                                                            <% if(order.progress === 'pending'){ %>
+                                                                <a href="/sales/orders/edit/<%= order.id %>" class="btn btn-primary">
+                                                                    Edit
+                                                                </a>
+                                                            <% } %>
                                                         </td>
                                                     </tr>
                                                     <% }) %>

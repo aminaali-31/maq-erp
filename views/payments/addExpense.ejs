@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <div class="container mt-4">
+                        <h3 class="mb-4">Add Expense</h3>
+
+                        <!-- Success Message -->
+                        <% if (success) { %>
+                            <div class="alert alert-success">
+                                <%= success %>
+                            </div>
+                            <% } %>
+
+                                <!-- Error Message -->
+                                <% if (error) { %>
+                                    <div class="alert alert-danger">
+                                        <%= error %>
+                                    </div>
+                                    <% } %>
+
+                                        <form action="/accounts/expenses/add" method="POST">
+
+                                            <!-- Title -->
+                                            <div class="mb-3">
+                                                <label class="form-label">Expense Title</label>
+                                                <input type="text" name="title" class="form-control" required>
+                                            </div>
+                                            <!-- Amount -->
+                                            <div class="mb-3">
+                                                <label class="form-label">Amount</label>
+                                                <input type="number" step="0.01" name="amount" class="form-control"
+                                                    required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="account" class="form-label">Payment Account</label>
+                                                <select name="account" class="form-control">
+                                                    <% accounts.forEach(a => { %>
+                                                        <option value="<%= a.id %>"><%= a.name %></option>
+                                                    <% }) %>
+                                                </select>
+                                            </div>
+
+                                            <!-- Expense Date -->
+                                            <div class="mb-3">
+                                                <label class="form-label">Expense Date</label>
+                                                <input type="date" name="expense_date" class="form-control" required>
+                                            </div>
+
+                                            
+                                            <button class="btn btn-primary">
+                                                Add Expense
+                                            </button>
+
+                                        </form>
+                    </div>
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>

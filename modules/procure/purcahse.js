@@ -9,7 +9,7 @@ exports.showAddPOForm = async (req, res) => {
         const [vendors] = await db.execute("SELECT id, name FROM vendors")
         const message = req.query.message || null;
 
-        res.render('procure/addPurchase', { products, vendors, message });
+        res.render('procure/addPurchase', { products, vendors, message: req.query.message});
     } catch (err) {
         console.error('Error fetching products:', err);
         res.status(500).send('Server error');
@@ -22,7 +22,7 @@ const PAYABLE_ACCOUNT_ID = 2;
 
 // Add a new purchase order with items + journal entries
 exports.addPurchaseOrder = async (req, res) => {
-    const connection = await db.getConnection();
+    const conn = await db.getConnection();
 
     try {
         const { vendor_id, po_date, total_amount, items } = req.body;
@@ -31,106 +31,94 @@ exports.addPurchaseOrder = async (req, res) => {
             return res.redirect('/procure/purchase-orders/add?message=Vendor and items are required');
         }
 
-        await connection.beginTransaction();
+        await conn.beginTransaction();
 
-        // ✅ 1. Insert Purchase Order
-        const [poResult] = await connection.execute(
+         // 1️⃣ Insert Purchase Order
+        const [poResult] = await conn.execute(
             `INSERT INTO purchase_orders (vendor_id, order_date, status, total_amount)
-             VALUES (?, ?, ?, ?)`,
+            VALUES (?, ?, ?, ?)`,
             [vendor_id, po_date || new Date(), 'Pending', total_amount]
         );
-
         const poId = poResult.insertId;
-                // Create Journal Header
-        const [journalResult] = await connection.execute(
+
+        // 2️⃣ Create Journal Header
+        const [journalResult] = await conn.execute(
             `INSERT INTO journal 
             (reference_type, reference_id,name,date)
             VALUES (?, ?, ?, NOW())`,
-            [
-                'PURCHASE_ORDER',
-                poId,
-                `Purchase Order #${poId}`,
-            ]
+            ['PURCHASE_ORDER', poId, `Purchase Order #${poId}`]
         );
-
         const journalId = journalResult.insertId;
+
+        // 3️⃣ Fetch Vendor Account
+        const [vendorRows] = await conn.execute(
+            `SELECT account_id FROM vendors WHERE id=?`,
+            [vendor_id]
+        );
+        if (!vendorRows[0]) throw new Error('Vendor account not found');
+        const VENDOR_ACCOUNT_ID = vendorRows[0].account_id;
+
+        // 4️⃣ Set Inventory / Expense account
+        const INVENTORY_ACCOUNT_ID = 5; // replace with your actual inventory/asset account
 
         let calculatedTotal = 0;
 
-        // ✅ 2. Insert Items + Stock Movement
+        // 5️⃣ Insert Items + Stock + calculate total
         for (let item of items) {
-
-            const [productRows] = await connection.execute(
-                'SELECT id FROM products WHERE id = ?',
-                [item.product_id]
-            );
-
-            if (productRows.length === 0) {
-                throw new Error(`Product ID ${item.product_id} does not exist`);
-            }
-
             const quantity = parseInt(item.quantity);
             const unit_price = parseFloat(item.unit_price);
             const total = quantity * unit_price;
-
             calculatedTotal += total;
 
             // Insert PO Items
-            await connection.execute(
+            await conn.execute(
                 `INSERT INTO po_items (po_id, product_id, quantity, unit_price, total)
-                 VALUES (?, ?, ?, ?, ?)`,
+                VALUES (?, ?, ?, ?, ?)`,
                 [poId, item.product_id, quantity, unit_price, total]
             );
 
-            // Stock IN movement
-            await connection.execute(
-                `INSERT INTO stock_mov 
-                 (product_id, movement_type, quantity, cost_price, reference_type, reference_id)
-                 VALUES (?, 'IN', ?, ?, 'PURCHASE_ORDER', ?)`,
-                [item.product_id, quantity, unit_price, poId]
+            // Insert Inventory Batch
+            const batchNo = item.batch_no
+                ? parseInt(item.batch_no)
+                : Math.floor(Math.random() * 900) + 10;
+
+            await conn.execute(
+                `INSERT INTO inventory_batches
+                (product_id, batch_no, qty_received, qty_remaining, cost_price)
+                VALUES (?, ?, ?, ?, ?)`,
+                [item.product_id, batchNo, quantity, quantity, unit_price]
             );
         }
 
-        // ✅ 3. Add Journal Entries (DOUBLE ENTRY)
-
-        // Debit Inventory
-        await connection.execute(
-            `INSERT INTO journal_entries 
-            (journal_id,account_id, debit, credit)
-            VALUES (?,?, ?, 0)`,
-            [
-                journalId,
-                INVENTORY_ACCOUNT_ID,
-                calculatedTotal,
-            ]
+        // 6️⃣ Insert Journal Entries
+        // Debit Inventory / Expense (assets increase)
+        await conn.execute(
+            `INSERT INTO journal_entries
+            (journal_id, account_id, debit, credit)
+            VALUES (?, ?, ?, ?)`,
+            [journalId, INVENTORY_ACCOUNT_ID, calculatedTotal, 0]
         );
 
-        // Credit Accounts Payable
-        await connection.execute(
-            `INSERT INTO journal_entries 
-            (journal_id,account_id, debit, credit)
-            VALUES (?,?, 0, ?)`,
-            [
-                journalId,
-                PAYABLE_ACCOUNT_ID,
-                calculatedTotal,
-            ]
+        // Credit Vendor Account (liabilities increase)
+        await conn.execute(
+            `INSERT INTO journal_entries
+            (journal_id, account_id, debit, credit)
+            VALUES (?, ?, ?, ?)`,
+            [journalId, VENDOR_ACCOUNT_ID, 0, calculatedTotal]
         );
 
-        await connection.commit();
-
-        res.redirect(`/procure/purchase-orders/add?message=Purchase Order added successfully`);
+        await conn.commit();
+        res.redirect('/procure/purchase-orders/add?message=Purchase order created');
 
     } catch (err) {
-        await connection.rollback();
-        console.error('Error adding purchase order:', err);
-        res.status(500).send('Server error');
+        await conn.rollback();
+        console.error(err);
+        res.redirect('/procure/purchase-orders/add?message=' + encodeURIComponent(err.message));
     } finally {
-        connection.release();
-    }
-};
+        conn.release();
+}
 
-
+}
 // List all purchase orders
 exports.listAllPOs = async (req, res) => {
     try {
@@ -215,6 +203,100 @@ exports.changePOStatus = async (req, res) => {
         await connection.rollback();
         console.error(err);
         res.status(500).send('Server error');
+    } finally {
+        connection.release();
+    }
+};
+
+// controllers/purchaseOrderController.js
+exports.editPendingPOForm = async (req, res) => {
+    try {
+        const poId = req.params.id;
+
+        // 1️⃣ Fetch the purchase order
+        const [poRows] = await db.execute(`
+            SELECT po.*, s.name AS supplier_name
+            FROM purchase_orders po
+            LEFT JOIN vendors s ON po.vendor_id = s.id
+            WHERE po.id = ? AND po.status = 'pending'
+        `, [poId]);
+
+        if (!poRows.length) {
+            return res.redirect('/purchase/orders?error=Purchase order not found or not pending');
+        }
+
+        const po = poRows[0];
+
+        // 2️⃣ Fetch the items
+        const [items] = await db.execute(`
+            SELECT pi.*, p.name AS product_name
+            FROM po_items pi
+            JOIN products p ON pi.product_id = p.id
+            WHERE pi.po_id = ?
+        `, [poId]);
+
+        res.render('procure/edit', { po, items });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+};
+
+// Controller to handle update
+exports.updatePendingPO = async (req, res) => {
+    const connection = await db.getConnection();
+
+    try {
+        await connection.beginTransaction();
+
+        const poId = req.params.id;
+        const { items } = req.body; // items = [{po_item_id, cost_price}]
+
+        if (!items || !Array.isArray(items) || !items.length) {
+            throw new Error('No items provided');
+        }
+
+        let totalAmount = 0;
+
+        for (const item of items) {
+            const poItemId = item.po_item_id;
+            const costPrice = parseFloat(item.unit_price);
+
+            if (isNaN(costPrice) || costPrice < 0) {
+                throw new Error(`Invalid price for item ID ${poItemId}`);
+            }
+
+            // Update item price
+            await connection.query(`
+                UPDATE po_items
+                SET unit_price = ?
+                WHERE id = ?
+            `, [costPrice, poItemId]);
+
+            // Recalculate total
+            const [[row]] = await connection.query(`
+                SELECT quantity FROM po_items WHERE id = ?
+            `, [poItemId]);
+
+            totalAmount += row.quantity * costPrice;
+        }
+
+        // Update PO total
+        await connection.query(`
+            UPDATE purchase_orders
+            SET total_amount = ?
+            WHERE id = ?
+        `, [totalAmount, poId]);
+
+        await connection.commit();
+
+        res.redirect(`/procure/orders/edit/${poId}?success=PO updated successfully`);
+
+    } catch (err) {
+        await connection.rollback();
+        console.error(err);
+        res.redirect(`/procure/orders/edit/${req.params.id}?error=${encodeURIComponent(err.message)}`);
     } finally {
         connection.release();
     }

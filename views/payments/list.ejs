@@ -55,11 +55,11 @@
                                         </td>
 
                                         <td>
-                                            <%= p.payment_date %>
+                                            <%= p.payment_date.toISOString().split('T')[0]  %>
                                         </td>
 
                                         <td>
-                                            <%= p.notes || '-' %>
+                                            <%= p.reference || '-' %>
                                         </td>
 
                                     </tr>

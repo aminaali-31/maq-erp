@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Document</title>
+</head>
+<body>
+<div class="container fluid">
+  <div class="row position-sticky">
+    <%- include('../sidebar') %>
+    <main class="col-md-9 col-lg-10 p-4">
+        <div class="container mt-5">
+            <!-- views/purchase/edit_po.ejs -->
+<h3>Edit Pending Purchase Order #<%= po.id %></h3>
+<p>Supplier: <%= po.supplier_name %></p>
+
+<form method="POST" action="/procure/orders/edit/<%= po.id %>">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Cost Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% items.forEach((item, idx) => { %>
+            <tr>
+                <td><%= item.product_name %></td>
+                <td><%= item.quantity %></td>
+                <td>
+                    <input type="hidden" name="items[<%= idx %>][po_item_id]" value="<%= item.id %>">
+                    <input type="number" step="0.01" name="items[<%= idx %>][unit_price]" class="form-control cost-price" value="<%= item.unit_price %>">
+                </td>
+                <td class="item-total"><%= (item.quantity * item.unit_price).toFixed(2) %></td>
+            </tr>
+            <% }) %>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="3" class="text-end">Grand Total:</th>
+                <th id="grandTotal"><%= items.reduce((sum,i)=>sum+(i.quantity*i.unit_price),0).toFixed(2) %></th>
+            </tr>
+        </tfoot>
+    </table>
+    <button type="submit" class="btn btn-primary">Update Prices</button>
+</form>
+
+<script>
+    // Auto-update row total and grand total on cost price change
+    document.querySelectorAll('.cost-price').forEach(input => {
+        input.addEventListener('input', function(){
+            const row = input.closest('tr');
+            const qty = parseFloat(row.children[2].innerText);
+            const totalCell = row.querySelector('.item-total');
+            const price = parseFloat(input.value) || 0;
+            totalCell.innerText = (qty * price).toFixed(2);
+
+            // update grand total
+            let grand = 0;
+            document.querySelectorAll('.item-total').forEach(td => grand += parseFloat(td.innerText));
+            document.getElementById('grandTotal').innerText = grand.toFixed(2);
+        });
+    });
+</script>
+          </div>
+          </main>
+          </div>
+          </div>
+
+</body>
+</html>

@@ -50,7 +50,7 @@
                                                 Invoice Date
                                             </label>
 
-                                            <input type="date" name="invoice_date" class="form-control" required>
+                                            <input type="date" name="invoice_date" class="form-control"  value="<%= new Date().toISOString().split('T')[0] %>" required>
                                         </div>
 
                                         <!-- Total Amount -->

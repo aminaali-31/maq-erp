@@ -21,13 +21,14 @@ exports.showLedger = async (req, res) => {
         const [entries] = await pool.execute(`
             SELECT 
                 j.date,
+                j.id,
                 j.name,
                 je.debit,
                 je.credit
             FROM journal_entries je
             JOIN journal j ON je.journal_id = j.id
             WHERE je.account_id = ?
-            ORDER BY j.date ASC
+            ORDER BY j.id DESC
         `, [accountId]);
 
         let balance = 0;
@@ -53,6 +54,55 @@ exports.showLedger = async (req, res) => {
         res.status(500).send("Server Error");
     }
 };
+
+exports.showPayable = async (req,res) => {
+    try {
+        const [payable] = await pool.execute(`
+            SELECT 
+                v.id AS vendor_id,
+                v.name AS name,
+                SUM(je.debit) AS debit,
+                SUM(je.credit) AS credit,
+                SUM(je.credit - je.debit) AS balance
+            FROM vendors v
+            JOIN accounts a ON v.account_id = a.id
+            LEFT JOIN journal_entries je ON je.account_id = a.id
+            LEFT JOIN journal j ON je.journal_id = j.id
+            GROUP BY v.id, v.name
+            ORDER BY v.name;`);
+        
+        res.render('payments/ledger', {entries: payable, account:{name:'Payables'} 
+        })
+    } catch (e) {
+        console.log(e);
+        res.status(500).send("Database Error")
+    }
+}
+
+exports.showReceivable = async (req,res) => {
+    try {
+        const [rece] = await pool.execute(`
+            SELECT 
+                c.name AS name,
+                COALESCE(SUM(je.debit), 0) AS debit,
+                COALESCE(SUM(je.credit), 0) AS credit,
+                COALESCE(SUM(je.debit - je.credit), 0) AS balance
+            FROM customers c
+            JOIN accounts a 
+                ON c.account_id = a.id
+            LEFT JOIN journal_entries je 
+                ON je.account_id = a.id
+            LEFT JOIN journal j 
+                ON je.journal_id = j.id
+            GROUP BY c.id, c.name
+            ORDER BY c.name;`)
+
+        res.render('payments/ledger', {entries: rece, account:{name:'Receivables'}})
+    } catch (e) {
+        console.log(e);
+        res.status(500).send("Database Error")
+    }
+}
 
 exports.accountSummary = async (req,res)=>{
     try{
@@ -82,13 +132,68 @@ exports.accountSummary = async (req,res)=>{
                 GROUP BY a.id, a.name, a.type
                 ORDER BY a.name
             `);
+        const [receivable] = await pool.execute(`
+            SELECT 
+                COALESCE(SUM(je.debit),0) AS total_debit,
+                COALESCE(SUM(je.credit),0) AS total_credit,
+                COALESCE(SUM(je.debit - je.credit),0) AS balance
+            FROM customers c
+            LEFT JOIN accounts a 
+                ON c.account_id = a.id
+            LEFT JOIN journal_entries je 
+                ON je.account_id = a.id
+        `);
+        
+            const [payable] = await pool.execute(`
+            SELECT 
+                COALESCE(SUM(je.debit),0) AS total_debit,
+                COALESCE(SUM(je.credit),0) AS total_credit,
+                COALESCE(SUM(je.credit - je.debit),0) AS balance
+            FROM vendors v
+            LEFT JOIN accounts a 
+                ON v.account_id = a.id
+            LEFT JOIN journal_entries je 
+                ON je.account_id = a.id
+        `);
+        const rec = receivable[0];
+        const pay = payable[0];
 
         res.render('payments/summary',{
-            accounts
-        });
-
+                accounts,
+                rec,
+                pay
+    });
     }catch(err){
         console.error(err);
         res.status(500).send("Server Error");
+    }
+};
+
+// Show add account form
+exports.showAddAccount = (req, res) => {
+    res.render('payments/addAccount', {message:req.query.message});
+};
+
+// Save account
+exports.storeAccount = async (req, res) => {
+    try {
+
+        const { account_name, account_type } = req.body;
+
+        if (!account_name || !account_type) {
+            return res.send("Account name and type are required");
+        }
+
+        await pool.query(
+            `INSERT INTO accounts (name,type)
+             VALUES (?, ?)`,
+            [account_name, account_type]
+        );
+
+        res.redirect('/accounts/add?message=Account added successfully');
+
+    } catch (error) {
+        console.error(error);
+        res.redirect('/accounts/add?message=Unable to add Account')
     }
 };

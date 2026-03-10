@@ -19,21 +19,25 @@
                             <label>Employee</label>
                             <select name="emp_id" class="form-control" required>
                                 <option value="">Select Employee</option>
-
                                 <% employees.forEach(emp=>{ %>
                                     <option value="<%= emp.id %>">
                                         <%= emp.name %>
                                     </option>
                                     <% }) %>
-
                             </select>
                         </div>
-
                         <div class="col-md-4 mb-3">
-                            <label>Payroll Date</label>
-                            <input type="date" name="payroll_date" class="form-control" required>
+                            <label for="month" class="form-label">Month</label>
+                            <input type="month" id="month" name="month" class="form-control" required>
                         </div>
-
+                        <div class="col-md-4 mb-3">
+                            <label for="" class="form-label">Payment Account</label>
+                            <select name="account" class="form-control">
+                                <% accounts.forEach(a => { %>
+                                    <option value="<%= a.id %>"><%= a.name %></option>
+                                <% }) %>
+                            </select>
+                        </div>
                         <div class="col-md-4 mb-3">
                             <label>Basic Salary</label>
                             <input type="number" name="basic_salary" class="form-control" required>
@@ -48,19 +52,16 @@
                             <label>Overtime</label>
                             <input type="number" name="overtime" value="0" class="form-control">
                         </div>
-
                         <div class="col-md-3 mb-3">
                             <label>Deductions</label>
                             <input type="number" name="deductions" value="0" class="form-control">
                         </div>
-
                         <div class="col-md-3 mb-3">
                             <label> </label>
                             <button class="btn btn-primary w-100 mt-2">
                                 Save Payroll
                             </button>
                         </div>
-
                     </form>
                 </main>
         </div>

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { register_roles,register, login, logout, addCutomer,listCustomers,
+const { register_roles,register, login, logout, addCustomer,listCustomers,
             deleteCustomer,showEditCustomer,updateCustomer ,listUsers} = require("../modules/auth/auth.controller");
 
 const authenticateAndAuthorize = require('../middlewares/inventory');
@@ -19,7 +19,7 @@ router.get('/customers',authenticateAndAuthorize([1,3]),listCustomers);
 
 router.get('/addCustomer', authenticateAndAuthorize([1,3]),(req,res) => res.render('auth/addCustomer',{success: req.query.success, error: req.query.error}));
 
-router.post('/addCustomer',authenticateAndAuthorize([1,3]), addCutomer);
+router.post('/addCustomer',authenticateAndAuthorize([1,3]), addCustomer);
 
 router.get('/customers/edit/:id', authenticateAndAuthorize([1,3]), showEditCustomer);
 

@@ -1,32 +1,58 @@
 const db = require('../../config/db'); // mysql2/promise connection
+const bcrypt = require('bcrypt');
 
 // Add a new vendor
 exports.addVendor = async (req, res) => {
+    const conn = await db.getConnection();
+
     try {
-        const { name, phone, email, address, payment_terms } = req.body;
-
+        const { name, password, phone, email, address, payment_terms } = req.body;
         // Basic validation
-        if (!name || name.trim() === '') {
-            return res.redirect('/procure/addVendor?message=Vendor name is required');
+        if (!name || name.trim() === '' ||  !password ) {
+            return res.redirect('/procure/addVendor?message=Vendor name and password are required');
         }
+        const hashedPassword = await bcrypt.hash(password, 12);
 
-        const [result] = await db.execute(
-            `INSERT INTO vendors (name, phone, email, address, payment_terms)
-             VALUES (?, ?, ?, ?, ?)`,
-            [name.trim(), phone || null, email || null, address || null, payment_terms || 'Net 30']
+        await conn.beginTransaction();
+
+        const [result] = await conn.execute(
+            `INSERT INTO vendors (name, password,  phone, email, address, payment_terms)
+             VALUES (?, ?,?, ?, ?, ?)`,
+            [name.trim(), hashedPassword, phone || null, email || null, address || null, payment_terms || 'Net 30']
         );
 
+         const venId = result.insertId;
+
+        // 2️⃣ Auto-create Account for vendor
+        const accountName = `${name}`;
+        const [accountResult] = await conn.execute(
+            `INSERT INTO accounts (name, type)
+             VALUES (?, ?)`,
+            [accountName, 'liability']
+        );
+
+        const accountId = accountResult.insertId;
+
+        // 3️⃣ Link Account to vendors
+        await conn.execute(
+            `UPDATE vendors SET account_id=? WHERE id=?`,
+            [accountId, venId]
+        );
+
+        await conn.commit(); // commit transaction
         res.redirect('/procure/addVendor?message=Vendor added successfully');
 
     } catch (err) {
+        await conn.rollback();
         console.error('Error adding vendor:', err);
-
         // Handle duplicate vendor name if you add UNIQUE constraint
         if (err.code === 'ER_DUP_ENTRY') {
             return res.redirect('/procure/addVendor?message=Vendor name already exists');
         }
 
         res.status(500).send('Server error');
+    } finally {
+        conn.release();
     }
 };
 

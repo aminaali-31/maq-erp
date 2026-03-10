@@ -59,7 +59,12 @@ exports.createInvoice = async (req,res)=>{
         Journal Posting ⭐
         */
 
-        const AR_ACCOUNT_ID = 3;
+        const [customer] = await connection.execute(
+            `SELECT account_id FROM customers WHERE id=?`,
+            [final_customer_id]
+            );
+        if (!customer[0]) throw new Error('Customer account not found');
+        const AR_ACCOUNT_ID = customer[0].account_id; // use auto-created customer account
         const SALES_ACCOUNT_ID = 1;
 
         const [journalResult] = await connection.execute(

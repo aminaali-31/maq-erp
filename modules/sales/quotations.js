@@ -43,17 +43,48 @@ exports.listQuotations = async (req, res) => {
 // Show Add Quotation Form
 exports.addQuotationForm = async (req, res) => {
     try {
-        const [products] = await pool.execute('SELECT * FROM products');
-        res.render('quotations/add', { products });
+         const [products] = await pool.execute(`
+            SELECT 
+                p.id AS product_id,
+                p.name,
+                p.sale_price,
+                b.id AS batch_id,
+                b.batch_no,
+                b.qty_remaining,
+                b.cost_price
+            FROM products p
+            JOIN inventory_batches b 
+            ON b.product_id = p.id
+            WHERE b.qty_remaining > 0
+            `);
+        
+       
+        const productOptions = products.map(p => ({
+            value: JSON.stringify({
+                product_id: p.product_id,
+                batch_id: p.batch_id,
+                sale_price: Number(p.sale_price),
+                cost_price: Number(p.cost_price),
+                name: p.name,
+                stock: Number(p.qty_remaining)
+            }),
+            label: `${p.name} | Batch ${p.batch_no} | Stock:${p.qty_remaining} |  Cost:${p.cost_price}`
+        }));
+
+        res.render('quotations/add', {
+            productOptions,
+            success: req.query.success,
+            error: req.query.error
+        });
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
     }
 };
 
-// Create Quotation with FIFO cost calculation and profit
+// Create Quotation with batch-aware cost
 exports.createQuotation = async (req, res) => {
-    const { title, items } = req.body; // items = [{product_id, quantity, sale_price}]
+    const { title, items } = req.body; // items = [{product_id, batch_id, quantity, sale_price, name, category}]
     const conn = await pool.getConnection();
 
     try {
@@ -69,30 +100,27 @@ exports.createQuotation = async (req, res) => {
 
         let grandTotal = 0;
         let totalCost = 0;
-        console.log("Items received from form:", items);
-        // Insert each item
+
         for (let item of items) {
-            const quantity = parseInt(item.quantity);
-            const salePrice = parseFloat(item.sale_price);
-            const category_id = parseInt(item.category_id)
-            // Get cost price using FIFO
-            const costPrice = await getCostPriceFIFO(item.product_id, quantity);
+            const productData = JSON.parse(item.product_data);
+            console.log(productData);
+            const product_id = productData.product_id;
+            const batch_id = productData.batch_id;
+            const quantity = Number(item.quantity);
+            const salePrice = Number(item.sale_price);
+            const name = productData.name
+            const category = productData.category || null;
+            const costPrice = productData.cost_price;
 
-            // Calculate total & profit
-            const totalItem = quantity * salePrice;
-            const profitItem = (salePrice - costPrice) * quantity;
-
-            grandTotal += totalItem;
-            totalCost += costPrice * quantity;
-
-            const [rows] = await conn.execute("SELECT name FROM categories WHERE id = ?", [category_id]);
-            const categoryName = rows.length ? rows[0].name : null; // fallback if category not found
-            // Insert into qo_items
+            // Insert quotation item
             await conn.execute(`
-                INSERT INTO qo_items 
-                (qo_id, product_id, quantity, name, category, cost_price, sale_price)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            `, [qoId, item.product_id, quantity, item.name, categoryName, costPrice, salePrice]);
+                INSERT INTO qo_items
+                (qo_id, product_id, batch_id, quantity, name, category, cost_price, sale_price)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            `, [qoId, product_id, batch_id, quantity, name, category, costPrice, salePrice]);
+
+            grandTotal += quantity * salePrice;
+            totalCost += quantity * costPrice;
         }
 
         const margin = grandTotal > 0 ? ((grandTotal - totalCost) / grandTotal) * 100 : 0;
