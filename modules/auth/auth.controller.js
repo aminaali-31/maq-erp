@@ -9,7 +9,7 @@ exports.register_roles = async (req,res) => {
             `SELECT * FROM roles`
         );
 
-        res.render("auth/register", {roles, error:null, key: process.env.SITE_KEY});
+        res.render("auth/register", {roles, error:null, key: process.env.SITE_SECRET});
 
     } catch (err) {
         console.error(err);
