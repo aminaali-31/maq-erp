@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const pool = require("../../config/db");
 const axios = require('axios');
+require("dotenv").config();
 
 exports.register_roles = async (req,res) => {
      try {
@@ -8,7 +9,7 @@ exports.register_roles = async (req,res) => {
             `SELECT * FROM roles`
         );
 
-        res.render("auth/register", {roles, error:null});
+        res.render("auth/register", {roles, error:null, key: process.env.SITE_KEY});
 
     } catch (err) {
         console.error(err);
@@ -24,7 +25,7 @@ exports.register = async (req, res) => {
 
   try {
 
-    const secretKey = '6LdGwYUsAAAAAHZ74p7oasm49MV1lTQBm9Hkl5_d';
+    const secretKey = process.env.SECRET_KEY;
     const response = await axios.post(
             `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${captcha}`
         );
