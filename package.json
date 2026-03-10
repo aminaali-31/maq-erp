@@ -1,4 +1,11 @@
 {
+  "name": "erp",
+  "version": "1.0.0",
+  "description": "My Node App",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
     "axios": "^1.13.6",
     "bcrypt": "^6.0.0",
