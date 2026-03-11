@@ -85,6 +85,7 @@ exports.addQuotationForm = async (req, res) => {
 // Create Quotation with batch-aware cost
 exports.createQuotation = async (req, res) => {
     const { title, items } = req.body; // items = [{product_id, batch_id, quantity, sale_price, name, category}]
+    const published = req.body.published ? 'yes' : 'no';
     const conn = await pool.getConnection();
 
     try {
@@ -92,9 +93,9 @@ exports.createQuotation = async (req, res) => {
 
         // Insert quotation header
         const [quoResult] = await conn.execute(`
-            INSERT INTO quotations (title, grand_total, margin, profit)
-            VALUES (?, 0, 0, 0)
-        `, [title]);
+            INSERT INTO quotations (title, grand_total, margin, profit, is_published)
+            VALUES (?, 0, 0, 0, ?)
+        `, [title, published]);
 
         const qoId = quoResult.insertId;
 
@@ -155,5 +156,64 @@ exports.viewQuotation = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
+    }
+};
+
+exports.publishedQuotations = async () => {
+    try {
+
+        const [quotes] = await pool.query(`
+            SELECT id, title , grand_total , date
+            FROM quotations
+            WHERE is_published = 'yes'
+            ORDER BY date DESC
+        `);
+
+        return quotes
+
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
+};
+
+exports.viewClientQuotation = async (req, res) => {
+    try {
+
+        const quotationId = req.params.id;
+
+        // get quotation
+        const [quotationRows] = await pool.execute(`
+            SELECT *
+            FROM quotations
+            WHERE id = ?
+        `, [quotationId]);
+
+        if (quotationRows.length === 0) {
+            return res.status(404).send("Quotation not found");
+        }
+
+        const quotation = quotationRows[0];
+
+        // get quotation items
+        const [items] = await pool.execute(`
+            SELECT
+                q.id,
+                p.name,
+                q.quantity,
+                q.sale_price
+            FROM qo_items AS q
+            JOIN products AS p ON q.product_id = p.id
+            WHERE qo_id = ?
+        `, [quotationId]);
+
+        res.render('quotations/quotation-view', {
+            quotation,
+            items
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
     }
 };

@@ -32,18 +32,17 @@ exports.addVendor = async (req, res) => {
         );
 
         const accountId = accountResult.insertId;
-
+        await conn.execute(
+            `INSERT INTO users (username, password, email, role_id, vendor_id, customer_id, status)
+            VALUES (?, ?, ?, 7, ?, NULL, 'active')`,
+            [name, hashedPassword, email, venId]
+        );
         // 3️⃣ Link Account to vendors
         await conn.execute(
             `UPDATE vendors SET account_id=? WHERE id=?`,
             [accountId, venId]
         );
 
-        await conn.execute(
-            `INSERT INTO users (username, password, email, role_id, vendor_id, customer_id, status)
-            VALUES (?, ?, ?, 7, ?, NULL, 'active')`,
-            [name, hashedPassword, email, venId]
-        );
 
         await conn.commit(); // commit transaction
         res.redirect('/procure/addVendor?message=Vendor added successfully');

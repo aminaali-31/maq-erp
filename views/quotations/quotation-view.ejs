@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <%- include('../head') %>
+
+    <title>Quotation Details</title>
+
+</head>
+
+<body>
+
+<div class="container py-5">
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between mb-4">
+
+                <h4 class="fw-bold">
+                    Quotation #<%= quotation.id %>
+                </h4>
+
+            </div>
+
+            <p class="text-muted mb-4">
+                <strong>Title:</strong> <%= quotation.title %>
+            </p>
+
+            <!-- Items Table -->
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <% items.forEach((item, index) => { %>
+
+                        <tr>
+                            <td><%= index + 1 %></td>
+                            <td><%= item.name %></td>
+                            <td><%= item.quantity %></td>
+                            <td>Rs <%= item.sale_price %></td>
+                            <td>Rs <%= item.sale_price * item.quantity %></td>
+                        </tr>
+
+                        <% }) %>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- Summary -->
+
+            <div class="row mt-4">
+
+                <div class="col-md-6"></div>
+
+                <div class="col-md-6">
+
+                    <table class="table">
+
+                        <tr>
+                            <th>Grand Total</th>
+                            <td class="text-end fw-bold">
+                                Rs <%= quotation.grand_total %>
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -467,3 +467,6 @@ CREATE TABLE complaints (
 
 ALTER TABLE complaints ADD COLUMN feedback TINYINT UNSIGNED DEFAULT NULL;
 ALTER TABLE sales_orders ADD COLUMN feedback TINYINT UNSIGNED DEFAULT NULL;
+
+// latest
+ALTER TABLE quotations ADD COLUMN is_published ENUM('yes','no') DEFAULT 'no';

@@ -12,14 +12,14 @@ router.post('/category',
     inventoryController.addCategory
 );
 
-router.get('/allProducts',authenticateAndAuthorize([1,2]),inventoryController.getAllProducts);
+router.get('/allProducts',authenticateAndAuthorize([1,3]),inventoryController.getAllProducts);
 
 // Show edit form
-router.get('/products/:id/edit',authenticateAndAuthorize([1,2]), inventoryController.editProductForm);
+router.get('/products/:id/edit',authenticateAndAuthorize([1,3]), inventoryController.editProductForm);
 
 // Update product
-router.post('/products/:id/edit', authenticateAndAuthorize([1,2]),inventoryController.updateProduct);
+router.post('/products/:id/edit', authenticateAndAuthorize([1,3]),inventoryController.updateProduct);
 
 //Show stock movements
-router.get('/stock-movements', authenticateAndAuthorize([1,2]),inventoryController.listStockMovements);
+router.get('/stock-movements', authenticateAndAuthorize([1,3]),inventoryController.listStockMovements);
 module.exports = router;

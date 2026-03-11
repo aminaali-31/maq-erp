@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <%- include('../head') %>
+        <title>CEO Dashboard</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+            .metric-card {
+                 border-left: 3px solid #7C4DFF;
+            }
+        </style>
+</head>
+
+<body>
+
+    <div class="container-fluid">
+         <div class="row position-sticky">
+
+            <%- include('../sidebar') %>
+
+                <main class="col-md-9 col-lg-10 p-4">
+
+                    <h3 class="mb-4">CEO Dashboard</h3>
+
+                    <!-- Financial Cards -->
+
+                    <div class="row g-4 mb-4">
+
+                        <div class="col-md-3">
+                            <div class="custom-card metric-card p-3">
+                                <div>
+                                <h6 class="metric-title">Revenue</h6>
+                                <h4>PKR <%= revenue %>
+                                </h4>
+                                 </div>
+                                </div>
+                            </div>
+
+                        <div class="col-md-3">
+                            <div class="custom-card metric-card p-3">
+                                <div>
+                                <h6 class="metric-title">Expenses</h6>
+                                <h4>PKR <%= expenses %>
+                                </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="custom-card metric-card p-3">
+                                <div>
+                                <h6 class="metric-title">Net Profit</h6>
+                                <h4>PKR <%= Number(profit).toFixed(1) %>
+                                </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="metric-card custom-card p-3">
+                                <div>
+                                <h6 class="metric-title">Profit Margin</h6>
+                                <h4>
+                                    <%= revenue ? ((profit/revenue)*100).toFixed(1) : 0 %>%
+                                </h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI metric-card custom-cards -->
+
+                    <div class="row g-4 mb-4">
+
+                        <div class="col-md-3">
+                            <div class="metric-card custom-card p-3 ">
+                                <div>
+                                    <h6 class="metric-title">Customers</h6>
+                                
+                                <h4>
+                                    <%= customers %>
+                                </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="metric-card custom-card p-3">
+                                <div>
+                                    <h6 class="metric-title">Vendors</h6>
+                                
+                                <h4>
+                                    <%= vendors %>
+                                </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="metric-card custom-card p-3 ">
+                                
+                                <div>
+                                    <h6 class="metric-title">Products</h6>
+                                <h4>
+                                    <%= products %>
+                                </h4>
+                                    </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="metric-card custom-card p-3 ">
+                                <div>
+                                    <h6 class="metric-title">Orders</h6>
+                                
+                               
+                                <h4>
+                                    <%= orders %>
+                                </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Risk Indicators -->
+
+                    <div class="row g-4 mb-4">
+
+                        <div class="col-md-3">
+                            <div class="metric-card custom-card p-3">
+                                <div>
+                                    <h6 class="metric-title">Receivables</h6>
+                                
+                                <h4>PKR <%= receivables %>
+                                </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="metric-card custom-card p-3">
+                                
+                                <div>
+                                    <h6 class="metric-title">Payables</h6>
+                                
+                                <h4>PKR <%= payables %>
+                                </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="metric-card custom-card p-3">
+                               
+                                <div>
+                                    <h6 class="metric-title">Low Stock</h6>
+                             
+                                <h4>
+                                    <%= lowStock %>
+                                </h4>
+                                   </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="metric-card custom-card p-3">
+                                <div>
+                                    <h6 class="metric-title">Pending complaints</h6>
+                                
+                                <h4>
+                                    <%= complaints %>
+                                </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Sales vs Purchases Chart -->
+                    <div class="row mb-4">
+
+    <!-- Sales vs Purchases Chart -->
+    <div class="col-md-6">
+        <div class="custom-card p-4 mb-4">
+            <h5>Sales vs Purchases</h5>
+            <div style="height: 300px; width: 100%;">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profits Chart -->
+    <div class="col-md-6">
+        <div class="custom-card p-4 mb-4">
+            <h5>Profits</h5>
+            <div style="height: 300px; width: 100%;">
+                <canvas id="profitChart" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+                    <!-- Top Tables -->
+
+                    <div class="row">
+
+                        <div class="col-md-4">
+                            <div class="custom-card p-3">
+                                <h6>Top Customers</h6>
+                                <table class="table">
+                                    <% topCustomers.forEach(c=>{ %>
+                                        <tr>
+                                            <td>
+                                                <%= c.name %>
+                                            </td>
+                                            <td>
+                                                <%= c.revenue %>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="custom-card p-3">
+                                <h6>Top Products</h6>
+                                <table class="table">
+                                    <% topProducts.forEach(p=>{ %>
+                                        <tr>
+                                            <td>
+                                                <%= p.name %>
+                                            </td>
+                                            <td>
+                                                <%= p.sold %>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="custom-card p-3">
+                                <h6>Top Vendors</h6>
+                                <table class="table">
+                                    <% topVendors.forEach(v=>{ %>
+                                        <tr>
+                                            <td>
+                                                <%= v.name %>
+                                            </td>
+                                            <td>
+                                                <%= v.purchases %>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </main>
+        </div>
+    </div>
+
+    <script>
+
+        const chartData = <%- JSON.stringify(chart) %>;
+
+        const labels = chartData.map(x => x.month);
+        const sales = chartData.map(x => x.sales);
+        const purchases = chartData.map(x => x.purchases);
+
+        new Chart(document.getElementById("salesChart"), {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "Sales",
+                        data: sales
+                    },
+                    {
+                        label: "Purchases",
+                        data: purchases
+                    }
+                ]
+            }
+        });
+
+        const profitData = <%- JSON.stringify(profits) %>;
+        const profitsValues = profitData.map(x => x.profit);
+
+        new Chart(document.getElementById("profitChart"), {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Profit",
+                    data: profitsValues,
+                    fill: true, // fill under the line
+                    borderColor: "rgba(75, 192, 192, 1)",
+                    backgroundColor: "rgba(75, 192, 192, 0.2)",
+                    tension: 0.3 // smooth curve
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: "top" } },
+                scales: {
+                    y: { beginAtZero: true },
+                    x: { ticks: { maxRotation: 0 } }
+                }
+            }
+        });
+</script>
+    </script>
+
+</body>
+
+</html>

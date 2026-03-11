@@ -3,6 +3,11 @@
 <head>
     <%- include('../head') %>
     <title>Document</title>
+    <style>
+        .custom-card {
+            border-left: 3px solid #7C4DFF;
+        }
+    </style>
 </head>
 <body>
    <%- include('nav') %>
@@ -10,21 +15,21 @@
     <div class="container my-5">
         <h1 class="text-center mb-4">Welcome, <%= customer.name %>!</h1>
 
-        <div class="row text-center">
-            <div class="col-md-6 mb-3">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Orders</h5>
+        <div class="row text-center d-flex" style="justify-content: center;">
+            <div class="col-md-4 mb-3">
+                <div class="metric-card custom-card">
+                    <div class="custom-card-body">
+                        <h5 class="custom-card-header">Total Orders</h5>
                         <p class="display-4"><%= orders %></p>
                         <a href="/customer/orders" class="btn btn-primary">View Orders</a>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6 mb-3">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Complaints</h5>
+            <div class="col-md-4 mb-3">
+                <div class="metric-card custom-card">
+                    <div class="custom-card-body">
+                        <h5 class="custom-card-header">Total Complaints</h5>
                         <p class="display-4"><%= complaints %></p>
                         <a href="/customer/complaints" class="btn btn-primary">View Complaints</a>
                     </div>
@@ -33,9 +38,9 @@
         </div>
 
         <!-- Optional extra actions -->
-        <div class="text-center mt-4">
-            <a href="/customer/ledger" class="btn btn-success me-2">View Ledger</a>
-            <a href="/customer/complaints" class="btn btn-warning">Add Complaint</a>
+        <div class="text-center mt-4 d-flex align-items-center" style="justify-content: center;">
+            <a href="/customer/ledger" class="btn action-btn me-2">View Ledger</a>
+            <a href="/customer/complaints" class="btn action-btn">Add Complaint</a>
         </div>
     </div>
 

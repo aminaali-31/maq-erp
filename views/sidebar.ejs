@@ -22,32 +22,30 @@
       <% if(user && Number(user.role_id) === 1){ %>
       <!-- Admin Section -->
       <li class="nav-item">
-        <a class="nav-link text-white" href="/admin/approvals">
-          Role Approvals
-        </a>
+        <a href="/admin/dashboard" class="nav-link text-white">Dashboard</a>
       </li>
-
-      <li class="nav-item">
-        <a class="nav-link text-white" href="/auth/users">
-          Users
-        </a>
-      </li>
-      <% } %>
 
       <!-- Customer / Vendor Section -->
       <li class="nav-item">
         <a class="nav-link text-white d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#customersVendorsMenu" role="button" aria-expanded="false" aria-controls="customersVendorsMenu">
-          Customers / Vendors
+          Users
           <i class="bi bi-caret-down-fill"></i>
         </a>
         <div class="collapse" id="customersVendorsMenu">
           <ul class="nav flex-column ms-3">
+            <li class="nav-item"> <a class="nav-link text-white" href="/admin/approvals">Role Approvals </a>
+      </li>
+
+      <li class="nav-item"> <a class="nav-link text-white" href="/auth/users">Users </a>
+      </li>
             <li class="nav-item"><a class="nav-link text-white" href="/auth/customers">Customers</a></li>
             <li class="nav-item"><a class="nav-link text-white" href="/procure/allVendors">Vendors</a></li>
           </ul>
         </div>
       </li>
+      <% } %>
 
+       <% if(Number(user.role_id) === 1 || Number(user.role_id) === 3 ){ %>
       <!-- Sales Section -->
       <li class="nav-item">
       <a class="nav-link text-white d-flex justify-content-between align-items-center" 
@@ -67,11 +65,13 @@
         </ul>
       </div>
     </li>
+    <% } %>
 
+     <% if(Number(user.role_id) === 1 || Number(user.role_id) === 3 ){ %>
       <!-- Inventory / Stock Section -->
       <li class="nav-item">
         <a class="nav-link text-white d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#inventoryMenu" role="button" aria-expanded="false" aria-controls="inventoryMenu">
-          Inventory / Stock
+          Inventory
           <i class="bi bi-caret-down-fill"></i>
         </a>
         <div class="collapse" id="inventoryMenu">
@@ -83,11 +83,12 @@
           </ul>
         </div>
       </li>
-
+      <% } %>
+       <% if(Number(user.role_id) === 1 || Number(user.role_id) === 2 ){ %>
       <!-- Accounts / Payments Section -->
       <li class="nav-item">
         <a class="nav-link  text-white d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#accountsMenu" role="button" aria-expanded="false" aria-controls="accountsMenu">
-          Accounts / Payments
+          Finance
               <i class="bi bi-caret-down-fill"></i>
         </a>
         <div class="collapse" id="accountsMenu">
@@ -98,24 +99,31 @@
           </ul>
         </div>
       </li>
-
+      <% } %>
+       <% if(Number(user.role_id) === 1){ %>
        <li class="nav-item">
    <a class="nav-link text-white" href="/accounts/summary">Accounts Dashboard</a>
        </li>
+       <% } %>
+        <% if(Number(user.role_id) === 1 || Number(user.role_id) === 3 ){ %>
        <li class="nav-item">
         <a href="/admin/pendings" class="nav-link text-white">Pendings</a>
        </li>
+       <% } %>
+        <% if(Number(user.role_id) === 1){ %>
       <li class="nav-item">
         <a class="nav-link text-white" href="/hr/dashboard">
           Human Resource
         </a>
       </li>
-
+      <% } %>
+ <% if(Number(user.role_id) === 1 || Number(user.role_id) === 3 ){ %>
       <li class="nav-item">
         <a class="nav-link text-white" href="/procure/dashboard">
           Manager Dashboard
         </a>
       </li>
+      <% } %>
 
       <!-- Logout -->
       <li class="nav-item">

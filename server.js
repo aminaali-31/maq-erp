@@ -14,6 +14,7 @@ const accountRoutes = require('./routes/accounts');
 const hrRoutes = require('./routes/hr.routes');
 const customerRoutes = require('./routes/customer');
 const vendorRoutes = require('./routes/vendor');
+const quotationController = require('./modules/sales/quotations')
 
 
 const app = express();
@@ -47,6 +48,15 @@ app.use((req, res, next) => {
     next();
 });
 
+app.get('/', async (req, res) => {
+
+    const quotes = await quotationController.publishedQuotations();
+
+    res.render('quotations/dashboard', {
+        quotes
+    });
+
+});
 app.use("/auth", authRoutes);
 app.use("/admin", ceoRoutes);
 app.use('/inventory', inventoryRoutes);

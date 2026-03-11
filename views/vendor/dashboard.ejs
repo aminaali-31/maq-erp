@@ -9,11 +9,11 @@
     <div class="container">
 
     <!-- Ledger Summary -->
-    <div class="card mb-4">
-        <div class="card-header bg-info text-white">Ledger Summary</div>
-        <div class="card-body">
-            <table class="table table-bordered table-hover">
-                <thead class="table-light">
+    <div class="custom-card mb-4">
+        <div class="custom-card-header">Ledger Summary</div>
+        <div class="custom-card-header">
+            <table class="table">
+                <thead>
                     <tr>
                         <th>Total Debit</th>
                         <th>Total Credit</th>
@@ -32,14 +32,14 @@
     </div>
 
     <!-- Pending Purchase Orders -->
-    <div class="card mb-4">
-        <div class="card-header bg-warning text-dark">Pending Purchase Orders</div>
-        <div class="card-body">
+    <div class="custom-card mb-4">
+        <div class="custom-card-header">Pending Purchase Orders</div>
+        <div class="custom-card-body">
             <% if (pendingOrders.length === 0) { %>
                 <p class="text-muted">No pending orders.</p>
             <% } else { %>
-                <table class="table table-striped table-hover">
-                    <thead class="table-light">
+                <table class="table">
+                    <thead>
                         <tr>
                             <th>Order ID</th>
                             <th>Order Date</th>

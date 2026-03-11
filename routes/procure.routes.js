@@ -28,7 +28,7 @@ router.get('/purchase-orders/view/:id', authenticateAndAuthorize([1,3]), poContr
 
 router.get('/purchase-orders/change-status/:id', authenticateAndAuthorize([1,3]), poController.changePOStatus);
 
-router.get('/dashboard', dashboardController.getManagerDashboard);
+router.get('/dashboard',authenticateAndAuthorize([1,3]), dashboardController.getManagerDashboard);
 
 
 module.exports = router;
