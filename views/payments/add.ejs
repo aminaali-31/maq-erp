@@ -44,18 +44,45 @@
                                                 <div class="col-md-3 mb-3">
                                                 <label>From Account</label>
                                                 <select name="from_account_id" class="form-control">
-                                                <% accounts.forEach(a=>{ %>
-                                                    <option value="<%= a.id %>"><%= a.name %></option>
+
+                                                <% accounts.forEach(a => { %>
+                                                    <option value="<%= a.id %>">
+                                                        <%= a.name %> 
+                                                        
+                                                        <% if(a.type === 'customer'){ %>
+                                                            (Receivable: Rs <%= a.balance %>)
+                                                        
+                                                        <% } else if(a.type === 'vendor'){ %>
+                                                            (Payable: Rs <%= Math.abs(a.balance) %>)
+                                                        
+                                                        <% } else { %>
+                                                            (Balance: Rs <%= a.balance %>)
+                                                        <% } %>
+                                                    </option>
                                                 <% }) %>
-                                                </select>
+
+                                            </select>
                                                 </div>
                                                 <div class="col-md-3 mb-3">
                                                 <label>To Account</label>
                                                 <select name="to_account_id" class="form-control">
-                                                <% accounts.forEach(a=>{ %>
-                                                    <option value="<%= a.id %>"><%= a.name %></option>
+                                                <% accounts.forEach(a => { %>
+                                                    <option value="<%= a.id %>">
+                                                        <%= a.name %> 
+                                                        
+                                                        <% if(a.type === 'customer'){ %>
+                                                            (Receivable: Rs <%= a.balance %>)
+                                                        
+                                                        <% } else if(a.type === 'vendor'){ %>
+                                                            (Payable: Rs <%= Math.abs(a.balance) %>)
+                                                        
+                                                        <% } else { %>
+                                                            (Balance: Rs <%= a.balance %>)
+                                                        <% } %>
+                                                    </option>
                                                 <% }) %>
-                                                </select>
+
+                                            </select>
                                                 </div>
                                                 <!-- Amount -->
                                                 <div class="col-md-3 mb-3">

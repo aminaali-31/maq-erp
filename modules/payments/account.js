@@ -108,6 +108,90 @@ exports.accountSummary = async (req,res)=>{
     try{
 
         const [accounts] = await pool.execute(`
+            SELECT 
+                a.id,
+                a.name,
+                a.type,
+                COALESCE(SUM(je.debit),0) AS total_debit,
+                COALESCE(SUM(je.credit),0) AS total_credit,
+                COALESCE(SUM(je.debit - je.credit),0) AS balance
+            FROM accounts a
+            LEFT JOIN journal_entries je 
+                ON je.account_id = a.id
+            LEFT JOIN journal j
+                ON j.id = je.journal_id
+            WHERE a.name IN ('sales revenue', 'stock account', 'expense')
+            GROUP BY a.id
+            ORDER BY a.name
+        `,);
+
+        const [receivable] = await pool.execute(`
+            SELECT 
+                COALESCE(SUM(je.debit),0) AS total_debit,
+                COALESCE(SUM(je.credit),0) AS total_credit,
+                COALESCE(SUM(je.debit - je.credit),0) AS balance
+            FROM customers c
+            LEFT JOIN accounts a 
+                ON c.account_id = a.id
+            LEFT JOIN journal_entries je 
+                ON je.account_id = a.id
+        `);
+        
+            const [payable] = await pool.execute(`
+            SELECT 
+                COALESCE(SUM(je.debit),0) AS total_debit,
+                COALESCE(SUM(je.credit),0) AS total_credit,
+                COALESCE(SUM(je.credit - je.debit),0) AS balance
+            FROM vendors v
+            LEFT JOIN accounts a 
+                ON v.account_id = a.id
+            LEFT JOIN journal_entries je 
+                ON je.account_id = a.id
+        `);
+        const [sales] = await pool.execute(`
+            SELECT 
+
+                COALESCE(SUM(
+                    CASE 
+                        WHEN MONTH(j.date) = MONTH(CURRENT_DATE)
+                        AND YEAR(j.date) = YEAR(CURRENT_DATE)
+                        THEN je.credit ELSE 0
+                    END
+                ),0) AS this_month_sales,
+
+                COALESCE(SUM(
+                    CASE 
+                        WHEN YEAR(j.date) = YEAR(CURRENT_DATE)
+                        THEN je.credit ELSE 0
+                    END
+                ),0) AS this_year_sales,
+
+                COALESCE(SUM(je.credit),0) AS total_sales
+
+            FROM accounts a
+            JOIN journal_entries je ON je.account_id = a.id
+            JOIN journal j ON j.id = je.journal_id
+            WHERE a.name='sales revenue'
+        `);
+        const sale = sales[0];
+        const rec = receivable[0];
+        const pay = payable[0];
+
+        res.render('payments/summary',{
+                accounts,
+                sale,
+                rec,
+                pay
+    });
+    }catch(err){
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+};
+
+exports.showAllAccounts = async (req,res) => {
+    try {
+        const [accounts] = await pool.execute(`
                 SELECT 
                     a.id,
                     a.name,
@@ -158,17 +242,16 @@ exports.accountSummary = async (req,res)=>{
         const rec = receivable[0];
         const pay = payable[0];
 
-        res.render('payments/summary',{
-                accounts,
-                rec,
-                pay
-    });
+        res.render('payments/allAccounts', {
+            accounts,
+            rec,
+            pay
+        })
     }catch(err){
         console.error(err);
         res.status(500).send("Server Error");
     }
-};
-
+}
 // Show add account form
 exports.showAddAccount = (req, res) => {
     res.render('payments/addAccount', {message:req.query.message});

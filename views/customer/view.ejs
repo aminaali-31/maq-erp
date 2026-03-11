@@ -26,7 +26,7 @@
 
         <div class="card mb-4 shadow-sm">
             <div class="card-body">
-                <p><strong>Order Date:</strong> <%= new Date(order.order_date).toLocaleDateString() %></p>
+                <p><strong>Order Date:</strong> <%= new Date(order.date).toLocaleDateString() %></p>
                 <p><strong>Status:</strong> 
                     <% if(order.status === 'pending') { %>
                         <span class="badge bg-warning text-dark">Pending</span>

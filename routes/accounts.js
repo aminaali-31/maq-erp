@@ -22,4 +22,6 @@ router.get('/payables', accountController.showPayable);
 
 router.get('/receivables', accountController.showReceivable);
 
+router.get('/allAccounts', accountController.showAllAccounts);
+
 module.exports = router;

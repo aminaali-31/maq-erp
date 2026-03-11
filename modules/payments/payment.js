@@ -3,26 +3,32 @@ const pool = require('../../config/db');
 
 exports.showPaymentForm = async (req,res)=>{
     try{
-        const [sales] = await pool.execute(
-            "SELECT id  FROM sales_orders WHERE status IN ('pending','payment pending') ORDER BY id DESC"
-        );
+       
+         const [accounts] = await pool.execute(`
+            SELECT 
+                a.id,
+                a.name,
+                COALESCE(SUM(je.debit - je.credit),0) AS balance,
 
-        const [purchases] = await pool.execute(
-            "SELECT id FROM purchase_orders WHERE status IN ('Pending','Received') ORDER BY id DESC"
-        );
+                CASE
+                    WHEN c.id IS NOT NULL THEN 'customer'
+                    WHEN v.id IS NOT NULL THEN 'vendor'
+                    ELSE 'account'
+                END AS type
 
-        const [expenses] = await pool.execute(
-            "SELECT id, title FROM expenses WHERE status='UNPAID' ORDER BY id DESC"
-        );
-
-        const [accounts] = await pool.execute(
-            "SELECT id,name FROM accounts"
-        );
+            FROM accounts a
+            LEFT JOIN journal_entries je 
+                ON je.account_id = a.id
+            LEFT JOIN customers c 
+                ON c.account_id = a.id
+            LEFT JOIN vendors v 
+                ON v.account_id = a.id
+            WHERE a.name NOT IN ('sales revenue','stock account')
+            GROUP BY a.id, a.name, c.id, v.id
+            ORDER BY a.name
+    `);
 
         res.render('payments/add',{
-            sales,
-            purchases,
-            expenses,
             accounts,
             success:req.query.success,
             error:req.query.error
