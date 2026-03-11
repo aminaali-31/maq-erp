@@ -11,24 +11,28 @@
     flex-direction: column;
     align-items: center;
 }
+
 main {
     margin-left: 250px;
     height: 100vh;
     overflow-y: auto;
 }
+
 .sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 250px;
-  overflow-y: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px;
+    overflow-y: auto;
 }
+
 form {
     padding: 10px;
     background-color: white;
     border-radius: 10px;
 }
+
 body {
     overflow-x: hidden;
 }
@@ -42,25 +46,130 @@ body {
 }
 
 /* Container fix */
-.container-fluid{
+.container-fluid {
     padding: 0;
 }
 
 /* Main content */
-main{
+main {
     transition: all 0.3s ease;
 }
 
 /* Table mobile scroll */
-.table-responsive{
+.table-responsive {
     width: 100%;
     overflow-x: auto;
 }
 
-/* Mobile layout */
-@media (max-width: 768px){
+/* ============================= */
+/* Dashboard Card Styles */
+/* ============================= */
+body {
+    background-color: #f5f6fa;
+}
 
-    .sidebar{
+.metric-card {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 5px;
+
+    border-left: 3px solid #7C4DFF;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+}
+
+.metric-card:hover {
+    transform: translateY(-3px);
+}
+
+.metric-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #af34ec;
+    background-color: #d7a3f940;
+    margin-right: 15px;
+}
+
+
+.metric-title {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+}
+
+.metric-card h4 {
+    font-weight: 700;
+    margin: 0;
+    font-size: 20px;
+}
+
+/* Action buttons */
+.action-btn {
+    border-radius: 10px;
+    font-weight: 500;
+    background-color: #7C4DFF;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 1s ease-in-out;
+}
+
+.action-btn:hover {
+    border: 1px solid #7C4DFF;
+    background-color: #f5f6fa;
+    color: black;
+}
+
+/* Custom Card Styles */
+.custom-card {
+    background-color: #fff;
+    border: 1px solid #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 15px;
+}
+
+.custom-card-body {
+    padding: 20px;
+}
+
+.custom-card-header {
+    color: #000000;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #ffffff;
+}
+
+/* Table badges */
+.badge {
+    font-size: 0.8rem;
+}
+
+.chart-container {
+    height: 300px;
+    width: 100%;
+}
+
+/* Mobile layout */
+@media (max-width: 768px) {
+    .metric-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .metric-icon {
+        margin-bottom: 10px;
+    }
+
+    .sidebar {
         position: fixed;
         left: -260px;
         width: 250px;
@@ -70,18 +179,18 @@ main{
         transition: 0.3s;
     }
 
-    .sidebar.active{
+    .sidebar.active {
         left: 0;
         display: inline-block;
     }
 
-    main{
+    main {
         width: 100%;
         margin-left: 0 !important;
         padding: 15px;
     }
 
-    table{
+    table {
         font-size: 13px;
     }
 

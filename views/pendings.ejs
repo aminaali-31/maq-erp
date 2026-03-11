@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('head') %>
+        <title>Dashboard - Pending Items</title>
+
+        <style>
+            .custom-card {
+                border-left: 3px solid #7C4DFF;
+            }
+
+            .custom-card:hover {
+                transform: translateY(-3px);
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            thead {
+                background-color: #f5f6fa;
+            }
+        </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row position-sticky">
+
+            <%- include('sidebar') %>
+
+                <main class="col-md-9 col-lg-10 p-4">
+                     <div class="row g-4">
+                    <h2 class="mb-4">Dashboard - Pending Items</h2>
+
+                        <!-- Pending Sale Orders -->
+                        <div class="col-12">
+                            <div class="custom-card p-3">
+                                <h5>Pending Sale Orders (<%= pendingSales.length %>)</h5>
+
+                                <div class="table-responsive mt-3">
+                                    <table class="table table-sm table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Customer</th>
+                                                <th>Date</th>
+                                                <th>Amount</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <% if(pendingSales.length===0){ %>
+                                                <tr>
+                                                    <td colspan="4" class="text-center">No pending sale orders</td>
+                                                </tr>
+                                                <% } %>
+
+                                                    <% pendingSales.forEach(order=> { %>
+                                                        <tr>
+                                                            <td>#<%= order.id %>
+                                                            </td>
+                                                            <td>
+                                                                <%= order.customer_name %>
+                                                            </td>
+                                                            <td>
+                                                                <%= new Date(order.date).toLocaleDateString() %>
+                                                            </td>
+                                                            <td>
+                                                                <%= order.total_amount.toLocaleString() %>
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Pending Complaints -->
+                        <div class="col-md-6">
+                            <div class="custom-card p-3">
+                                <h5>Pending Complaints (<%= pendingComplaints.length %>)</h5>
+
+                                <div class="table-responsive mt-3">
+                                    <table class="table table-sm table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Customer</th>
+                                                <th>Message</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <% if(pendingComplaints.length===0){ %>
+                                                <tr>
+                                                    <td colspan="4" class="text-center">No pending complaints</td>
+                                                </tr>
+                                                <% } %>
+
+                                                    <% pendingComplaints.forEach(comp=> { %>
+                                                        <tr>
+                                                            <td>#<%= comp.id %>
+                                                            </td>
+                                                            <td>
+                                                                <%= comp.customer_name %>
+                                                            </td>
+                                                            <td>
+                                                                <%= comp.message %>
+                                                            </td>
+                                                            <td>
+                                                                <%= new Date(comp.date).toLocaleDateString() %>
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <!-- Pending Approvals -->
+                        <div class="col-md-6">
+                            <div class="custom-card p-3">
+                                <h5>Pending Approvals (<%= approvals.length %>)</h5>
+
+                                <div class="table-responsive mt-3">
+                                    <table class="table table-sm table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Username</th>
+                                                <th>Email</th>
+                                                <th>Role</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+
+                                            <% if(approvals.length===0){ %>
+                                                <tr>
+                                                    <td colspan="4" class="text-center">No pending approvals</td>
+                                                </tr>
+                                                <% } %>
+
+                                                    <% approvals.forEach(app=> { %>
+                                                        <tr>
+                                                            <td>#<%= app.id %>
+                                                            </td>
+                                                            <td>
+                                                                <%= app.username %>
+                                                            </td>
+                                                            <td>
+                                                                <%= app.email %>
+                                                            </td>
+                                                            <td>
+                                                                <%= app.role_name %>
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+</div>
+
+                    </div>
+                </main>
+    </div>
+</body>
+
+</html>

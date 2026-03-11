@@ -3,6 +3,7 @@ const router = express.Router();
 const { register_roles,register, login, logout, addCustomer,listCustomers,
             deleteCustomer,showEditCustomer,updateCustomer ,listUsers} = require("../modules/auth/auth.controller");
 
+
 const authenticateAndAuthorize = require('../middlewares/inventory');
 // Registration page
 router.get("/register",register_roles);
@@ -26,7 +27,6 @@ router.get('/customers/edit/:id', authenticateAndAuthorize([1,3]), showEditCusto
 router.post('/customers/update/:id', authenticateAndAuthorize([1,3]), updateCustomer);
 
 router.get('/customers/delete/:id', authenticateAndAuthorize([1,3]), deleteCustomer);
-
 
 router.get('/users',authenticateAndAuthorize([1]),listUsers);
 module.exports = router;

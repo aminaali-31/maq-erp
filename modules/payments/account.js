@@ -38,16 +38,16 @@ exports.showLedger = async (req, res) => {
             let debit = Number(e.debit) || 0;
             let credit = Number(e.credit) || 0;
 
-            if(account.type === 'income' || account.type === 'liability'){
+            if (account.type === 'income' || account.type === 'liability') {
                 balance += credit - debit;
             }
-            else{
+            else {
                 balance += debit - credit;
             }
 
             e.balance = balance;
         });
-        res.render('payments/ledger', {account,entries});
+        res.render('payments/ledger', { account, entries });
 
     } catch (err) {
         console.error(err);
@@ -55,7 +55,7 @@ exports.showLedger = async (req, res) => {
     }
 };
 
-exports.showPayable = async (req,res) => {
+exports.showPayable = async (req, res) => {
     try {
         const [payable] = await pool.execute(`
             SELECT 
@@ -70,8 +70,9 @@ exports.showPayable = async (req,res) => {
             LEFT JOIN journal j ON je.journal_id = j.id
             GROUP BY v.id, v.name
             ORDER BY v.name;`);
-        
-        res.render('payments/ledger', {entries: payable, account:{name:'Payables'} 
+
+        res.render('payments/ledger', {
+            entries: payable, account: { name: 'Payables' }
         })
     } catch (e) {
         console.log(e);
@@ -79,7 +80,7 @@ exports.showPayable = async (req,res) => {
     }
 }
 
-exports.showReceivable = async (req,res) => {
+exports.showReceivable = async (req, res) => {
     try {
         const [rece] = await pool.execute(`
             SELECT 
@@ -97,33 +98,15 @@ exports.showReceivable = async (req,res) => {
             GROUP BY c.id, c.name
             ORDER BY c.name;`)
 
-        res.render('payments/ledger', {entries: rece, account:{name:'Receivables'}})
+        res.render('payments/ledger', { entries: rece, account: { name: 'Receivables' } })
     } catch (e) {
         console.log(e);
         res.status(500).send("Database Error")
     }
 }
 
-exports.accountSummary = async (req,res)=>{
-    try{
-
-        const [accounts] = await pool.execute(`
-            SELECT 
-                a.id,
-                a.name,
-                a.type,
-                COALESCE(SUM(je.debit),0) AS total_debit,
-                COALESCE(SUM(je.credit),0) AS total_credit,
-                COALESCE(SUM(je.debit - je.credit),0) AS balance
-            FROM accounts a
-            LEFT JOIN journal_entries je 
-                ON je.account_id = a.id
-            LEFT JOIN journal j
-                ON j.id = je.journal_id
-            WHERE a.name IN ('sales revenue', 'stock account', 'expense')
-            GROUP BY a.id
-            ORDER BY a.name
-        `,);
+exports.accountSummary = async (req, res) => {
+    try {
 
         const [receivable] = await pool.execute(`
             SELECT 
@@ -136,8 +119,8 @@ exports.accountSummary = async (req,res)=>{
             LEFT JOIN journal_entries je 
                 ON je.account_id = a.id
         `);
-        
-            const [payable] = await pool.execute(`
+
+        const [payable] = await pool.execute(`
             SELECT 
                 COALESCE(SUM(je.debit),0) AS total_debit,
                 COALESCE(SUM(je.credit),0) AS total_credit,
@@ -148,48 +131,52 @@ exports.accountSummary = async (req,res)=>{
             LEFT JOIN journal_entries je 
                 ON je.account_id = a.id
         `);
-        const [sales] = await pool.execute(`
-            SELECT 
+        const [accounts] = await pool.execute(`
+    SELECT 
+        a.name AS account_name,
+        a.type,
 
-                COALESCE(SUM(
-                    CASE 
-                        WHEN MONTH(j.date) = MONTH(CURRENT_DATE)
-                        AND YEAR(j.date) = YEAR(CURRENT_DATE)
-                        THEN je.credit ELSE 0
-                    END
-                ),0) AS this_month_sales,
+        COALESCE(SUM(
+            CASE 
+                WHEN MONTH(j.date) = MONTH(CURRENT_DATE)
+                     AND YEAR(j.date) = YEAR(CURRENT_DATE)
+                THEN ABS(je.debit - je.credit)
+                ELSE 0
+            END
+        ), 0) AS this_month,
 
-                COALESCE(SUM(
-                    CASE 
-                        WHEN YEAR(j.date) = YEAR(CURRENT_DATE)
-                        THEN je.credit ELSE 0
-                    END
-                ),0) AS this_year_sales,
+        COALESCE(SUM(
+            CASE 
+                WHEN YEAR(j.date) = YEAR(CURRENT_DATE)
+                THEN ABS(je.debit - je.credit)
+                ELSE 0
+            END
+        ), 0) AS this_year,
 
-                COALESCE(SUM(je.credit),0) AS total_sales
+        COALESCE(SUM(ABS(je.debit - je.credit)), 0) AS total
 
-            FROM accounts a
-            JOIN journal_entries je ON je.account_id = a.id
-            JOIN journal j ON j.id = je.journal_id
-            WHERE a.name='sales revenue'
-        `);
-        const sale = sales[0];
+    FROM accounts a
+    LEFT JOIN journal_entries je ON je.account_id = a.id
+    LEFT JOIN journal j ON j.id = je.journal_id
+    WHERE a.name IN ('Sales Revenue', 'Office Expenses', 'Stocks')
+    GROUP BY a.id, a.name
+`);
+  
         const rec = receivable[0];
         const pay = payable[0];
 
-        res.render('payments/summary',{
-                accounts,
-                sale,
-                rec,
-                pay
-    });
-    }catch(err){
+        res.render('payments/summary', {
+            accounts,
+            rec,
+            pay
+        });
+    } catch (err) {
         console.error(err);
         res.status(500).send("Server Error");
     }
 };
 
-exports.showAllAccounts = async (req,res) => {
+exports.showAllAccounts = async (req, res) => {
     try {
         const [accounts] = await pool.execute(`
                 SELECT 
@@ -227,8 +214,8 @@ exports.showAllAccounts = async (req,res) => {
             LEFT JOIN journal_entries je 
                 ON je.account_id = a.id
         `);
-        
-            const [payable] = await pool.execute(`
+
+        const [payable] = await pool.execute(`
             SELECT 
                 COALESCE(SUM(je.debit),0) AS total_debit,
                 COALESCE(SUM(je.credit),0) AS total_credit,
@@ -247,14 +234,14 @@ exports.showAllAccounts = async (req,res) => {
             rec,
             pay
         })
-    }catch(err){
+    } catch (err) {
         console.error(err);
         res.status(500).send("Server Error");
     }
 }
 // Show add account form
 exports.showAddAccount = (req, res) => {
-    res.render('payments/addAccount', {message:req.query.message});
+    res.render('payments/addAccount', { message: req.query.message });
 };
 
 // Save account

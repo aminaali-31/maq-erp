@@ -96,6 +96,16 @@ exports.getManagerDashboard = async (req, res) => {
         GROUP BY month_num, month
         ORDER BY month_num
         `);
+        const [monthlyPurchases] = await pool.execute(`
+            SELECT 
+                MONTH(order_date) AS month_num,
+                DATE_FORMAT(order_date,'%b') AS month,
+                SUM(total_amount) AS totalPurchases,
+                COUNT(*) AS totalPO
+            FROM purchase_orders
+            GROUP BY month_num, month
+            ORDER BY month_num
+        `);
 
         /*
         -------------------------------------------------
@@ -119,7 +129,8 @@ exports.getManagerDashboard = async (req, res) => {
 
             recentSalesOrders,
             recentPOs,
-            monthlySales
+            monthlySales,
+            monthlyPurchases
         });
 
     } catch (error) {
