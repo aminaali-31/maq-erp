@@ -19,9 +19,20 @@ exports.register_roles = async (req,res) => {
 exports.register = async (req, res) => {
   const roleId = parseInt(req.body.role_id, 10);
   const { username, email, password, 'g-recaptcha-response': captcha } = req.body;
+  if (!captcha) {
+        return res.send('Please complete the CAPTCHA');
+    }
 
   try {
 
+    const secretKey = process.env.SECRET_KEY;
+    const response = await axios.post(
+            `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${captcha}`
+        );
+
+    if (!response.data.success) {
+        return res.send('CAPTCHA verification failed');
+    }
     // Check if email exists
     const [existing] = await pool.query(
       "SELECT id FROM users WHERE email = ?",
