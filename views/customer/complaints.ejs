@@ -22,7 +22,11 @@
     <%- include('nav') %>
 
     <div class="container my-5">
+        <a href="javascript:history.back()">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
         <h1 class="mb-4 text-center">My Complaints</h1>
+        
 
         <% if (complaints.length === 0) { %>
             <div class="alert alert-info text-center">You have not submitted any complaints yet.</div>

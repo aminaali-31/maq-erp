@@ -11,6 +11,9 @@
         <div class="row position-sticky">
             <%- include('../sidebar') %>
                 <main class="col-md-9 col-lg-10 p-4">
+                    <a href="javascript:history.back()">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
                     <h2>Payroll List</h2>
 
                     <a href="/hr/payroll/add" class="btn btn-primary mb-3">
@@ -30,7 +33,6 @@
                                     <th>Overtime</th>
                                     <th>Deductions</th>
                                     <th>Net Salary</th>
-                                    <th>Status</th>
                                 </tr>
                             </thead>
 
@@ -70,12 +72,7 @@
                                                 <td>
                                                     <strong>Rs. <%= Number(p.net_salary).toFixed(2) %></strong>
                                                 </td>
-                                                <td>
-                                                    <span
-                                                        class="badge bg-<%= p.status === 'paid' ? 'success' : 'warning' %>">
-                                                        <%= p.status %>
-                                                    </span>
-                                                </td>
+                                       
                                             </tr>
                                             <% }) %>
 

@@ -9,6 +9,9 @@
     <div class="row position-sticky">
     <%- include('../sidebar') %>
     <main class="col-md-9 col-lg-10 p-4">
+        <a href="javascript:history.back()">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
        <h2>Edit Product</h2>
         <form method="POST" action="/inventory/products/<%= product.id %>/edit">
             <div class="mb-3">

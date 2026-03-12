@@ -9,6 +9,9 @@
     <div class="row position-sticky">
     <%- include('../sidebar') %>
     <main class="col-md-9 col-lg-10 p-4">
+        <a href="javascript:history.back()">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
         <div class="container mt-5">
       <h2>Stock Movements</h2>
       <div class="table-responsive">
@@ -46,7 +49,12 @@
                         Rs.<%= Number(m.cost_price).toLocaleString('en-US', { minimumFractionDigits: 2 }) %>
                     </td>
                     <td>
-                        <%= m.reference_type %> #<%= m.reference_id %>
+                        <% if (m.reference_type === 'Sales Order') { %>
+                            <a href="/sales/orders/view/<%= m.reference_id %>" class="text-dark"><%= m.reference_type %> #<%= m.reference_id %></a>
+                        <% } else { %>
+                            <a href="/procure/purchase-orders/view/<%= m.reference_id %>" class="text-dark"><%= m.reference_type %> #<%= m.reference_id %></a>
+                        <% } %>
+                       
                     </td>
                     <td>
                         <%= new Date(m.date).toLocaleString() %>
