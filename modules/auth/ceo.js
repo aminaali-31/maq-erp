@@ -183,3 +183,61 @@ exports.dashboard = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
+exports.createJobForm = async (req, res) => {
+    try {
+
+        const [employees] = await pool.execute(
+            `SELECT id, username FROM users`
+        );
+
+        res.render('jobs/create', {
+            employees,
+            error: req.query.error || null,
+            success: req.query.success || null
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.redirect('/jobs?error=' + encodeURIComponent(err.message));
+    }
+};
+
+exports.createJob = async (req, res) => {
+
+    const { title, description, employee_id, show_date, due_date } = req.body;
+
+    if (!title || !employee_id || !show_date) {
+        return res.redirect('/admin/jobs/create?error=Required fields missing');
+    }
+
+    try {
+
+        await pool.execute(
+            `INSERT INTO jobs
+            (title, description, employee_id, show_date, due_date, status)
+            VALUES (?, ?, ?, ?, ?, 'PENDING')`,
+            [title, description, employee_id, show_date, due_date]
+        );
+
+        res.redirect('/admin/jobs/create?success=Job created');
+
+    } catch (err) {
+        console.error(err);
+        res.redirect('/admin/jobs/create?error=' + encodeURIComponent(err.message));
+    }
+};
+
+
+exports.showAllJobs = async (req,res) => {
+  try {
+
+    const [jobs] =await pool.execute(`
+      SELECT * FROM jobs`);
+
+    res.render('jobs/all', {jobs});
+  } catch (e) {
+       console.error(e);
+      res.status(500).send("Database Error");
+  }
+}

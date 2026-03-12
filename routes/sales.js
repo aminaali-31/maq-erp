@@ -25,7 +25,7 @@ router.post('/orders/new' ,authenticateAndAuthorize([1,3]), salesController.crea
 
 router.get('/orders', authenticateAndAuthorize([1,3]),salesController.listSalesOrders);
 
-router.post('/orders/status',authenticateAndAuthorize([1,3]), salesController.updateOrderStatus);
+router.post('/orders/status',authenticateAndAuthorize([1]), salesController.updateOrderStatus);
 
 router.get('/orders/view/:id',authenticateAndAuthorize([1,3]), salesController.viewSalesOrder);
 
@@ -38,5 +38,6 @@ router.get("/invoices",authenticateAndAuthorize([1,3]), invoiceController.listIn
 router.get('/orders/edit/:id', authenticateAndAuthorize([1,3]),salesController.editOrderForm);
 
 router.post('/orders/edit/:id',authenticateAndAuthorize([1,3]), salesController.updateEditOrder);
+
 
 module.exports = router;

@@ -106,7 +106,14 @@ exports.getManagerDashboard = async (req, res) => {
             GROUP BY month_num, month
             ORDER BY month_num
         `);
-
+        const [jobs] = await pool.execute(
+            `SELECT *
+            FROM jobs
+            WHERE employee_id = ?
+            AND show_date <= CURDATE()
+            ORDER BY show_date DESC`,
+            [req.session.user.id]
+        );
         /*
         -------------------------------------------------
         Render Dashboard View
@@ -130,6 +137,7 @@ exports.getManagerDashboard = async (req, res) => {
             recentSalesOrders,
             recentPOs,
             monthlySales,
+            jobs,
             monthlyPurchases
         });
 

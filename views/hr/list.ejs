@@ -16,6 +16,17 @@
                     <a href="/hr/add" class="btn btn-primary mb-3">
                         Add Employee
                     </a>
+                     <% if (success) { %>
+                                    <div class="alert alert-success w-100">
+                                        <%= success %>
+                                    </div>
+                                    <% } %>
+
+                                        <% if (error) { %>
+                                            <div class="alert alert-danger w-100">
+                                                <%= error %>
+                                            </div>
+                                            <% } %>
                     <table class="table table-bordered">
 
                         <thead class="table-dark">
@@ -24,6 +35,7 @@
                                 <th>Name</th>
                                 <th>Department</th>
                                 <th>Salary</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
 
@@ -47,6 +59,9 @@
                                                 <%= e.department_name || 'N/A' %>
                                             </td>
                                             <td>Rs.<%= e.salary %>
+                                            </td>
+                                            <td>
+                                                <a href="/hr/edit/<%= e.id %>" class="btn btn-primary">Edit</a>
                                             </td>
                                         </tr>
                                         <% }) %>

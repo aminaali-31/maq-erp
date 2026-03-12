@@ -1,298 +1,365 @@
 <!DOCTYPE html>
+
 <head>
     <%- include('../head') %>
-    <title>ERP Dashboard</title>
+        <title>ERP Dashboard</title>
 
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+        <!-- Bootstrap Icons -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
-    <style>
-      
-    </style>
+        <style>
+
+        </style>
 </head>
 
 <body>
     <div class="container-fluid">
         <div class="row position-sticky">
             <%- include('../sidebar') %>
-            <main class="col-md-9 col-lg-10 p-4">
+                <main class="col-md-9 col-lg-10 p-4">
 
-                <!-- ============================= -->
-                <!-- Key Summary Cards -->
-                <!-- ============================= -->
-                <div class="row g-3" style="margin-bottom: 30px;">
+                    <!-- ============================= -->
+                    <!-- Key Summary Cards -->
+                    <!-- ============================= -->
+                    <div class="row g-3" style="margin-bottom: 30px;">
 
-                    <div class="col-lg-3 col-md-6">
-                        <div class="metric-card">
-                            <div class="metric-icon"><i class="bi bi-currency-dollar"></i></div>
-                            <div>
-                                <p class="metric-title">Total Sales</p>
-                                <h4>PKR <%= summary.totalSales %></h4>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <div class="metric-card">
-                            <div class="metric-icon"><i class="bi bi-box-seam"></i></div>
-                            <div>
-                                <p class="metric-title">Sales Orders</p>
-                                <h4><%= summary.totalOrders %></h4>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <div class="metric-card">
-                            <div class="metric-icon"><i class="bi bi-credit-card"></i></div>
-                            <div>
-                                <p class="metric-title">Pending Receivables</p>
-                                <h4>PKR <%= summary.pendingReceivables %></h4>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <div class="metric-card">
-                            <div class="metric-icon"><i class="bi bi-graph-up"></i></div>
-                            <div>
-                                <p class="metric-title">Total Profit</p>
-                                <h4>PKR <%= summary.totalProfit %></h4>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <div class="metric-card">
-                            <div class="metric-icon"><i class="bi bi-bag-check"></i></div>
-                            <div>
-                                <p class="metric-title">Purchase Orders</p>
-                                <h4><%= summary.totalPO %></h4>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <div class="metric-card">
-                            <div class="metric-icon"><i class="bi bi-cash-stack"></i></div>
-                            <div>
-                                <p class="metric-title">Pending Payables</p>
-                                <h4>PKR <%= summary.pendingPayables %></h4>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <div class="metric-card">
-                            <div class="metric-icon"><i class="bi bi-exclamation-triangle"></i></div>
-                            <div>
-                                <p class="metric-title">Low Stock Items</p>
-                                <h4><%= summary.lowStockCount %></h4>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <div class="metric-card">
-                            <div class="metric-icon"><i class="bi bi-boxes"></i></div>
-                            <div>
-                                <p class="metric-title">Total Products</p>
-                                <h4><%= summary.totalProducts %></h4>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- ============================= -->
-                <!-- Action Buttons -->
-                <!-- ============================= -->
-                <div class=" g-3 text-center d-flex justify-content-between align-items-center" style="margin-bottom: 30px;">
-                    <div class="col-md-2 col-6">
-                        <a href="/sales/orders/new" class="btn  w-100 action-btn"><i class="bi bi-plus-lg me-1"></i> Add Sale</a>
-                    </div>
-                    <div class="col-md-2 col-6">
-                        <a href="/sales/orders" class="btn  w-100 action-btn"><i class="bi bi-box-seam me-1"></i> Sales Orders</a>
-                    </div>
-                    <div class="col-md-2 col-6">
-                        <a href="/procure/purchase-orders/add" class="btn  w-100 action-btn"><i class="bi bi-cart-plus me-1"></i> Purchase Order</a>
-                    </div>
-                    <div class="col-md-2 col-6">
-                        <a href="/procure/purchase-orders" class="btn w-100 action-btn"><i class="bi bi-gear me-1"></i> Procurement</a>
-                    </div>
-                    <div class="col-md-2 col-6">
-                        <a href="/inventory/allProducts" class="btn w-100 action-btn"><i class="bi bi-archive me-1"></i> Inventory</a>
-                    </div>
-                </div>
-
-                <!-- ============================= -->
-                <!-- Charts -->
-                <!-- ============================= -->
-                <div class="row mb-4">
-    <!-- First chart: 3/4 width -->
-    <div class="col-md-9">
-        <div class="custom-card">
-            <div class="custom-card-body">
-                <h6 class=" mb-3">Sales vs Purchase Analytics</h6>
-                <div class="chart-container">
-                    <canvas id="financeChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pie chart: 1/4 width -->
-    <div class="col-md-3">
-        <div class="custom-card">
-            <div class="custom-card-body">
-                <h6 class="mb-3">Order Distribution</h6>
-                <div class="chart-container">
-                    <canvas id="orderChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-                    <div class="col-lg-12 mt-4">
-                        <div class="custom-card">
-                            <div class="custom-card-body">
-                                <h6 class=" mb-3">Sales Trend</h6>
-                                <div class="chart-container">
-                                    <canvas id="salesTrendChart"></canvas>
+                        <div class="col-lg-3 col-md-2">
+                            <div class="metric-card">
+                                <div class="metric-icon"><i class="bi bi-currency-dollar"></i></div>
+                                <div>
+                                    <p class="metric-title">Total Sales</p>
+                                    <h4>
+                                        <%= summary.totalSales %>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- ============================= -->
-                <!-- Tables -->
-                <!-- ============================= -->
-                <div class="row g-3">
-                    <div class="col-md-6">
+                        <div class="col-lg-3 col-md-2">
+                            <div class="metric-card">
+                                <div class="metric-icon"><i class="bi bi-box-seam"></i></div>
+                                <div>
+                                    <p class="metric-title">Sales Orders</p>
+                                    <h4>
+                                        <%= summary.totalOrders %>
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="metric-card">
+                                <div class="metric-icon"><i class="bi bi-credit-card"></i></div>
+                                <div>
+                                    <p class="metric-title">Pending Receivables</p>
+                                    <h4>
+                                        <%= summary.pendingReceivables %>
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="metric-card">
+                                <div class="metric-icon"><i class="bi bi-bag-check"></i></div>
+                                <div>
+                                    <p class="metric-title">Purchase Orders</p>
+                                    <h4>
+                                        <%= summary.totalPO %>
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="metric-card">
+                                <div class="metric-icon"><i class="bi bi-cash-stack"></i></div>
+                                <div>
+                                    <p class="metric-title">Pending Payables</p>
+                                    <h4>
+                                        <%= summary.pendingPayables %>
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="metric-card">
+                                <div class="metric-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                                <div>
+                                    <p class="metric-title">Low Stock Items</p>
+                                    <h4>
+                                        <%= summary.lowStockCount %>
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="metric-card">
+                                <div class="metric-icon"><i class="bi bi-boxes"></i></div>
+                                <div>
+                                    <p class="metric-title">Total Products</p>
+                                    <h4>
+                                        <%= summary.totalProducts %>
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ============================= -->
+                    <!-- Action Buttons -->
+                    <!-- ============================= -->
+                    <div class=" g-3 text-center d-flex justify-content-between align-items-center wrap"
+                        style="margin-bottom: 30px;">
+                        <div class="col-md-2 col-6">
+                            <a href="/sales/orders/new" class="btn  w-100 action-btn"><i class="bi bi-plus-lg me-1"></i>
+                                Add Sale</a>
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <a href="/sales/orders" class="btn  w-100 action-btn"><i class="bi bi-box-seam me-1"></i>
+                                Sales Orders</a>
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <a href="/procure/purchase-orders/add" class="btn  w-100 action-btn"><i
+                                    class="bi bi-cart-plus me-1"></i> Purchase Order</a>
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <a href="/procure/purchase-orders/all" class="btn w-100 action-btn"><i
+                                    class="bi bi-gear me-1"></i> Procurement</a>
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <a href="/inventory/allProducts" class="btn w-100 action-btn"><i
+                                    class="bi bi-archive me-1"></i> Inventory</a>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
                         <div class="custom-card">
-                            <div class="custom-card-header mb-3">Latest Sales Orders</div>
+                            <div class="custom-card-header mb-3">Tasks to Do</div>
                             <div class="custom-card-body p-0">
                                 <table class="table mb-0">
+
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
-                                            <th>Customer</th>
-                                            <th>Amount</th>
+                                            <th>Title</th>
+                                            <th>Description</th>
                                             <th>Status</th>
+                                            <th>Due Date</th>
                                         </tr>
                                     </thead>
+
                                     <tbody>
-                                        <% recentSalesOrders.forEach(order => { %>
+
+                                        <% jobs.forEach(job=> { %>
+
                                             <tr>
-                                                <td><%= order.id %></td>
-                                                <td><%= order.customer %></td>
-                                                <td>PKR <%= order.total_amount %></td>
-                                                <td><span class="badge bg-info"><%= order.status %></span></td>
+                                                <td>
+                                                    <%= job.title %>
+                                                </td>
+                                                <td>
+                                                    <%= job.description %>
+                                                </td>
+                                                <td>
+                                                    <%= job.status %>
+                                                </td>
+                                                <td>
+                                                    <%= job.due_date.toISOString().split('T')[0] %>
+                                                </td>
                                             </tr>
-                                        <% }) %>
+
+                                            <% }) %>
+
                                     </tbody>
+
                                 </table>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="custom-card shadow-sm">
-                            <div class="custom-card-header mb-3">Latest Purchase Orders</div>
-                            <div class="custom-card-body p-0">
-                                <table class="table mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Vendor</th>
-                                            <th>Amount</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% recentPOs.forEach(po => { %>
-                                            <tr>
-                                                <td><%= po.id %></td>
-                                                <td><%= po.vendor %></td>
-                                                <td>PKR <%= po.total_amount %></td>
-                                                <td><span class="badge bg-warning"><%= po.status %></span></td>
-                                            </tr>
-                                        <% }) %>
-                                    </tbody>
-                                </table>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                            </div>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <div class="custom-card">
+                                        <div class="custom-card-header mb-3">Latest Sales Orders</div>
+                                        <div class="custom-card-body p-0">
+                                            <table class="table mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Customer</th>
+                                                        <th>Amount</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% recentSalesOrders.forEach(order=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= order.id %>
+                                                            </td>
+                                                            <td>
+                                                                <%= order.customer %>
+                                                            </td>
+                                                            <td>PKR <%= order.total_amount %>
+                                                            </td>
+                                                            <td><span class="badge bg-info">
+                                                                    <%= order.status %>
+                                                                </span></td>
+                                                        </tr>
+                                                        <% }) %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
 
-            </main>
+                                <div class="col-md-6">
+                                    <div class="custom-card shadow-sm">
+                                        <div class="custom-card-header mb-3">Latest Purchase Orders</div>
+                                        <div class="custom-card-body p-0">
+                                            <table class="table mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Vendor</th>
+                                                        <th>Amount</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% recentPOs.forEach(po=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= po.id %>
+                                                            </td>
+                                                            <td>
+                                                                <%= po.vendor %>
+                                                            </td>
+                                                            <td>PKR <%= po.total_amount %>
+                                                            </td>
+                                                            <td><span class="badge bg-warning">
+                                                                    <%= po.status %>
+                                                                </span></td>
+                                                        </tr>
+                                                        <% }) %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ============================= -->
+                            <!-- Charts -->
+                            <!-- ============================= -->
+                            <div class="row mb-4">
+                                <!-- First chart: 3/4 width -->
+                                <div class="col-md-9">
+                                    <div class="custom-card">
+                                        <div class="custom-card-body">
+                                            <h6 class=" mb-3">Sales vs Purchase Analytics</h6>
+                                            <div class="chart-container">
+                                                <canvas id="financeChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pie chart: 1/4 width -->
+                                <div class="col-md-3">
+                                    <div class="custom-card">
+                                        <div class="custom-card-body">
+                                            <h6 class="mb-3">Order Distribution</h6>
+                                            <div class="chart-container">
+                                                <canvas id="orderChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-lg-12 mt-4">
+                                    <div class="custom-card">
+                                        <div class="custom-card-body">
+                                            <h6 class=" mb-3">Sales Trend</h6>
+                                            <div class="chart-container">
+                                                <canvas id="salesTrendChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ============================= -->
+                            <!-- Tables -->
+                            <!-- ============================= -->
+                            
+
+                </main>
         </div>
     </div>
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-    const months = <%- JSON.stringify(monthlySales.map(m => m.month)) %>;
-    const salesData = <%- JSON.stringify(monthlySales.map(m => m.totalSales)) %>;
-    const purchasesData = <%- JSON.stringify(monthlyPurchases.map(m => m.totalPurchases)) %>;
+        const months = <%- JSON.stringify(monthlySales.map(m => m.month)) %>;
+        const salesData = <%- JSON.stringify(monthlySales.map(m => m.totalSales)) %>;
+        const purchasesData = <%- JSON.stringify(monthlyPurchases.map(m => m.totalPurchases)) %>;
         // Finance Chart
         const financeCtx = document.getElementById('financeChart').getContext('2d');
-const monthlyChart = new Chart(financeCtx, {
-    type: 'bar',
-    data: {
-        labels: months, // e.g., ['Jan','Feb','Mar']
-        datasets: [
-            {
-                label: 'Sales',
-                data: salesData,
-                backgroundColor: '#7C4DFF',
-                borderRadius: 5,    // rounded bar corners
-                barPercentage: 0.5
+        const monthlyChart = new Chart(financeCtx, {
+            type: 'bar',
+            data: {
+                labels: months, // e.g., ['Jan','Feb','Mar']
+                datasets: [
+                    {
+                        label: 'Sales',
+                        data: salesData,
+                        backgroundColor: '#7C4DFF',
+                        borderRadius: 5,    // rounded bar corners
+                        barPercentage: 0.5
+                    },
+                    {
+                        label: 'Purchases',
+                        data: purchasesData,
+                        backgroundColor: '#23e795',
+                        borderRadius: 5,
+                        barPercentage: 0.5
+                    }
+                ]
             },
-            {
-                label: 'Purchases',
-                data: purchasesData,
-                backgroundColor: '#23e795',
-                borderRadius: 5,
-                barPercentage: 0.5
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    usePointStyle: true,
-                    pointStyle: 'circle'
-                }
-            },
-            tooltip: {
-                mode: 'index',
-                intersect: false
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                title: {
-                    display: true,
-                    text: 'Amount'
-                }
-            },
-            x: {
-                title: {
-                    display: true,
-                    text: 'Month'
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Amount'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Month'
+                        }
+                    }
                 }
             }
-        }
-    }
-});
+        });
 
         // Order Distribution Chart
         const orderCtx = document.getElementById('orderChart');
@@ -308,12 +375,12 @@ const monthlyChart = new Chart(financeCtx, {
                     spacing: -5
                 }]
             },
-            options: { cutout: '85%', responsive: true, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 20} } }}
+            options: { cutout: '85%', responsive: true, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 20 } } } }
         });
 
         // Sales Trend Chart
         const salesTrendCtx = document.getElementById('salesTrendChart');
-       const salesAmounts = <%- JSON.stringify(monthlySales.map(m => m.totalSales)) %>;
+        const salesAmounts = <%- JSON.stringify(monthlySales.map(m => m.totalSales)) %>;
         const salesCounts = <%- JSON.stringify(monthlySales.map(m => m.totalOrders)) %>;
 
         new Chart(salesTrendCtx, {

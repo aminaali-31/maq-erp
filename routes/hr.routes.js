@@ -16,4 +16,7 @@ router.get('/payroll/add', authenticateAndAuthorize([1,4]),salaryController.show
 
 router.post('/payroll/add', authenticateAndAuthorize([1,4]),salaryController.addPayroll);
 
+router.get('/edit/:id', authenticateAndAuthorize([1,4]), controller.editEmployeeForm);
+router.post('/edit/:id', authenticateAndAuthorize([1,4]), controller.updateEmployee);
+
 module.exports = router;

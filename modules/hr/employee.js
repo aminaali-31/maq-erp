@@ -48,7 +48,9 @@ exports.listEmployees = async (req, res) => {
         `);
 
         res.render('hr/list', {
-            employees
+            employees,
+            success:req.query.success,
+            error: req.query.error
         });
 
     } catch (err) {
@@ -117,5 +119,57 @@ exports.showDashboard = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send("Server Error");
+    }
+};
+
+exports.editEmployeeForm = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [employeeRows] = await db.execute(
+            `SELECT e.* , d.name AS dep_name
+            FROM employees AS e
+            JOIN departments as d ON e.depart_id = d.id
+            WHERE e.id = ?`,
+            [id]
+        );
+
+        if (!employeeRows.length) {
+            return res.redirect('/hr/list?error=Employee not found');
+        }
+
+        res.render('hr/edit', {
+            employee: employeeRows[0],
+            error: req.query.error || null,
+            success: req.query.success || null
+        });
+    } catch (err) {
+        console.error(err);
+        res.redirect('/hr/list?error=' + encodeURIComponent(err.message));
+    }
+};
+
+
+exports.updateEmployee = async (req, res) => {
+    const { id } = req.params;
+    const { name, department, salary } = req.body;
+    const dep = parseInt(department)
+    console.log(dep);
+    const sal = parseInt(salary)
+    if (!name) {
+        return res.redirect(`/hr/edit/${id}?error=Namer equired`);
+    }
+
+    try {
+        await db.execute(
+            `UPDATE employees 
+             SET name=?, depart_id=?, salary=? 
+             WHERE id=?`,
+            [name, dep, sal, id]
+        );
+
+        res.redirect('/hr/list?success=Employee updated');
+    } catch (err) {
+        console.error(err);
+        res.redirect(`/hr/edit/${id}?error=` + encodeURIComponent(err.message));
     }
 };

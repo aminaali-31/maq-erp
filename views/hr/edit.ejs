@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Register</title>
+</head>
+
+<body>
+    <%- include('../sidebar') %>
+
+<div class="container mt-4">
+    <main>
+    <h2>Edit Employee</h2>
+
+    <% if (error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+
+    <% if (success) { %>
+        <div class="alert alert-success"><%= success %></div>
+    <% } %>
+
+    <form action="/hr/edit/<%= employee.id %>" method="POST">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name *</label>
+            <input type="text" class="form-control" id="name" name="name" value="<%= employee.name %>" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="department" class="form-label">Department</label>
+            <input type="text" class="form-control" id="department" name="department" value="<%= employee.depart_id %>">
+        </div>
+        <div class="mb-3">
+            <label for="salary" class="form-label">Salary *</label>
+            <input type="number" class="form-control" id="salary" name="salary" value="<%= employee.salary %>">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Employee</button>
+        <a href="/hr/list" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+</main>
+</body>
+</html>

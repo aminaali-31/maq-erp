@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+
+                    <div class="container mt-4">
+
+                        <h3>All Jobs</h3>
+                        <a href="/admin/jobs/create" class="btn btn-primary mb-3">Create a Job</a>
+                        <table class="table table-bordered">
+
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Due Date</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <% jobs.forEach(job=> { %>
+
+                                    <tr>
+                                        <td>
+                                            <%= job.title %>
+                                        </td>
+                                        <td>
+                                            <%= job.description %>
+                                        </td>
+                                        <td>
+                                            <%= job.status %>
+                                        </td>
+                                        <td>
+                                            <%= job.due_date.toISOString().split('T')[0] %>
+                                        </td>
+                                    </tr>
+
+                                    <% }) %>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <div class="container mt-4">
+
+                        <h3>Create Job</h3>
+
+                        <form method="POST" action="/admin/jobs/create">
+
+                            <div class="mb-3">
+                                <label>Title</label>
+                                <input type="text" name="title" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Description</label>
+                                <textarea name="description" class="form-control"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Assign Employee</label>
+                                <select name="employee_id" class="form-control" required>
+
+                                    <option value="">Select Employee</option>
+
+                                    <% employees.forEach(emp=> { %>
+                                        <option value="<%= emp.id %>">
+                                            <%= emp.username %>
+                                        </option>
+                                        <% }) %>
+
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Show Date</label>
+                                <input type="date" name="show_date" class="form-control" value="<%= new Date().toISOString().split('T')[0] %>" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Due Date</label>
+                                <input type="date" name="due_date" value="<%= new Date().toISOString().split('T')[0] %>" class="form-control">
+                            </div>
+
+                            <button class="btn btn-primary">Create Job</button>
+
+                        </form>
+
+                    </div>
+
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>

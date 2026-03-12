@@ -10,4 +10,8 @@ router.post('/approve/:approvalId', authenticateAndAuthorize([1]), approveRole);
 router.get('/pendings', authenticateAndAuthorize([1,3]), pedningController.getDashboard);
 router.get('/dashboard', authenticateAndAuthorize([1]), ceoController.dashboard);
 
+router.get('/jobs/create', ceoController.createJobForm);
+router.post('/jobs/create', ceoController.createJob);
+router.get('/jobs/all', ceoController.showAllJobs);
+
 module.exports = router;

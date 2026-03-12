@@ -75,7 +75,7 @@ body {
     border-radius: 5px;
 
     border-left: 3px solid #7C4DFF;
-    padding: 30px;
+    padding: 30px 15px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s;
 }
@@ -164,7 +164,10 @@ body {
         flex-direction: column;
         align-items: flex-start;
     }
-
+    .wrap {
+        flex-direction: column;
+        gap:5px
+    }
     .metric-icon {
         margin-bottom: 10px;
     }
