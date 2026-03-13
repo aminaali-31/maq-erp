@@ -235,9 +235,31 @@ exports.showAllJobs = async (req,res) => {
     const [jobs] =await pool.execute(`
       SELECT * FROM jobs`);
 
-    res.render('jobs/all', {jobs});
+    res.render('jobs/all', {jobs, success:req.query.success, error: req.query.error});
   } catch (e) {
        console.error(e);
       res.status(500).send("Database Error");
   }
 }
+
+exports.changeJobStatus = async (req, res) => {
+    try {
+        const jobId = req.params.id;
+        const status = req.query.status;
+
+        if (!jobId || !status) {
+            return res.redirect('/admin/jobs/all?error=Missing parameters');
+        }
+
+        await pool.execute(
+            `UPDATE jobs SET status = ? WHERE id = ?`,
+            [status, jobId]
+        );
+
+        res.redirect('/admin/jobs/all?success=Status updated');
+
+    } catch (err) {
+        console.error(err);
+        res.redirect('/admin/jobs/all?error=Unable to update status');
+    }
+};

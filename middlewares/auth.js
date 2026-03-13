@@ -1,6 +1,6 @@
 exports.logout = (req, res) => {
   req.session.destroy(() => {
-    res.redirect("/login");
+    res.redirect("/auth/login");
   });
 };
 
@@ -20,11 +20,11 @@ exports.isAuthenticated = (req, res, next) => {
 exports.isCustomer = (req, res, next) => {
 
     if (!req.session.user) {
-        return res.redirect("/login");
+        return res.redirect("/auth/login");
     }
 
     if (!req.session.user.customer_id) {
-        return res.redirect("/login");
+        return res.redirect("/auth/login");
     }
 
     next();

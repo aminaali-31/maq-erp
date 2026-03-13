@@ -15,9 +15,32 @@
                         <i class="bi bi-arrow-left"></i>
                     </a>
                     <div class="container mt-4">
+                         <% if (success) { %>
+                                    <div class="alert alert-success w-100">
+                                        <%= success %>
+                                    </div>
+                                    <% } %>
+
+                                        <% if (error) { %>
+                                            <div class="alert alert-danger w-100">
+                                                <%= error %>
+                                            </div>
+                                            <% } %>
 
                         <h3>All Jobs</h3>
                         <a href="/admin/jobs/create" class="btn btn-primary mb-3">Create a Job</a>
+                        <% if (success) { %>
+                                    <div class="alert alert-success w-100">
+                                        <%= success %>
+                                    </div>
+                                    <% } %>
+
+                                        <% if (error) { %>
+                                            <div class="alert alert-danger w-100">
+                                                <%= error %>
+                                            </div>
+                                            <% } %>
+                        <div class="table-responsive">
                         <table class="table table-bordered">
 
                             <thead class="table-dark">
@@ -41,7 +64,13 @@
                                             <%= job.description %>
                                         </td>
                                         <td>
-                                            <%= job.status %>
+                                            <form action="/admin/jobs/all/status/<%= job.id %>" method="GET">
+                                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                    <option value="PENDIND" <%= job.status === 'PENDING' ? 'selected' : '' %>>Pending</option>
+                                                    <option value="IN_PROGRESS" <%= job.status === 'IN_PROGRESS' ? 'selected' : '' %>>In Progress</option>
+                                                    <option value="COMPLETED" <%= job.status === 'COMPLETED' ? 'selected' : '' %>>Completed</option>
+                                                </select>
+                                            </form>
                                         </td>
                                         <td>
                                             <%= job.due_date.toISOString().split('T')[0] %>
@@ -53,6 +82,7 @@
                             </tbody>
 
                         </table>
+                        </div>
 
                     </div>
                 </main>

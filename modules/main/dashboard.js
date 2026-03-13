@@ -16,7 +16,7 @@ exports.getDashboard = async (req, res) => {
             `SELECT comp.id, comp.message, comp.customer_id, c.name AS customer_name, comp.date
              FROM complaints AS comp
              JOIN customers AS c ON c.id = comp.customer_id
-             WHERE comp.status = 'pending'
+             WHERE comp.status IN ('pending', 'in_progress')
              ORDER BY comp.date DESC`
         );
 

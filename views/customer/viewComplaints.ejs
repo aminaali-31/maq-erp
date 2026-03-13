@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Document</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <a href="javascript:history.back()">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                    <h3 class="mb-4">Complaints</h3>
+                     <% if (success) { %>
+                                    <div class="alert alert-success w-100">
+                                        <%= success %>
+                                    </div>
+                                    <% } %>
+
+                                        <% if (error) { %>
+                                            <div class="alert alert-danger w-100">
+                                                <%= error %>
+                                            </div>
+                                            <% } %>
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% complaints.forEach(c=> { %>
+                                <tr>
+                                    <td>
+                                        <%= c.id %>
+                                    </td>
+                                    <td>
+                                        <%= c.name %>
+                                    </td>
+                                    <td>
+                                        <%= c.message %>
+                                    </td>
+                                    <td>
+                                    <form action="/customer/view/complaints/status/<%= c.id %>" method="GET">
+                                        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                            <option value="pending" <%= c.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                                            <option value="processing" <%= c.status === 'processing' ? 'selected' : '' %>>Processing</option>
+                                            <option value="completed" <%= c.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                                        </select>
+                                    </form>
+                                    </td>
+                                    <td>
+                                        <%= new Date(c.date).toLocaleDateString() %>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>

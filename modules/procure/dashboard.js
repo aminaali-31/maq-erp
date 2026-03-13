@@ -110,6 +110,7 @@ exports.getManagerDashboard = async (req, res) => {
             `SELECT *
             FROM jobs
             WHERE employee_id = ?
+            AND status IN ('PENDING','IN_PROGRESS')
             AND show_date <= CURDATE()
             ORDER BY show_date DESC`,
             [req.session.user.id]

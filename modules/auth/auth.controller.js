@@ -114,7 +114,7 @@ exports.login = async (req, res) => {
 
     switch (user.role_id) {
         case 1: // Admin
-            return res.redirect("/admin/approvals");
+            return res.redirect("/admin/dashboard");
 
         case 2: // Accounts
             return res.redirect("/accounts/summary");
@@ -364,5 +364,72 @@ exports.listUsers = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send("Server Error");
+    }
+};
+
+exports.showEditUser = async (req, res) => {
+    try {
+
+        const userId = req.params.id;
+
+        const [rows] = await pool.query(
+            `SELECT * FROM users WHERE id = ?`,
+            [userId]
+        );
+
+        if (rows.length === 0) {
+            return res.redirect('/auth/users?error=User not found');
+        }
+
+        const user = rows[0];
+
+        const isCustomer = user.customer_id !== null;
+        const isVendor = user.vendor_id !== null;
+
+        const [roles] = await pool.query(`SELECT id, name FROM roles`);
+
+        res.render('auth/editUser', {
+            user,
+            roles,
+            isCustomer,
+            isVendor
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.redirect('/auth/users?error=Something went wrong');
+    }
+};
+
+exports.updateUser = async (req, res) => {
+    try {
+
+        const userId = req.params.id;
+        const { name, email, password, role } = req.body;
+        if (!password)
+        {
+            await pool.execute(
+            `UPDATE users 
+             SET username = ?, email = ?, role_id = ?
+             WHERE id = ?`,
+            [name, email,role, userId]
+        );
+
+        res.redirect('/auth/users?success=User updated');
+        }
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        await pool.execute(
+            `UPDATE users 
+             SET username = ?, email = ?, password = ?,  role_id = ?
+             WHERE id = ?`,
+            [name, email, hashedPassword, role, userId]
+        );
+
+        res.redirect('/auth/users?success=User updated');
+
+    } catch (err) {
+        console.error(err);
+        res.redirect('/auth/users?error=Update failed');
     }
 };
