@@ -31,7 +31,7 @@
 
                                 <div class="table-responsive">
 
-                                    <table class="table table-bordered table-striped table-hover">
+                                    <table class="table table-bordered table-striped">
 
                                         <thead class="table-dark">
                                             <tr>
@@ -39,8 +39,7 @@
                                                 <th>Date</th>
                                                 <th>Customer</th>
                                                 <th class="text-end">Total Amount</th>
-                                                <th>Status</th>
-                                                <th class="text-center">Action</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
 
@@ -62,21 +61,8 @@
                                                     </td>
 
                                                     <td class="text-end fw-bold">
-                                                        <%= Number(inv.total_amount || 0).toFixed(2) %>
+                                                        <%= Number(inv.total_amount || 0).toLocaleString() %>
                                                     </td>
-
-                                                    <td>
-                                                        <% if(inv.status==='paid' ){ %>
-                                                            <span class="badge bg-success">Paid</span>
-                                                            <% } else if(inv.status==='posted' ){ %>
-                                                                <span class="badge bg-primary">Posted</span>
-                                                                <% } else { %>
-                                                                    <span class="badge bg-secondary">
-                                                                        <%= inv.status %>
-                                                                    </span>
-                                                                    <% } %>
-                                                    </td>
-
                                                     <td class="text-center">
 
                                                         <a href="/invoices/view/<%= inv.id %>"

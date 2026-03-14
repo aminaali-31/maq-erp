@@ -24,6 +24,7 @@
                         <i class="bi bi-arrow-left"></i>
                     </a>
 
+
                     <h3 class="mb-4">CEO Dashboard</h3>
 
                     <!-- Financial Cards -->
@@ -34,7 +35,7 @@
                             <div class="custom-card metric-card p-3">
                                 <div>
                                 <h6 class="metric-title">Revenue</h6>
-                                <h4>PKR <%= revenue %>
+                                <h4>PKR <%= Number(revenue).toLocaleString() %>
                                 </h4>
                                  </div>
                                 </div>
@@ -44,7 +45,7 @@
                             <div class="custom-card metric-card p-3">
                                 <div>
                                 <h6 class="metric-title">Expenses</h6>
-                                <h4>PKR <%= expenses %>
+                                <h4>PKR <%= Number(expenses).toLocaleString() %>
                                 </h4>
                                 </div>
                             </div>
@@ -53,8 +54,8 @@
                         <div class="col-md-3">
                             <div class="custom-card metric-card p-3">
                                 <div>
-                                <h6 class="metric-title">Net Profit</h6>
-                                <h4>PKR <%= Number(profit).toFixed(1) %>
+                                <h6 class="metric-title">Net Monthly Profit</h6>
+                                <h4>PKR <%= Number(profit).toLocaleString() %>
                                 </h4>
                                 </div>
                             </div>
@@ -136,7 +137,7 @@
                                 <div>
                                     <h6 class="metric-title">Receivables</h6>
                                 
-                                <h4>PKR <%= receivables %>
+                                <h4>PKR <%= Number(receivables).toLocaleString() %>
                                 </h4>
                                 </div>
                             </div>
@@ -148,7 +149,7 @@
                                 <div>
                                     <h6 class="metric-title">Payables</h6>
                                 
-                                <h4>PKR <%= payables %>
+                                <h4>PKR <%= Number(payables).toLocaleString() %>
                                 </h4>
                                 </div>
                             </div>
@@ -220,7 +221,7 @@
                                                 <%= c.name %>
                                             </td>
                                             <td>
-                                                <%= c.revenue %>
+                                                <%= Number(c.revenue).toLocaleString() %>
                                             </td>
                                         </tr>
                                         <% }) %>
@@ -230,7 +231,7 @@
 
                         <div class="col-md-4 mb-3">
                             <div class="custom-card p-3">
-                                <h6>Top Products</h6>
+                                <h6>Top Selling Products</h6>
                                 <table class="table">
                                     <% topProducts.forEach(p=>{ %>
                                         <tr>
@@ -256,7 +257,7 @@
                                                 <%= v.name %>
                                             </td>
                                             <td>
-                                                <%= v.purchases %>
+                                                <%= Number(v.purchases).toLocaleString() %>
                                             </td>
                                         </tr>
                                         <% }) %>
@@ -268,7 +269,77 @@
                 </main>
         </div>
     </div>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const userRole = "<%= user.role_id || '' %>";
+    const notifications = [
+        "Your sales report is ready.",
+        "Purchase order 102 needs approval.",
+        "This is something ridiculous",
+        "Reminder: Team meeting at 3 PM."
+    ];
 
+    if (userRole.toLowerCase() !== '1') return;
+
+    const synth = window.speechSynthesis;
+
+    // Start automatically after login
+    setTimeout(() => {
+        const greet = new SpeechSynthesisUtterance(
+            `Hello sir, you have ${notifications.length} new notifications. Would you like to listen?`
+        );
+
+        greet.onend = () => listenForResponse();
+        synth.speak(greet);
+
+    }, 1000); // small delay so browser finishes loading
+
+    function listenForResponse() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            console.log("Speech recognition not supported");
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+
+        recognition.onresult = (event) => {
+            const result = event.results[0][0].transcript.toLowerCase();
+
+            console.log("CEO response:", result);
+
+            recognition.stop();
+
+            if (result.includes("yes")) {
+                setTimeout(() => readNotifications(0), 100);
+            } else {
+                window.speechSynthesis.speak(
+                    new SpeechSynthesisUtterance("Okay, no problem.")
+                );
+            }
+        };
+
+        recognition.onerror = (err) => {
+            console.log("Speech recognition error:", err);
+        };
+
+        recognition.start();
+    }
+
+    function readNotifications(index) {
+        if (index >= notifications.length) return;
+
+        const utter = new SpeechSynthesisUtterance(notifications[index]);
+
+        utter.onend = () => {
+            setTimeout(() => readNotifications(index + 1), 300);
+        };
+
+        speechSynthesis.speak(utter);
+    }
+});
+</script>
     <script>
 
         const chartData = <%- JSON.stringify(chart) %>;
@@ -320,8 +391,6 @@
             }
         });
 </script>
-    </script>
-
 </body>
 
 </html>

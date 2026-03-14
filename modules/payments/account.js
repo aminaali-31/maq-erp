@@ -135,7 +135,7 @@ exports.accountSummary = async (req, res) => {
     SELECT 
         a.name AS account_name,
         a.type,
-
+        a.id,
         COALESCE(SUM(
             CASE 
                 WHEN MONTH(j.date) = MONTH(CURRENT_DATE)

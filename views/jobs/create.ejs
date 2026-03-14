@@ -15,7 +15,17 @@
                         <i class="bi bi-arrow-left"></i>
                     </a>
                     <div class="container mt-4">
+                          <% if (success) { %>
+                                    <div class="alert alert-success w-100">
+                                        <%= success %>
+                                    </div>
+                                    <% } %>
 
+                                        <% if (error) { %>
+                                            <div class="alert alert-danger w-100">
+                                                <%= error %>
+                                            </div>
+                                            <% } %>
                         <h3>Create Job</h3>
 
                         <form method="POST" action="/admin/jobs/create">
@@ -38,7 +48,7 @@
 
                                     <% employees.forEach(emp=> { %>
                                         <option value="<%= emp.id %>">
-                                            <%= emp.username %>
+                                            <%= emp.name %>
                                         </option>
                                         <% }) %>
 

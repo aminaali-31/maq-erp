@@ -24,21 +24,25 @@ exports.getManagerDashboard = async (req, res) => {
         `);
 
         // Pending Customer Receivables
-        const [pendingReceivables] = await pool.execute(`
-            SELECT IFNULL(SUM(total_amount),0) AS pendingReceivables
-            FROM sales_orders
-            WHERE status != 'completed'
+        const [[receivables]] = await pool.execute(`
+            SELECT 
+                COALESCE(SUM(je.debit - je.credit),0) AS balance
+            FROM customers c
+            LEFT JOIN accounts a 
+                ON c.account_id = a.id
+            LEFT JOIN journal_entries je 
+                ON je.account_id = a.id
         `);
 
-        // Purchase Orders Summary
-        const [purchaseSummary] = await pool.execute(`
-            SELECT COUNT(*) AS totalPO,
-                   IFNULL(SUM(CASE 
-                        WHEN status!='Paid' 
-                        THEN total_amount ELSE 0 END),0) AS pendingPayables
-            FROM purchase_orders
-        `);
-
+    const [[payables]] = await pool.execute(`
+        SELECT COALESCE(SUM(je.credit - je.debit),0) AS balance
+        FROM journal_entries je
+        WHERE je.account_id IN (
+            SELECT account_id FROM vendors WHERE account_id IS NOT NULL
+        )
+    `);
+        const [[po]] = await pool.execute(`
+            SELECT COUNT(*) AS total_po FROM purchase_orders`)
         // Total Products
         const [productCount] = await pool.execute(`
             SELECT COUNT(*) AS totalProducts
@@ -126,10 +130,10 @@ exports.getManagerDashboard = async (req, res) => {
                 totalSales: salesTotal[0].totalSales,
                 totalProfit: salesTotal[0].totalProfit,
                 totalOrders: salesTotal[0].totalOrders,
-                pendingReceivables: pendingReceivables[0].pendingReceivables,
+                pendingReceivables: receivables.balance,
 
-                totalPO: purchaseSummary[0].totalPO,
-                pendingPayables: purchaseSummary[0].pendingPayables,
+                totalPO: po.total_po,
+                pendingPayables: payables.balance,
 
                 totalProducts: productCount[0].totalProducts,
                 lowStockCount: lowStock[0].lowStockCount

@@ -15,7 +15,7 @@ const hrRoutes = require('./routes/hr.routes');
 const customerRoutes = require('./routes/customer');
 const vendorRoutes = require('./routes/vendor');
 const quotationController = require('./modules/sales/quotations')
-
+const bcrypt = require('bcrypt')
 
 const app = express();
 // Body parsing

@@ -16,10 +16,6 @@ exports.showAddPOForm = async (req, res) => {
     }
 };
 
-// Account mapping (CHANGE THESE according to your database)
-const INVENTORY_ACCOUNT_ID = 6;
-const PAYABLE_ACCOUNT_ID = 2;
-
 // Add a new purchase order with items + journal entries
 exports.addPurchaseOrder = async (req, res) => {
     const conn = await db.getConnection();
@@ -59,13 +55,14 @@ exports.addPurchaseOrder = async (req, res) => {
         const VENDOR_ACCOUNT_ID = vendorRows[0].account_id;
 
         // 4️⃣ Set Inventory / Expense account
-        const INVENTORY_ACCOUNT_ID = 5; // replace with your actual inventory/asset account
+        const INVENTORY_ACCOUNT_ID = 3; // replace with your actual inventory/asset account
 
         let calculatedTotal = 0;
 
         // 5️⃣ Insert Items + Stock + calculate total
         for (let item of items) {
             const quantity = parseInt(item.quantity);
+            const product_id = parseInt(item.product_id)
             const unit_price = parseFloat(item.unit_price);
             const total = quantity * unit_price;
             calculatedTotal += total;
@@ -75,6 +72,11 @@ exports.addPurchaseOrder = async (req, res) => {
                 `INSERT INTO po_items (po_id, product_id, quantity, unit_price, total)
                 VALUES (?, ?, ?, ?, ?)`,
                 [poId, item.product_id, quantity, unit_price, total]
+            );
+            await conn.execute(`
+                INSERT INTO stock_mov (product_id, quantity, movement_type, cost_price, reference_type, reference_id)
+                VALUES (?, ?, ?, ?, ?, ?)`,
+                [product_id, quantity, 'IN', unit_price, 'Purchase order', poId]
             );
 
             // Insert Inventory Batch

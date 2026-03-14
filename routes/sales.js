@@ -16,6 +16,8 @@ router.post('/quotations/add',authenticateAndAuthorize([1,3]), quotationControll
 // View a single quotation
 router.get('/quotations/:id', authenticateAndAuthorize([1,3]),quotationController.viewQuotation);
 
+router.get("/quotations/:id/pdf", quotationController.downloadQuotationPDF);
+
 router.get('/quotes/:id', quotationController.viewClientQuotation);
 
 // Create sales order

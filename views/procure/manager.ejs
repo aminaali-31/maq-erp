@@ -32,7 +32,7 @@
                                 <div>
                                     <p class="metric-title">Total Sales</p>
                                     <h4>
-                                        <%= summary.totalSales %>
+                                        <%= Number(summary.totalSales).toLocaleString() %>
                                     </h4>
                                 </div>
                             </div>
@@ -56,7 +56,7 @@
                                 <div>
                                     <p class="metric-title">Pending Receivables</p>
                                     <h4>
-                                        <%= summary.pendingReceivables %>
+                                        <%= Number(summary.pendingReceivables).toLocaleString() %>
                                     </h4>
                                 </div>
                             </div>
@@ -80,7 +80,7 @@
                                 <div>
                                     <p class="metric-title">Pending Payables</p>
                                     <h4>
-                                        <%= summary.pendingPayables %>
+                                        <%= Number(summary.pendingPayables).toLocaleString() %>
                                     </h4>
                                 </div>
                             </div>

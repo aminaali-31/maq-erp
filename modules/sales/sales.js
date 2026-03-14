@@ -182,12 +182,12 @@ exports.createSalesOrder = async (req, res) => {
 
         await connection.commit();
 
-        return res.redirect('/sales/orders/new?success=Sales order created successfully');
+        return res.redirect('/sales/orders?success=Sales order created successfully');
 
     } catch (error) {
         await connection.rollback();
         console.error(error.message);
-        return res.redirect('/sales/orders/new?error=' + encodeURIComponent(error.message));
+        return res.redirect('/sales/orders?error=' + encodeURIComponent(error.message));
     } finally {
         connection.release();
     }

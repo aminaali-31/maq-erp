@@ -482,3 +482,37 @@ CREATE TABLE jobs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (employee_id) REFERENCES users(id)
 );
+
+
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Truncate all tables
+TRUNCATE TABLE users;
+TRUNCATE TABLE role_approvals;
+TRUNCATE TABLE products;
+TRUNCATE TABLE inventory_level;
+TRUNCATE TABLE inventory_batches;
+TRUNCATE TABLE stock_mov;
+TRUNCATE TABLE vendors;
+TRUNCATE TABLE purchase_orders;
+TRUNCATE TABLE po_items;
+TRUNCATE TABLE customers;
+TRUNCATE TABLE sales_orders;
+TRUNCATE TABLE so_items;
+TRUNCATE TABLE quotations;
+TRUNCATE TABLE qo_items;
+TRUNCATE TABLE accounts;
+TRUNCATE TABLE journal;
+TRUNCATE TABLE journal_entries;
+TRUNCATE TABLE sales_invoices;
+TRUNCATE TABLE invoice_items;
+TRUNCATE TABLE payments;
+TRUNCATE TABLE employees;
+TRUNCATE TABLE payroll;
+TRUNCATE TABLE expenses;
+TRUNCATE TABLE complaints;
+TRUNCATE TABLE jobs;
+-- Repeat for all tables
+
+SET FOREIGN_KEY_CHECKS = 1;

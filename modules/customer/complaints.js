@@ -9,6 +9,7 @@ exports.listComplaints = async (req, res) => {
                 c.message,
                 c.status,
                 c.date,
+                c.feedback,
                 ct.name AS name
             FROM complaints c
             LEFT JOIN customers ct ON ct.id = c.customer_id

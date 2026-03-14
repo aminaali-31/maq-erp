@@ -51,7 +51,7 @@ exports.dashboard = async (req, res) => {
        Financial Risks
     ========================= */
 
-    const [receivables] = await pool.execute(`
+    const [[receivables]] = await pool.execute(`
             SELECT 
                 COALESCE(SUM(je.debit - je.credit),0) AS balance
             FROM customers c
@@ -61,15 +61,13 @@ exports.dashboard = async (req, res) => {
                 ON je.account_id = a.id
         `);
 
-        const [payables] = await pool.execute(`
-            SELECT 
-                COALESCE(SUM(je.credit - je.debit),0) AS balance
-            FROM vendors v
-            LEFT JOIN accounts a 
-                ON v.account_id = a.id
-            LEFT JOIN journal_entries je 
-                ON je.account_id = a.id
-        `);
+    const [[payables]] = await pool.execute(`
+        SELECT COALESCE(SUM(je.credit - je.debit),0) AS balance
+        FROM journal_entries je
+        WHERE je.account_id IN (
+            SELECT account_id FROM vendors WHERE account_id IS NOT NULL
+        )
+    `);
     const [[lowStock]] = await pool.query(`
         SELECT p.reorder_level, il.quantity AS total
         FROM products p
@@ -168,8 +166,8 @@ exports.dashboard = async (req, res) => {
       vendors: vendors.total,
       products: products.total,
       orders: orders.total,
-      receivables: receivables.total || 0,
-      payables: payables.total || 0,
+      receivables: receivables.balance || 0,
+      payables: payables.balance || 0,
       lowStock: lowStock.total,
       complaints: complaints.total,
       chart,
@@ -188,7 +186,7 @@ exports.createJobForm = async (req, res) => {
     try {
 
         const [employees] = await pool.execute(
-            `SELECT id, username FROM users`
+            `SELECT id, name FROM employees`
         );
 
         res.render('jobs/create', {
@@ -199,7 +197,7 @@ exports.createJobForm = async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.redirect('/jobs?error=' + encodeURIComponent(err.message));
+        res.redirect('/admin/jobs?error=' + encodeURIComponent(err.message));
     }
 };
 
@@ -220,7 +218,7 @@ exports.createJob = async (req, res) => {
             [title, description, employee_id, show_date, due_date]
         );
 
-        res.redirect('/admin/jobs/create?success=Job created');
+        res.redirect('/admin/jobs?success=Job created');
 
     } catch (err) {
         console.error(err);

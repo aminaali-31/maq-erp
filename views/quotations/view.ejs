@@ -1,51 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <%- include('../head') %>
-    <title>Document</title>
+        <title>Document</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 40px;
+                color: #333;
+            }
+
+            .head {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 30px;
+            }
+
+            .logo {
+                font-size: 24px;
+                font-weight: bold;
+            }
+
+            .company-details {
+                text-align: right;
+            }
+
+            .title {
+                text-align: center;
+                font-size: 28px;
+                margin: 20px 0;
+                font-weight: bold;
+            }
+
+            .info {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 20px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            table th {
+                background: #2c3e50;
+                color: white;
+                padding: 10px;
+            }
+
+            table td {
+                padding: 10px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .total-section {
+                margin-top: 20px;
+                width: 300px;
+                float: right;
+            }
+
+            .total-section table td {
+                padding: 8px;
+            }
+
+            .grand-total {
+                font-size: 18px;
+                font-weight: bold;
+            }
+
+            .footer {
+                margin-top: 60px;
+                text-align: center;
+                font-size: 12px;
+                color: #777;
+            }
+        </style>
 </head>
+
 <body>
-<div class="container fluid">
-  <div class="row position-sticky">
-    <%- include('../sidebar') %>
-    <main class="col-md-9 col-lg-10 p-4">
-        <a href="javascript:history.back()">
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="javascript:history.back()">
                         <i class="bi bi-arrow-left"></i>
                     </a>
-        <h2>Quotation #<%= quotation.id %> - <%= quotation.title %></h2>
-        <p>Grand Total: Rs.<%= Number(quotation.grand_total).toLocaleString('en-US',{minimumFractionDigits:2}) %></p>
-        <p>Profit: Rs. <%= Number(quotation.profit).toLocaleString('en-US',{minimumFractionDigits:2}) %></p>
-        <p>Margin: <%= Number(quotation.margin).toFixed(2) %>%</p>
+                    <a href="/sales/quotations/<%= quotation.id %>/pdf" class="btn btn-success ms-2">
+                    Download Quotation PDF
+                    </a>
+                    </div>
+                    <div class="head">
+                        <div class="logo">MAQ ERP</div>
 
-        <h4>Items</h4>
-        <div class="table-responsive">
-        <table class="table table-bordered">
-        <thead>
-        <tr>
-        <th>Product</th>
-        <th>Category</th>
-        <th>Quantity</th>
-        <th>Cost Price</th>
-        <th>Sale Price</th>
-        <th>Profit</th>
-        </tr>
-        </thead>
-        <tbody>
-        <% items.forEach(i => { %>
-        <tr>
-        <td><%= i.name %></td>
-        <td><%= i.category %></td>
-        <td><%= i.quantity %></td>
-        <td>Rs. <%= Number(i.cost_price).toLocaleString('en-US',{minimumFractionDigits:2}) %></td>
-        <td>Rs. <%= Number(i.sale_price).toLocaleString('en-US',{minimumFractionDigits:2}) %></td>
-        <td>Rs. <%= Number((i.sale_price - i.cost_price)*i.quantity).toLocaleString('en-US',{minimumFractionDigits:2}) %></td>
-        </tr>
-        <% }) %>
-        </tbody>
-        </table>
+                        <div class="company-details">
+                            <div>Maqsolar</div>
+                            <div>GC-41 F Block Pak Arab Lahore</div>
+                            <div>+92 3214776991</div>
+                        </div>
+                    </div>
+
+                    <div class="title">QUOTATION</div>
+
+                    <div class="info">
+                        <div>
+                            <strong>Quotation #:</strong>
+                            <%= quotation.id %><br>
+                                <strong>Date:</strong>
+                                <%= new Date(quotation.date).toLocaleDateString() %>
+                        </div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% items.forEach(item=> { %>
+                                <tr>
+                                    <td>
+                                        <%= item.name %>
+                                    </td>
+                                    <td>
+                                        <%= item.quantity %>
+                                    </td>
+                                    <td>
+                                        <%= item.sale_price.toLocaleString() %>
+                                    </td>
+                                    <td>
+                                        <%= (item.sale_price * item.quantity).toLocaleString() %>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+
+                    <div class="total-section">
+                        <table width="100%">
+                            <tr>
+                                <td>Subtotal</td>
+                                <td align="right">
+                                    <%= quotation.grand_total.toLocaleString() %>
+                                </td>
+                            </tr>
+
+                            <tr class="grand-total">
+                                <td>Total</td>
+                                <td align="right">
+                                    <%= quotation.grand_total.toLocaleString() %>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div style="clear:both"></div>
+
+                    <div class="footer">
+                        Thank you 
+                    </div>
+
+                </main>
         </div>
-    </main>
- </div>
-</div>
+    </div>
 </body>
+
 </html>

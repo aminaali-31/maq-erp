@@ -1,4 +1,5 @@
-const pool= require('../../config/db');
+const pool = require('../../config/db');
+const PDFDocument = require("pdfkit");
 
 // Helper: FIFO cost calculation
 async function getCostPriceFIFO(productId, quantityNeeded) {
@@ -43,7 +44,7 @@ exports.listQuotations = async (req, res) => {
 // Show Add Quotation Form
 exports.addQuotationForm = async (req, res) => {
     try {
-         const [products] = await pool.execute(`
+        const [products] = await pool.execute(`
             SELECT 
                 p.id AS product_id,
                 p.name,
@@ -55,10 +56,9 @@ exports.addQuotationForm = async (req, res) => {
             FROM products p
             JOIN inventory_batches b 
             ON b.product_id = p.id
-            WHERE b.qty_remaining > 0
             `);
-        
-       
+
+
         const productOptions = products.map(p => ({
             value: JSON.stringify({
                 product_id: p.product_id,
@@ -104,7 +104,6 @@ exports.createQuotation = async (req, res) => {
 
         for (let item of items) {
             const productData = JSON.parse(item.product_data);
-            console.log(productData);
             const product_id = productData.product_id;
             const batch_id = productData.batch_id;
             const quantity = Number(item.quantity);
@@ -217,3 +216,118 @@ exports.viewClientQuotation = async (req, res) => {
         res.status(500).send("Server Error");
     }
 };
+
+
+
+exports.downloadQuotationPDF = async (req, res) => {
+     console.log("PDF route hit");
+    const quotationId = req.params.id;
+
+    const [quotation] = await pool.execute(`
+        SELECT q.*
+        FROM quotations q
+        WHERE q.id=?
+        `, [quotationId]);
+
+    const [items] = await pool.execute(`
+        SELECT qi.*,p.name product_name
+        FROM qo_items qi
+        LEFT JOIN products p ON qi.product_id=p.id
+        WHERE qi.qo_id=?
+        `, [quotationId]);
+
+      const q = quotation[0];
+
+    const doc = new PDFDocument({ margin: 50 });
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+        "Content-Disposition",
+        `attachment; filename=quotation-${quotationId}.pdf`
+    );
+
+    doc.pipe(res);
+
+    // Header
+    doc
+        .fontSize(22)
+        .text("MAQ ERP", 50, 50)
+        .fontSize(10)
+        .text("MAQSOLAR", 50, 75)
+        .text("Phone: +92 3214776991");
+
+    doc
+        .fontSize(20)
+        .text("QUOTATION", 400, 50);
+
+    // Customer info
+    doc
+        .fontSize(12)
+        .text(`Quotation #: ${q.id}`,50,130)
+        .text(`Date: ${new Date(q.date).toLocaleDateString()}`);
+
+    // Table header
+    let tableTop = 200;
+    const colProduct = 50;
+    const colQty = 300;
+    const colPrice = 370;
+    const colTotal = 450;
+    const tableWidth = 500;
+
+    // Draw dark background
+    // Header background
+    doc.rect(50, tableTop, tableWidth, 25).fill("#2c3e50");
+
+    // Header text
+    doc
+    .fillColor("white")
+    .fontSize(12)
+    .text("Product", colProduct + 5, tableTop + 7)
+    .text("Qty", colQty + 5, tableTop + 7)
+    .text("Price", colPrice + 5, tableTop + 7)
+    .text("Total", colTotal + 5, tableTop + 7);
+
+    doc.fillColor("black");
+
+    // Header border
+    doc.rect(50, tableTop, tableWidth, 25).stroke();
+
+    let y = tableTop + 25;
+
+    items.forEach(item => {
+
+        doc.rect(50, y, tableWidth, 25).stroke();
+
+        doc
+        .fontSize(10)
+        .text(item.product_name, colProduct + 5, y + 7)
+        .text(item.quantity, colQty + 5, y + 7)
+        .text(Number(item.sale_price).toLocaleString(), colPrice + 5, y + 7)
+        .text(Number(item.sale_price * item.quantity).toLocaleString(), colTotal + 5, y + 7);
+
+        y += 25;
+    });
+
+    // Total
+    doc.moveDown(2);
+
+    doc
+        .fontSize(12)
+        .text(
+            `Total: ${Number(q.grand_total).toLocaleString()}`,
+            450,
+            y + 20
+        );
+
+    // Footer
+    doc
+        .fontSize(10)
+        .text(
+            "Thank you for your business!",
+            50,
+            700,
+            { align: "center", width: 500 }
+        );
+
+    doc.end();
+}

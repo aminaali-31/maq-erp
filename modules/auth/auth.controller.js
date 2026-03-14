@@ -247,7 +247,7 @@ exports.addCustomer = async (req, res) => {
     } catch (err) {
         await conn.rollback();
         console.error(err);
-        res.redirect('/auth/addCustomer?error=Unable to add customer');
+        res.redirect('/auth/addCustomer?error=Unable to add customer. Try some other username or email');
     } finally {
         conn.release();
     }
