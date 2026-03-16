@@ -7,7 +7,7 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
             .metric-card {
-                 border-left: 3px solid #7C4DFF;
+                border-left: 3px solid #7C4DFF;
             }
         </style>
 </head>
@@ -15,20 +15,22 @@
 <body>
 
     <div class="container-fluid">
-         <div class="row position-sticky">
+        <div class="row position-sticky">
 
             <%- include('../sidebar') %>
 
                 <main class="col-md-9 col-lg-10 p-4">
                     <div class="d-flex justify-content-between align-items-center">
-                    <a href="javascript:history.back()">
+                        <a href="javascript:history.back()">
 
-                        <i class="bi bi-arrow-left"></i>
+                            <i class="bi bi-arrow-left"></i>
 
-                    </a>
-                    <div>
-                        <p class="custom-card-header">Hello, <%= user.full_name[0].toUpperCase() + user.full_name.slice(1) %></p>
-                    </div>
+                        </a>
+                        <div>
+                            <p class="custom-card-header">Hello, <%= user.full_name[0].toUpperCase() +
+                                    user.full_name.slice(1) %>
+                            </p>
+                        </div>
                     </div>
 
 
@@ -41,19 +43,9 @@
                         <div class="col-md-3">
                             <div class="custom-card metric-card p-3">
                                 <div>
-                                <h6 class="metric-title">Revenue</h6>
-                                <h4>PKR <%= Number(revenue).toLocaleString() %>
-                                </h4>
-                                 </div>
-                                </div>
-                            </div>
-
-                        <div class="col-md-3">
-                            <div class="custom-card metric-card p-3">
-                                <div>
-                                <h6 class="metric-title">Expenses</h6>
-                                <h4>PKR <%= Number(expenses).toLocaleString() %>
-                                </h4>
+                                    <h6 class="metric-title">Revenue</h6>
+                                    <h4>PKR <%= Number(revenue).toLocaleString() %>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
@@ -61,9 +53,19 @@
                         <div class="col-md-3">
                             <div class="custom-card metric-card p-3">
                                 <div>
-                                <h6 class="metric-title">Net Monthly Profit</h6>
-                                <h4>PKR <%= Number(profit).toLocaleString() %>
-                                </h4>
+                                    <h6 class="metric-title">Expenses</h6>
+                                    <h4>PKR <%= Number(expenses).toLocaleString() %>
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="custom-card metric-card p-3">
+                                <div>
+                                    <h6 class="metric-title">Net Monthly Profit</h6>
+                                    <h4>PKR <%= Number(profit).toLocaleString() %>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
@@ -71,10 +73,10 @@
                         <div class="col-md-3">
                             <div class="metric-card custom-card p-3">
                                 <div>
-                                <h6 class="metric-title">Profit Margin</h6>
-                                <h4>
-                                    <%= revenue ? ((profit/revenue)*100).toFixed(1) : 0 %>%
-                                </h4>
+                                    <h6 class="metric-title">Profit Margin</h6>
+                                    <h4>
+                                        <%= revenue ? ((profit/revenue)*100).toFixed(1) : 0 %>%
+                                    </h4>
                                 </div>
                             </div>
                         </div>
@@ -88,10 +90,10 @@
                             <div class="metric-card custom-card p-3 ">
                                 <div>
                                     <h6 class="metric-title">Customers</h6>
-                                
-                                <h4>
-                                    <%= customers %>
-                                </h4>
+
+                                    <h4>
+                                        <%= customers %>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
@@ -100,23 +102,23 @@
                             <div class="metric-card custom-card p-3">
                                 <div>
                                     <h6 class="metric-title">Vendors</h6>
-                                
-                                <h4>
-                                    <%= vendors %>
-                                </h4>
+
+                                    <h4>
+                                        <%= vendors %>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="metric-card custom-card p-3 ">
-                                
+
                                 <div>
                                     <h6 class="metric-title">Products</h6>
-                                <h4>
-                                    <%= products %>
-                                </h4>
-                                    </div>
+                                    <h4>
+                                        <%= products %>
+                                    </h4>
+                                </div>
                             </div>
                         </div>
 
@@ -124,11 +126,11 @@
                             <div class="metric-card custom-card p-3 ">
                                 <div>
                                     <h6 class="metric-title">Orders</h6>
-                                
-                               
-                                <h4>
-                                    <%= orders %>
-                                </h4>
+
+
+                                    <h4>
+                                        <%= orders %>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
@@ -143,35 +145,35 @@
                             <div class="metric-card custom-card p-3">
                                 <div>
                                     <h6 class="metric-title">Receivables</h6>
-                                
-                                <h4>PKR <%= Number(receivables).toLocaleString() %>
-                                </h4>
+
+                                    <h4>PKR <%= Number(receivables).toLocaleString() %>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="metric-card custom-card p-3">
-                                
+
                                 <div>
                                     <h6 class="metric-title">Payables</h6>
-                                
-                                <h4>PKR <%= Number(payables).toLocaleString() %>
-                                </h4>
+
+                                    <h4>PKR <%= Number(payables).toLocaleString() %>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="metric-card custom-card p-3">
-                               
+
                                 <div>
                                     <h6 class="metric-title">Low Stock</h6>
-                             
-                                <h4>
-                                    <%= lowStock %>
-                                </h4>
-                                   </div>
+
+                                    <h4>
+                                        <%= lowStock %>
+                                    </h4>
+                                </div>
                             </div>
                         </div>
 
@@ -179,10 +181,10 @@
                             <div class="metric-card custom-card p-3">
                                 <div>
                                     <h6 class="metric-title">Pending complaints</h6>
-                                
-                                <h4>
-                                    <%= complaints %>
-                                </h4>
+
+                                    <h4>
+                                        <%= complaints %>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
@@ -192,27 +194,27 @@
                     <!-- Sales vs Purchases Chart -->
                     <div class="row mb-4">
 
-    <!-- Sales vs Purchases Chart -->
-    <div class="col-md-6">
-        <div class="custom-card p-4 mb-4">
-            <h5>Sales vs Purchases</h5>
-            <div style="height: 300px; width: 100%;">
-                <canvas id="salesChart"></canvas>
-            </div>
-        </div>
-    </div>
+                        <!-- Sales vs Purchases Chart -->
+                        <div class="col-md-6">
+                            <div class="custom-card p-4 mb-4">
+                                <h5>Sales vs Purchases</h5>
+                                <div style="height: 300px; width: 100%;">
+                                    <canvas id="salesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
 
-    <!-- Profits Chart -->
-    <div class="col-md-6">
-        <div class="custom-card p-4 mb-4">
-            <h5>Profits</h5>
-            <div style="height: 300px; width: 100%;">
-                <canvas id="profitChart" height="150"></canvas>
-            </div>
-        </div>
-    </div>
+                        <!-- Profits Chart -->
+                        <div class="col-md-6">
+                            <div class="custom-card p-4 mb-4">
+                                <h5>Profits</h5>
+                                <div style="height: 300px; width: 100%;">
+                                    <canvas id="profitChart" height="150"></canvas>
+                                </div>
+                            </div>
+                        </div>
 
-</div>
+                    </div>
 
                     <!-- Top Tables -->
 
@@ -277,79 +279,79 @@
         </div>
     </div>
     <script>
-     document.addEventListener('DOMContentLoaded', async () => {
+        document.addEventListener('DOMContentLoaded', async () => {
 
-    const userRole = "<%= user.role_id || '' %>";
-    if (userRole !== '1') return;
+            const userRole = "<%= user.role_id || '' %>";
+            if (userRole !== '1') return;
 
-    const res = await fetch("/procure/manager/new-updates");
-    const data = await res.json();
-    const name = <%- JSON.stringify(user.full_name) %>;
+            const res = await fetch("/procure/manager/new-updates");
+            const data = await res.json();
+            const name = <% - JSON.stringify(user.full_name) %>;
 
-    const synth = window.speechSynthesis;
-    let selectedVoice;
+            const synth = window.speechSynthesis;
+            let selectedVoice;
 
-    function loadVoices() {
-        const voices = synth.getVoices();
-        selectedVoice = voices.find(v => v.lang === "en-US") || voices[0];
-    }
-
-    loadVoices();
-    speechSynthesis.onvoiceschanged = loadVoices;
-
-    function speak(text, callback) {
-        const speech = new SpeechSynthesisUtterance(text);
-        speech.voice = selectedVoice;
-        speech.lang = "en-US";
-        speech.rate = 1;
-
-        if (callback) speech.onend = callback;
-
-        synth.speak(speech);
-    }
-
-    setTimeout(() => {
-
-        speak(
-            `Hello ${name}. ${data.message}.`
-        );
-
-    }, 1000);
-
-
-    function listenForResponse() {
-
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) return;
-
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'en-US';
-
-        recognition.onresult = (event) => {
-
-            const result = event.results[0][0].transcript.toLowerCase();
-            recognition.stop();
-
-            if (result.includes("yes")) {
-
-                speak(data.message);
-
-            } else {
-
-                speak("Okay. Let me know if you need anything.");
-
+            function loadVoices() {
+                const voices = synth.getVoices();
+                selectedVoice = voices.find(v => v.lang === "en-US") || voices[0];
             }
 
-        };
+            loadVoices();
+            speechSynthesis.onvoiceschanged = loadVoices;
 
-        recognition.start();
-    }
+            function speak(text, callback) {
+                const speech = new SpeechSynthesisUtterance(text);
+                speech.voice = selectedVoice;
+                speech.lang = "en-US";
+                speech.rate = 1;
 
-});
-   </script>
+                if (callback) speech.onend = callback;
+
+                synth.speak(speech);
+            }
+
+            setTimeout(() => {
+
+                speak(
+                    `Hello ${name}. ${data.message}.`
+                );
+
+            }, 1000);
+
+
+            function listenForResponse() {
+
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) return;
+
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+
+                recognition.onresult = (event) => {
+
+                    const result = event.results[0][0].transcript.toLowerCase();
+                    recognition.stop();
+
+                    if (result.includes("yes")) {
+
+                        speak(data.message);
+
+                    } else {
+
+                        speak("Okay. Let me know if you need anything.");
+
+                    }
+
+                };
+
+                recognition.start();
+            }
+
+        });
+    </script>
     <script>
 
-        const chartData = <%- JSON.stringify(chart) %>;
+        const chartData = <% - JSON.stringify(chart) %>;
 
         const labels = chartData.map(x => x.month);
         const sales = chartData.map(x => x.sales);
@@ -372,7 +374,7 @@
             }
         });
 
-        const profitData = <%- JSON.stringify(profits) %>;
+        const profitData = <% - JSON.stringify(profits) %>;
         const profitsValues = profitData.map(x => x.profit);
 
         new Chart(document.getElementById("profitChart"), {
@@ -397,7 +399,7 @@
                 }
             }
         });
-</script>
+    </script>
 </body>
 
 </html>
