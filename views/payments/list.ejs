@@ -3,14 +3,14 @@
 
 <head>
     <%- include('../head') %>
-        <title>Document</title>
+        <title>Payments List</title>
 </head>
 
 <body>
     <div class="container fluid">
         <div class="row position-sticky">
             <%- include('../sidebar') %>
-                <main class="col-md-9 col-lg-10 p-2">
+                <main class="col-md-9 col-lg-10 p-2 mb-4">
                     <a href="javascript:history.back()">
                         <i class="bi bi-arrow-left"></i>
                     </a>
@@ -24,7 +24,6 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Type</th>
-                                    <th>Reference</th>
                                     <th>Account</th>
                                     <th>Amount</th>
                                     <th>Date</th>
@@ -43,10 +42,6 @@
 
                                         <td class="text-capitalize">
                                             <%= p.payment_type %>
-                                        </td>
-
-                                        <td>
-                                            <%= p.reference_id ? p.reference_id : '-' %>
                                         </td>
 
                                         <td>

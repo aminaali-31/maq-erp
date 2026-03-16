@@ -3,7 +3,7 @@
 
 <head>
     <%- include('../head') %>
-        <title>Register</title>
+        <title>Register Customer</title>
 </head>
 
 <body>
@@ -41,8 +41,14 @@
 
                     <div class="mb-3">
                         <label class="form-label">Phone</label>
-                        <input type="text" name="phone" class="form-control"
-                            placeholder="Enter phone number" required>
+                        <input 
+                        type="tel"
+                        name="phone"
+                        pattern="03[0-9]{9}"
+                        placeholder="03XXXXXXXXX"
+                        class="form-control"
+                        required
+                    >
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>

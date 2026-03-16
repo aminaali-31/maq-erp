@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <%- include('../head') %>
-    <title>Document</title>
+    <title>Add a Vendor</title>
 </head>
 <body>
 <div class="container fluid">
@@ -30,7 +30,15 @@
                 <!-- Phone -->
                 <div class="mb-3">
                 <label for="phone" class="form-label">Phone</label>
-                <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter phone number">
+                 <input 
+                        type="tel"
+                        name="phone"
+                        pattern="03[0-9]{9}"
+                        placeholder="03XXXXXXXXX"
+                        class="form-control"
+                        id="phone"
+                        required
+                    >
                 </div>
 
                 <!-- Email -->
