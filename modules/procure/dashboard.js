@@ -113,8 +113,7 @@ exports.getManagerDashboard = async (req, res) => {
         const [jobs] = await pool.execute(
             `SELECT *
             FROM jobs
-            WHERE employee_id = ?
-            AND status IN ('PENDING','IN_PROGRESS')
+            WHERE status IN ('PENDING','IN_PROGRESS')
             AND show_date <= CURDATE()
             ORDER BY show_date DESC`,
             [req.session.user.id]
@@ -149,5 +148,51 @@ exports.getManagerDashboard = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send("Dashboard Loading Error");
+    }
+};
+
+
+exports.getManagerUpdates = async (req, res) => {
+    try {
+
+        const [orders] = await pool.execute(
+            "SELECT COUNT(*) AS total FROM sales_orders WHERE status='pending'"
+        );
+
+        const [complaints] = await pool.execute(
+            "SELECT COUNT(*) AS total FROM complaints WHERE status='pending'"
+        );
+
+        const [purchases] = await pool.execute(
+            "SELECT COUNT(*) AS total FROM jobs WHERE status='PENDING'"
+        );
+
+        let messageParts = [];
+
+        if (orders[0].total > 0) {
+            messageParts.push(`${orders[0].total} pending sale orders`);
+        }
+
+        if (complaints[0].total > 0) {
+            messageParts.push(`${complaints[0].total} complaints`);
+        }
+
+        if (purchases[0].total > 0) {
+            messageParts.push(`${purchases[0].total} jobs pendings`);
+        }
+
+        let message;
+
+        if (messageParts.length === 0) {
+            message = "You currently have no pending items.";
+        } else {
+            message = "You have " + messageParts.join(", ");
+        }
+
+        res.json({ message });
+
+    } catch (err) {
+        console.error(err);
+        res.json({ message: "There was an error retrieving updates." });
     }
 };

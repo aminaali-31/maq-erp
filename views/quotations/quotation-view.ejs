@@ -10,8 +10,8 @@
 </head>
 
 <body>
-
-<div class="container py-5">
+<%- include('nav') %>
+<div class="container py-5" style="min-height:90vh"> 
 <a href="javascript:history.back()">
                         <i class="bi bi-arrow-left"></i>
                     </a>
@@ -55,8 +55,8 @@
                             <td><%= index + 1 %></td>
                             <td><%= item.name %></td>
                             <td><%= item.quantity %></td>
-                            <td>Rs <%= item.sale_price %></td>
-                            <td>Rs <%= item.sale_price * item.quantity %></td>
+                            <td>Rs <%= Number(item.sale_price).toLocaleString() %></td>
+                            <td>Rs <%= Number(item.sale_price * item.quantity).toLocaleString() %></td>
                         </tr>
 
                         <% }) %>
@@ -80,7 +80,7 @@
                         <tr>
                             <th>Grand Total</th>
                             <td class="text-end fw-bold">
-                                Rs <%= quotation.grand_total %>
+                                Rs <%= Number(quotation.grand_total).toLocaleString() %>
                             </td>
                         </tr>
 
@@ -95,6 +95,6 @@
     </div>
 
 </div>
-
+<%- include('../footer') %>
 </body>
 </html>

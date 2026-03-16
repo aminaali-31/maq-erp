@@ -57,6 +57,10 @@ app.get('/', async (req, res) => {
     });
 
 });
+
+app.get('/contact', async (req,res)=> {
+  res.render('quotations/contact')
+});
 app.use("/auth", authRoutes);
 app.use("/admin", ceoRoutes);
 app.use('/inventory', inventoryRoutes);

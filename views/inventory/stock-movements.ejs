@@ -15,8 +15,8 @@
         <div class="container mt-5">
       <h2>Stock Movements</h2>
       <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
+        <table class="table">
+            <thead>
                 <tr>
                     <th>ID</th>
                     <th>Product</th>
@@ -57,7 +57,7 @@
                        
                     </td>
                     <td>
-                        <%= new Date(m.date).toLocaleString() %>
+                        <%= new Date(m.date).toLocaleDateString() %>
                     </td>
                 </tr>
                 <% }) %>

@@ -1,306 +1,480 @@
 <!DOCTYPE html>
+<html lang="en">
 
 <head>
     <%- include('../head') %>
-        <title>ERP Dashboard</title>
+    <title>ERP Dashboard</title>
 
-        <!-- Bootstrap Icons -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-        <style>
-
-        </style>
+    <!-- Bootstrap 5 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Chart.js -->
 </head>
 
 <body>
     <div class="container-fluid">
-        <div class="row position-sticky">
+        <div class="row p-2">
+            <!-- Sidebar (Assuming your sidebar EJS handles its own col-md-3 etc.) -->
             <%- include('../sidebar') %>
-                <main class="col-md-9 col-lg-10 p-4">
-                   <a href="javascript:history.back()">
+
+              <main class="col-md-9 col-lg-10 p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                    <a href="javascript:history.back()">
+
                         <i class="bi bi-arrow-left"></i>
+
                     </a>
+                    <div>
+                        <p class="custom-card-header">Hello, <%= user.full_name[0].toUpperCase() + user.full_name.slice(1) %></p>
+                    </div>
+                    </div>
+
 
                     <!-- ============================= -->
+
                     <!-- Key Summary Cards -->
+
                     <!-- ============================= -->
+
                     <div class="row g-3" style="margin-bottom: 30px;">
 
+
+
                         <div class="col-lg-3 col-md-2">
+
                             <div class="metric-card">
+
                                 <div class="metric-icon"><i class="bi bi-currency-dollar"></i></div>
+
                                 <div>
+
                                     <p class="metric-title">Total Sales</p>
+
                                     <h4>
+
                                         <%= Number(summary.totalSales).toLocaleString() %>
+
                                     </h4>
+
                                 </div>
+
                             </div>
+
                         </div>
+
+
 
                         <div class="col-lg-3 col-md-2">
+
                             <div class="metric-card">
+
                                 <div class="metric-icon"><i class="bi bi-box-seam"></i></div>
+
                                 <div>
+
                                     <p class="metric-title">Sales Orders</p>
+
                                     <h4>
+
                                         <%= summary.totalOrders %>
+
                                     </h4>
+
                                 </div>
+
                             </div>
+
                         </div>
 
+
+
                         <div class="col-lg-3 col-md-6">
+
                             <div class="metric-card">
+
                                 <div class="metric-icon"><i class="bi bi-credit-card"></i></div>
+
                                 <div>
+
                                     <p class="metric-title">Pending Receivables</p>
+
                                     <h4>
+
                                         <%= Number(summary.pendingReceivables).toLocaleString() %>
+
                                     </h4>
+
                                 </div>
+
                             </div>
+
                         </div>
 
+
+
                         <div class="col-lg-3 col-md-6">
+
                             <div class="metric-card">
+
                                 <div class="metric-icon"><i class="bi bi-bag-check"></i></div>
+
                                 <div>
+
                                     <p class="metric-title">Purchase Orders</p>
+
                                     <h4>
+
                                         <%= summary.totalPO %>
+
                                     </h4>
+
                                 </div>
+
                             </div>
+
                         </div>
 
+
+
                         <div class="col-lg-3 col-md-6">
+
                             <div class="metric-card">
+
                                 <div class="metric-icon"><i class="bi bi-cash-stack"></i></div>
+
                                 <div>
+
                                     <p class="metric-title">Pending Payables</p>
+
                                     <h4>
+
                                         <%= Number(summary.pendingPayables).toLocaleString() %>
+
                                     </h4>
+
                                 </div>
+
                             </div>
+
                         </div>
 
+
+
                         <div class="col-lg-3 col-md-6">
+
                             <div class="metric-card">
+
                                 <div class="metric-icon"><i class="bi bi-exclamation-triangle"></i></div>
+
                                 <div>
+
                                     <p class="metric-title">Low Stock Items</p>
+
                                     <h4>
+
                                         <%= summary.lowStockCount %>
+
                                     </h4>
+
                                 </div>
+
                             </div>
+
                         </div>
+
+
 
                         <div class="col-lg-3 col-md-6">
+
                             <div class="metric-card">
+
                                 <div class="metric-icon"><i class="bi bi-boxes"></i></div>
+
                                 <div>
+
                                     <p class="metric-title">Total Products</p>
+
                                     <h4>
+
                                         <%= summary.totalProducts %>
+
                                     </h4>
+
                                 </div>
+
                             </div>
+
                         </div>
+
+
 
                     </div>
 
-                    <!-- ============================= -->
-                    <!-- Action Buttons -->
-                    <!-- ============================= -->
-                    <div class=" g-3 text-center d-flex justify-content-between align-items-center wrap"
-                        style="margin-bottom: 30px;">
-                        <div class="col-md-2 col-6">
-                            <a href="/sales/orders/new" class="btn  w-100 action-btn"><i class="bi bi-plus-lg me-1"></i>
-                                Add Sale</a>
-                        </div>
-                        <div class="col-md-2 col-6">
-                            <a href="/sales/orders" class="btn  w-100 action-btn"><i class="bi bi-box-seam me-1"></i>
-                                Sales Orders</a>
-                        </div>
-                        <div class="col-md-2 col-6">
-                            <a href="/procure/purchase-orders/add" class="btn  w-100 action-btn"><i
-                                    class="bi bi-cart-plus me-1"></i> Purchase Order</a>
-                        </div>
-                        <div class="col-md-2 col-6">
-                            <a href="/procure/purchase-orders/all" class="btn w-100 action-btn"><i
-                                    class="bi bi-gear me-1"></i> Procurement</a>
-                        </div>
-                        <div class="col-md-2 col-6">
-                            <a href="/inventory/allProducts" class="btn w-100 action-btn"><i
-                                    class="bi bi-archive me-1"></i> Inventory</a>
-                        </div>
+                <!-- Quick Actions -->
+                <div class="row g-3 mb-5">
+                    <div class="col-6 col-md-auto">
+                        <a href="/sales/orders/new" class="action-btn">
+                            <i class="bi bi-plus-lg"></i> Add Sale
+                        </a>
                     </div>
-                    <div class="row mb-4">
+                    <div class="col-6 col-md-auto">
+                        <a href="/sales/orders" class="action-btn">
+                            <i class="bi bi-box-seam"></i> Sales Orders
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-auto">
+                        <a href="/procure/purchase-orders/add" class="action-btn">
+                            <i class="bi bi-cart-plus"></i> Purchase Order
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-auto">
+                        <a href="/procure/purchase-orders/all" class="action-btn">
+                            <i class="bi bi-gear"></i> Procurement
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-auto">
+                        <a href="/inventory/allProducts" class="action-btn">
+                            <i class="bi bi-archive"></i> Inventory
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tasks Section -->
+                <div class="custom-card">
+                    <div class="custom-card-header">
+                        <i class="bi bi-list-task text-primary"></i> Tasks to Do
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Due Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% jobs.forEach(job => { %>
+                                    <tr>
+                                        <td class="fw-bold"><%= job.title %></td>
+                                        <td class="text-muted"><%= job.description %></td>
+                                        <td>
+                                            <span class="badge bg-light text-primary badge-status border border-primary-subtle">
+                                                <%= job.status %>
+                                            </span>
+                                        </td>
+                                        <td class="font-monospace"><%= job.due_date.toISOString().split('T')[0] %></td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tables Row -->
+                <div class="row">
+                    <div class="col-lg-6">
                         <div class="custom-card">
-                            <div class="custom-card-header mb-3">Tasks to Do</div>
-                            <div class="custom-card-body p-0">
+                            <div class="custom-card-header">Latest Sales Orders</div>
+                            <div class="table-responsive">
                                 <table class="table mb-0">
-
                                     <thead>
                                         <tr>
-                                            <th>Title</th>
-                                            <th>Description</th>
-                                            <th>Status</th>
-                                            <th>Due Date</th>
+                                            <th>ID</th>
+                                            <th>Customer</th>
+                                            <th>Amount</th>
                                         </tr>
                                     </thead>
-
                                     <tbody>
-
-                                        <% jobs.forEach(job=> { %>
-
+                                        <% recentSalesOrders.forEach(order => { %>
                                             <tr>
-                                                <td>
-                                                    <%= job.title %>
-                                                </td>
-                                                <td>
-                                                    <%= job.description %>
-                                                </td>
-                                                <td>
-                                                    <%= job.status %>
-                                                </td>
-                                                <td>
-                                                    <%= job.due_date.toISOString().split('T')[0] %>
-                                                </td>
+                                                <td class="text-primary fw-bold">#<%= order.id %></td>
+                                                <td><%= order.customer %></td>
+                                                <td class="fw-bold text-end">PKR <%= Number(order.total_amount).toLocaleString() %></td>
                                             </tr>
-
-                                            <% }) %>
-
+                                        <% }) %>
                                     </tbody>
-
                                 </table>
                             </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="custom-card">
+                            <div class="custom-card-header">Latest Purchase Orders</div>
+                            <div class="table-responsive">
+                                <table class="table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Vendor</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% recentPOs.forEach(po => { %>
+                                            <tr>
+                                                <td class="text-info fw-bold">#<%= po.id %></td>
+                                                <td><%= po.vendor %></td>
+                                                <td class="fw-bold text-end">PKR <%= Number(po.total_amount).toLocaleString() %></td>
+                                            </tr>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
                             </div>
-                            </div>
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-6">
-                                    <div class="custom-card">
-                                        <div class="custom-card-header mb-3">Latest Sales Orders</div>
-                                        <div class="custom-card-body p-0">
-                                            <table class="table mb-0">
-                                                <thead>
-                                                    <tr>
-                                                        <th>ID</th>
-                                                        <th>Customer</th>
-                                                        <th>Amount</th>
-                                                        <th>Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <% recentSalesOrders.forEach(order=> { %>
-                                                        <tr>
-                                                            <td>
-                                                                <%= order.id %>
-                                                            </td>
-                                                            <td>
-                                                                <%= order.customer %>
-                                                            </td>
-                                                            <td>PKR <%= order.total_amount %>
-                                                            </td>
-                                                            <td><span class="badge bg-info">
-                                                                    <%= order.status %>
-                                                                </span></td>
-                                                        </tr>
-                                                        <% }) %>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Row -->
+                        <div class="row mb-4">
+
+                        <!-- First chart: 3/4 width -->
+
+                        <div class="col-md-9 mb-3">
+
+                            <div class="custom-card">
+
+                                <div class="custom-card-body">
+
+                                    <h6 class=" mb-3">Sales vs Purchase Analytics</h6>
+
+                                    <div class="chart-container">
+
+                                        <canvas id="financeChart"></canvas>
+
                                     </div>
+
                                 </div>
 
-                                <div class="col-md-6">
-                                    <div class="custom-card shadow-sm">
-                                        <div class="custom-card-header mb-3">Latest Purchase Orders</div>
-                                        <div class="custom-card-body p-0">
-                                            <table class="table mb-0">
-                                                <thead>
-                                                    <tr>
-                                                        <th>ID</th>
-                                                        <th>Vendor</th>
-                                                        <th>Amount</th>
-                                                        <th>Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <% recentPOs.forEach(po=> { %>
-                                                        <tr>
-                                                            <td>
-                                                                <%= po.id %>
-                                                            </td>
-                                                            <td>
-                                                                <%= po.vendor %>
-                                                            </td>
-                                                            <td>PKR <%= po.total_amount %>
-                                                            </td>
-                                                            <td><span class="badge bg-warning">
-                                                                    <%= po.status %>
-                                                                </span></td>
-                                                        </tr>
-                                                        <% }) %>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- ============================= -->
-                            <!-- Charts -->
-                            <!-- ============================= -->
-                            <div class="row mb-4">
-                                <!-- First chart: 3/4 width -->
-                                <div class="col-md-9 mb-3">
-                                    <div class="custom-card">
-                                        <div class="custom-card-body">
-                                            <h6 class=" mb-3">Sales vs Purchase Analytics</h6>
-                                            <div class="chart-container">
-                                                <canvas id="financeChart"></canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Pie chart: 1/4 width -->
-                                <div class="col-md-3 mb-3">
-                                    <div class="custom-card">
-                                        <div class="custom-card-body">
-                                            <h6 class="mb-3">Order Distribution</h6>
-                                            <div class="chart-container">
-                                                <canvas id="orderChart"></canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <div class="col-lg-12 mt-4 mb-2">
-                                    <div class="custom-card">
-                                        <div class="custom-card-body">
-                                            <h6 class=" mb-3">Sales Trend</h6>
-                                            <div class="chart-container">
-                                                <canvas id="salesTrendChart"></canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
 
-                            <!-- ============================= -->
-                            <!-- Tables -->
-                            <!-- ============================= -->
-                            
+                        </div>
 
-                </main>
+
+
+                        <!-- Pie chart: 1/4 width -->
+
+                        <div class="col-md-3 mb-3">
+
+                            <div class="custom-card">
+
+                                <div class="custom-card-body">
+
+                                    <h6 class="mb-3">Order Distribution</h6>
+
+                                    <div class="chart-container">
+
+                                        <canvas id="orderChart"></canvas>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+
+
+                        <div class="col-lg-12 mt-4 mb-2">
+
+                            <div class="custom-card">
+
+                                <div class="custom-card-body">
+
+                                    <h6 class="mb-3">Sales Trend</h6>
+
+                                    <div class="chart-container">
+
+                                        <canvas id="salesTrendChart"></canvas>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+            </main>
         </div>
     </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
 
+    const userRole = "<%= user.role_id || '' %>";
+    if (userRole !== '1') return;
+
+    const res = await fetch("/procure/manager/new-updates");
+    const data = await res.json();
+    const name = <%- JSON.stringify(user.full_name) %>;
+    const synth = window.speechSynthesis;
+    let selectedVoice;
+
+    function loadVoices() {
+        const voices = synth.getVoices();
+        selectedVoice = voices.find(v => v.lang === "en-US") || voices[0];
+    }
+
+    loadVoices();
+    speechSynthesis.onvoiceschanged = loadVoices;
+
+    function speak(text, callback) {
+        const speech = new SpeechSynthesisUtterance(text);
+        speech.voice = selectedVoice;
+        speech.lang = "en-US";
+        speech.rate = 1;
+
+        if (callback) speech.onend = callback;
+
+        synth.speak(speech);
+    }
+
+    setTimeout(() => {
+
+        speak(
+            `Hello ${name}. ${data.message}. Would you like to hear the details?`,
+            listenForResponse
+        );
+
+    }, 1000);
+
+
+    function listenForResponse() {
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) return;
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+
+        recognition.onresult = (event) => {
+
+            const result = event.results[0][0].transcript.toLowerCase();
+            recognition.stop();
+
+            if (result.includes("yes")) {
+
+                speak(data.message);
+
+            } else {
+
+                speak("Okay. Let me know if you need anything.");
+
+            }
+
+        };
+
+        recognition.start();
+    }
+
+});
+    </script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -394,12 +568,12 @@
                     {
                         label: 'Sales Amount',
                         data: salesAmounts,
-                        borderColor: '#7C4DFF',
-                        backgroundColor: '#7C4DFF',
+                        borderColor: '#8B5CF6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        fill: true,
                         borderWidth: 3,
                         tension: 0.4,
                         pointRadius: 4,
-                        fill: false
                     },
                     {
                         label: 'Number of Orders',
@@ -413,7 +587,15 @@
                     }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+             options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#f1f5f9' }, border: { display: false } },
+                        x: { grid: { display: false }, border: { display: false } }
+                    }
+                }
         });
     </script>
 </body>

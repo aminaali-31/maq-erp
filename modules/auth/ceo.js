@@ -197,7 +197,7 @@ exports.createJobForm = async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.redirect('/admin/jobs?error=' + encodeURIComponent(err.message));
+        res.redirect('/admin/jobs/all?error=' + encodeURIComponent(err.message));
     }
 };
 
@@ -218,7 +218,7 @@ exports.createJob = async (req, res) => {
             [title, description, employee_id, show_date, due_date]
         );
 
-        res.redirect('/admin/jobs?success=Job created');
+        res.redirect('/admin/jobs/all?success=Job created');
 
     } catch (err) {
         console.error(err);

@@ -20,9 +20,16 @@
             <%- include('../sidebar') %>
 
                 <main class="col-md-9 col-lg-10 p-4">
+                    <div class="d-flex justify-content-between align-items-center">
                     <a href="javascript:history.back()">
+
                         <i class="bi bi-arrow-left"></i>
+
                     </a>
+                    <div>
+                        <p class="custom-card-header">Hello, <%= user.full_name[0].toUpperCase() + user.full_name.slice(1) %></p>
+                    </div>
+                    </div>
 
 
                     <h3 class="mb-4">CEO Dashboard</h3>
@@ -270,76 +277,76 @@
         </div>
     </div>
     <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const userRole = "<%= user.role_id || '' %>";
-    const notifications = [
-        "Your sales report is ready.",
-        "Purchase order 102 needs approval.",
-        "This is something ridiculous",
-        "Reminder: Team meeting at 3 PM."
-    ];
+     document.addEventListener('DOMContentLoaded', async () => {
 
-    if (userRole.toLowerCase() !== '1') return;
+    const userRole = "<%= user.role_id || '' %>";
+    if (userRole !== '1') return;
+
+    const res = await fetch("/procure/manager/new-updates");
+    const data = await res.json();
+    const name = <%- JSON.stringify(user.full_name) %>;
 
     const synth = window.speechSynthesis;
+    let selectedVoice;
 
-    // Start automatically after login
+    function loadVoices() {
+        const voices = synth.getVoices();
+        selectedVoice = voices.find(v => v.lang === "en-US") || voices[0];
+    }
+
+    loadVoices();
+    speechSynthesis.onvoiceschanged = loadVoices;
+
+    function speak(text, callback) {
+        const speech = new SpeechSynthesisUtterance(text);
+        speech.voice = selectedVoice;
+        speech.lang = "en-US";
+        speech.rate = 1;
+
+        if (callback) speech.onend = callback;
+
+        synth.speak(speech);
+    }
+
     setTimeout(() => {
-        const greet = new SpeechSynthesisUtterance(
-            `Hello sir, you have ${notifications.length} new notifications. Would you like to listen?`
+
+        speak(
+            `Hello ${name}. ${data.message}.`
         );
 
-        greet.onend = () => listenForResponse();
-        synth.speak(greet);
+    }, 1000);
 
-    }, 1000); // small delay so browser finishes loading
 
     function listenForResponse() {
+
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-            console.log("Speech recognition not supported");
-            return;
-        }
+        if (!SpeechRecognition) return;
 
         const recognition = new SpeechRecognition();
         recognition.lang = 'en-US';
 
         recognition.onresult = (event) => {
+
             const result = event.results[0][0].transcript.toLowerCase();
-
-            console.log("CEO response:", result);
-
             recognition.stop();
 
             if (result.includes("yes")) {
-                setTimeout(() => readNotifications(0), 100);
-            } else {
-                window.speechSynthesis.speak(
-                    new SpeechSynthesisUtterance("Okay, no problem.")
-                );
-            }
-        };
 
-        recognition.onerror = (err) => {
-            console.log("Speech recognition error:", err);
+                speak(data.message);
+
+            } else {
+
+                speak("Okay. Let me know if you need anything.");
+
+            }
+
         };
 
         recognition.start();
     }
 
-    function readNotifications(index) {
-        if (index >= notifications.length) return;
-
-        const utter = new SpeechSynthesisUtterance(notifications[index]);
-
-        utter.onend = () => {
-            setTimeout(() => readNotifications(index + 1), 300);
-        };
-
-        speechSynthesis.speak(utter);
-    }
 });
-</script>
+   </script>
     <script>
 
         const chartData = <%- JSON.stringify(chart) %>;
