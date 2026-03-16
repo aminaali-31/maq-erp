@@ -286,7 +286,7 @@
 
             const res = await fetch("/procure/manager/new-updates");
             const data = await res.json();
-            const name = <% - JSON.stringify(user.full_name) %>;
+            const name = <%- JSON.stringify(user.full_name) %>;
 
             const synth = window.speechSynthesis;
             let selectedVoice;
@@ -351,7 +351,7 @@
     </script>
     <script>
 
-        const chartData = <% - JSON.stringify(chart) %>;
+        const chartData = <%- JSON.stringify(chart) %>;
 
         const labels = chartData.map(x => x.month);
         const sales = chartData.map(x => x.sales);
@@ -374,7 +374,7 @@
             }
         });
 
-        const profitData = <% - JSON.stringify(profits) %>;
+        const profitData = <%- JSON.stringify(profits) %>;
         const profitsValues = profitData.map(x => x.profit);
 
         new Chart(document.getElementById("profitChart"), {
