@@ -40,14 +40,14 @@
                                 </option>
                             <% }) %>
                         </select>
+                      <% } else { %>
+                        <!-- Hidden input to preserve role -->
+                        <input type="hidden" name="role" value="<%= user.role_id %>">
 
-                        <% } %>
-                            <% if(isCustomer || isVendor){ %>
-                                <small class="text-danger">
-                                    This user is linked to a customer/vendor so the role cannot be changed.
-                                </small>
-                                <% } %>
-
+                        <small class="text-danger">
+                            This user is linked to a customer/vendor so the role cannot be changed.
+                        </small>
+                    <% } %>
                 </div>
 
                 <button class="btn btn-primary">Update</button>

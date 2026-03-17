@@ -406,13 +406,14 @@ exports.updateUser = async (req, res) => {
 
         const userId = req.params.id;
         const { name, email, password, role } = req.body;
+        const role_id = parseInt(role);
         if (!password)
         {
             await pool.execute(
             `UPDATE users 
              SET username = ?, email = ?, role_id = ?
              WHERE id = ?`,
-            [name, email,role, userId]
+            [name, email,role_id, userId]
         );
 
         res.redirect('/auth/users?success=User updated');
@@ -423,7 +424,7 @@ exports.updateUser = async (req, res) => {
             `UPDATE users 
              SET username = ?, email = ?, password = ?,  role_id = ?
              WHERE id = ?`,
-            [name, email, hashedPassword, role, userId]
+            [name, email, hashedPassword, role_id, userId]
         );
 
         res.redirect('/auth/users?success=User updated');
