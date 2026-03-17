@@ -5,6 +5,11 @@
     <%- include('../head') %>
         <title>HR - Dashboard</title>
 </head>
+<style>
+    .action-btn {
+        border: 1px solid #8B5CF6;
+    }
+</style>
 
 <body>
     <div class="container fluid">
@@ -28,7 +33,7 @@
                         <div class="row">
 
                             <!-- Total Employees -->
-                            <div class="col-md-3">
+                            <div class="col-md-3 mb-3">
                                 <div class="metric-card mb-3">
                                     <div>
                                         <h6 class="metric-title">Total Employees</h6>
@@ -41,7 +46,7 @@
 
 
                             <!-- New Hires -->
-                            <div class="col-md-3">
+                            <div class="col-md-3 mb-3">
                                 <div class="metric-card mb-3">
                                     <div>
                                         <h6 class="metric-title">Total Payroll</h6>
@@ -53,7 +58,7 @@
                             </div>
 
                             <!-- Total Payroll -->
-                            <div class="col-md-3">
+                            <div class="col-md-3 mb-3">
                                 <div class="metric-card mb-3">
                                     <div>
                                         <h6 class="metric-title">New Hires</h6>
@@ -65,7 +70,7 @@
                             </div>
 
                             <!-- Departments Count -->
-                            <div class="col-md-3">
+                            <div class="col-md-3 mb-3">
                                 <div class="metric-card mb-3">
                                     <div>
                                         <h6 class="metric-title">Departments</h6>
@@ -84,19 +89,19 @@
 
                             <h5 class="mb-3">Quick Actions</h5>
                             <div class="d-flex align-items-center wrap">
-                                <a href="/hr/add" class="btn action-btn me-2 mb-2">
+                                <a href="/hr/add" class="action-btn me-2 mb-2">
                                     Add Employee
                                 </a>
 
-                                <a href="/hr/list" class="btn action-btn me-2 mb-2">
+                                <a href="/hr/list" class="action-btn me-2 mb-2">
                                     View Employees
                                 </a>
 
-                                <a href="/hr/payroll/add" class="btn action-btn me-2 mb-2">
+                                <a href="/hr/payroll/add" class="action-btn me-2 mb-2">
                                     Add Payroll
                                 </a>
 
-                                <a href="/hr/payroll/list" class="btn action-btn me-2 mb-2">
+                                <a href="/hr/payroll/list" class="action-btn me-2 mb-2">
                                     View Payroll
                                 </a>
                             </div>
