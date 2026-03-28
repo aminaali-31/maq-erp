@@ -26,7 +26,7 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th>PO ID</th>
+                                                <th>Sr.</th>
                                                 <th>Vendor</th>
                                                 <th>Order Date</th>
                                                 <th>Status</th>
@@ -40,10 +40,10 @@
                                                     <td colspan="6" class="text-center">No purchase orders found</td>
                                                 </tr>
                                                 <% } else { %>
-                                                    <% pos.forEach(po=> { %>
+                                                    <% pos.forEach((po, idx) => { %>
                                                         <tr>
                                                             <td>
-                                                                <%= po.id %>
+                                                                <%= idx+1 %>
                                                             </td>
                                                             <td>
                                                                 <%= po.vendor_name %>

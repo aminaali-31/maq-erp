@@ -101,7 +101,7 @@ exports.getAllProducts = async (req, res) => {
             FROM products p
             LEFT JOIN categories c ON p.category_id = c.id
             LEFT JOIN inventory_level q on q.product_id = p.id
-            ORDER BY p.id
+            ORDER BY c.name DESC
         `);
         // Optional: success message from query string
         const message = req.query.message || null;

@@ -32,7 +32,7 @@
                                         <table class="table">
                                             <thead>
                                                 <tr>
-                                                    <th>ID</th>
+                                                    <th>Sr.</th>
                                                     <th>Customer</th>
                                                     <th>Total Amount</th>
                                                     <th>Payment Status</th>
@@ -42,10 +42,10 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <% orders.forEach(order=> { %>
+                                                <% orders.forEach((order, idx)=> { %>
                                                     <tr>
                                                         <td>
-                                                            <%= order.id %>
+                                                            <%= idx+1 %>
                                                         </td>
                                                         <td>
                                                             <%= order.customer_name %>
