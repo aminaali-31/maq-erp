@@ -18,7 +18,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>Sr.</th>
                     <th>Product</th>
                     <th>Type</th>
                     <th>Quantity</th>
@@ -33,9 +33,9 @@
                     <td colspan="7" class="text-center">No stock movements found</td>
                 </tr>
             <% } else { %>
-                <% movements.forEach(m => { %>
+                <% movements.forEach((m,idx) => { %>
                 <tr>
-                    <td><%= m.id %></td>
+                    <td><%= idx+! %></td>
                     <td><%= m.product_name %></td>
                     <td>
                         <% if (m.movement_type === 'IN') { %>

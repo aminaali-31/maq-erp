@@ -22,7 +22,7 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>Sr.</th>
                     <th>Name</th>
                     <th>Category</th>
                     <th>Sale Price</th>
@@ -38,9 +38,9 @@
                     <td colspan="7" class="text-center">No products found</td>
                     </tr>
                 <% } else { %>
-                    <% products.forEach(product => { %>
+                    <% products.forEach((product,idx) => { %>
                     <tr>
-                        <td><%= product.id %></td>
+                        <td><%= idx+1 %></td>
                         <td><%= product.name %></td>
                         <td><%= product.category_name %></td>
                         <td><%= Number(product.sale_price).toFixed(2) %></td>

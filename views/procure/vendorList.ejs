@@ -22,7 +22,7 @@
             <table class="table">
                 <thead >
                 <tr>
-                    <th>ID</th>
+                    <th>Sr.</th>
                     <th>Name</th>
                     <th>Phone</th>
                     <th>Email</th>
@@ -36,9 +36,9 @@
                     <td colspan="6" class="text-center">No vendors found</td>
                     </tr>
                 <% } else { %>
-                    <% vendors.forEach(vendor => { %>
+                    <% vendors.forEach((vendor,idx) => { %>
                     <tr>
-                        <td><%= vendor.id %></td>
+                        <td><%= idx+1 %></td>
                         <td><%= vendor.name %></td>
                         <td><%= vendor.phone %></td>
                         <td><%= vendor.email %></td>
