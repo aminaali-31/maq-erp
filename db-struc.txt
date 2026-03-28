@@ -516,3 +516,32 @@ TRUNCATE TABLE jobs;
 -- Repeat for all tables
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+
+-------- 
+CREATE TABLE contractors (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    phone VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE contracts (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    contractor_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    amount DECIMAL(10,2) NOT NULL,
+
+    FOREIGN KEY (contractor_id)
+        REFERENCES contractors(id)
+        ON DELETE CASCADE
+);
+
+
+ALTER TABLE contractors
+ADD COLUMN account_id INT,
+ADD FOREIGN KEY (account_id) REFERENCES accounts(id);
+
+ALTER TABLE contracts 
+ADD COLUMN date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;

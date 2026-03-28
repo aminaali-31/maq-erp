@@ -118,6 +118,17 @@ exports.getManagerDashboard = async (req, res) => {
             ORDER BY show_date DESC`,
             [req.session.user.id]
         );
+
+        const [po_items] = await pool.execute(
+            `SELECT 
+                c.id AS category_id,
+                c.name AS category_name,
+                SUM(q.quantity) AS total_quantity
+            FROM products p
+            JOIN categories c ON c.id = p.category_id
+            LEFT JOIN inventory_level q ON q.product_id = p.id
+            GROUP BY c.id, c.name`
+        );
         /*
         -------------------------------------------------
         Render Dashboard View
@@ -137,7 +148,7 @@ exports.getManagerDashboard = async (req, res) => {
                 totalProducts: productCount[0].totalProducts,
                 lowStockCount: lowStock[0].lowStockCount
             },
-
+            po_items,
             recentSalesOrders,
             recentPOs,
             monthlySales,

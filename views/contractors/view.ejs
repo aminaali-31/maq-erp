@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../head') %>
+    <title>Purchase Order</title>
+</head>
+<body>
+<div class="container fluid">
+  <div class="row position-sticky">
+    <%- include('../sidebar') %>
+    <main class="col-md-9 col-lg-10 p-4">
+        <a href="javascript:history.back()">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+        <div class="container mt-5">
+              <h2>Contract Details</h2>
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title"><%= contract.name %></h4>
+            <p><strong>Client:</strong> <%= contract.contractor_name %></p>
+            <p><strong>Date:</strong> <%= contract.date.toISOString().split('T')[0] %></p>
+            <p><strong>Amount:</strong> <%= contract.amount %></p>
+            <p><strong>Description:</strong> <%= contract.description %></p>
+        </div>
+        <div class="card-footer">
+            <a href="/contractors/allContracts" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>

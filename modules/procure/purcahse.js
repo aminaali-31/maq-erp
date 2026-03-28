@@ -54,8 +54,15 @@ exports.addPurchaseOrder = async (req, res) => {
         if (!vendorRows[0]) throw new Error('Vendor account not found');
         const VENDOR_ACCOUNT_ID = vendorRows[0].account_id;
 
-        // 4️⃣ Set Inventory / Expense account
-        const INVENTORY_ACCOUNT_ID = 3; // replace with your actual inventory/asset account
+        const [payableRows] = await conn.execute(
+            `SELECT id
+             FROM accounts
+             WHERE name = 'Stocks'`
+        );
+        if (!payableRows.length) {
+            throw new Error('Stocks account not found');
+        }
+        const INVENTORY_ACCOUNT_ID = payableRows[0].id
 
         let calculatedTotal = 0;
 

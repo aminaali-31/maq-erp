@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>Register Contractor</title>
+</head>
+
+<body>
+    <%- include('../sidebar') %>
+
+<div class="container fluid">
+  <div class="row position-sticky">
+    <%- include('../sidebar') %>
+    <main class="col-md-9 col-lg-10 p-4">
+      <a href="javascript:history.back()">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+            <h3 class="mb-4">Add New Contractor</h3>
+
+            <% if (success) { %>
+            <div class="alert alert-success">
+                <%= success %>
+            </div>
+            <% } %>
+
+            <% if (error) { %>
+            <div class="alert alert-danger">
+                <%= error %>
+            </div>
+            <% } %>
+
+            <form action="/contractors/add" method="POST">
+                <div class="card p-4">
+
+                    <div class="mb-3">
+                        <label class="form-label">Contractor Name</label>
+                        <input type="text" name="name" class="form-control"
+                            placeholder="Enter customer name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input 
+                        type="tel"
+                        name="phone"
+                        pattern="03[0-9]{9}"
+                        placeholder="03XXXXXXXXX"
+                        class="form-control"
+                        required
+                    >
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            Save Contractor
+                        </button>
+
+                        <a href="/contractors" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+
+                </div>
+            </form>
+    </main>
+    </div>
+    </div>
+<style>
+.main-content{
+    margin-left: 250px; /* Match sidebar width */
+    padding: 20px;
+}
+</style>
+</body>
+</html>

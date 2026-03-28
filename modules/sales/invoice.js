@@ -65,9 +65,17 @@ exports.createInvoice = async (req,res)=>{
             );
         if (!customer[0]) throw new Error('Customer account not found');
         const AR_ACCOUNT_ID = customer[0].account_id; // use auto-created customer account
-        const SALES_ACCOUNT_ID = 4;
+        const [salesAcc] = await connection.execute(
+            `SELECT id
+             FROM accounts
+            WHERE name = 'Sales Revenue' `
+            );
+            if (!salesAcc.length) {
+            throw new Error('Sales Revenue account not found');
+        }
+            const SALES_ACCOUNT_ID = salesAcc[0].id;
 
-        const [journalResult] = await connection.execute(
+            const [journalResult] = await connection.execute(
             `INSERT INTO journal
             (name,date,reference_type,reference_id)
             VALUES (?,?,?,?)`,

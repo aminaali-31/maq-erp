@@ -25,7 +25,7 @@
 
                     </a>
                     <div>
-                        <p class="custom-card-header">Hello, <%= user.full_name[0].toUpperCase() + user.full_name.slice(1) %></p>
+                        <p class="custom-card-header" style="font-size: 23px;">Hello, <%= user.full_name[0].toUpperCase() + user.full_name.slice(1) %></p>
                     </div>
                     </div>
 
@@ -239,38 +239,91 @@
                     </div>
                 </div>
 
-                <!-- Tasks Section -->
-                <div class="custom-card">
-                    <div class="custom-card-header">
-                        <i class="bi bi-list-task text-primary"></i> Tasks to Do
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Description</th>
-                                    <th>Status</th>
-                                    <th>Due Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% jobs.forEach(job => { %>
-                                    <tr>
-                                        <td class="fw-bold"><%= job.title %></td>
-                                        <td class="text-muted"><%= job.description %></td>
-                                        <td>
-                                            <span class="badge bg-light text-primary badge-status border border-primary-subtle">
-                                                <%= job.status %>
-                                            </span>
-                                        </td>
-                                        <td class="font-monospace"><%= job.due_date.toISOString().split('T')[0] %></td>
-                                    </tr>
-                                <% }) %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+              <div class="row">
+
+    <!-- Jobs Section (2/3 width) -->
+    <div class="col-md-8 mb-3">
+        <div class="custom-card h-100">
+            <div class="custom-card-header">
+                <i class="bi bi-list-task text-primary"></i> Tasks to Do
+            </div>
+
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Due Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <% jobs.forEach(job => { %>
+                            <tr>
+                                <td class="fw-bold"><%= job.title %></td>
+                                <td class="text-muted"><%= job.description %></td>
+
+                                <td>
+                                    <span class="badge bg-light text-primary border border-primary-subtle">
+                                        <%= job.status %>
+                                    </span>
+                                </td>
+
+                                <td class="font-monospace">
+                                    <%= job.due_date.toISOString().split('T')[0] %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Levels Section (1/3 width) -->
+    <div class="col-md-4 mb-3">
+        <div class="custom-card h-100">
+            <div class="custom-card-header">
+                <i class="bi bi-box-seam text-primary"></i> Inventory Levels
+            </div>
+
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <% po_items.forEach(po_item => { %>
+                            <tr>
+                                <td class="fw-bold">
+                                    <%= po_item.category_id %>
+                                </td>
+
+                                <td class="text-muted">
+                                    <%= po_item.category_name %>
+                                </td>
+
+                                <td class="font-monospace">
+                                    <%= po_item.total_quantity %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
 
                 <!-- Tables Row -->
                 <div class="row">

@@ -16,6 +16,7 @@ const customerRoutes = require('./routes/customer');
 const vendorRoutes = require('./routes/vendor');
 const quotationController = require('./modules/sales/quotations')
 const bcrypt = require('bcrypt')
+const contractorRoutes = require('./routes/contractors');
 
 const app = express();
 // Body parsing
@@ -71,6 +72,7 @@ app.use('/accounts', accountRoutes);
 app.use('/customer', customerRoutes);
 app.use('/vendor', vendorRoutes)
 app.use('/hr', hrRoutes);
+app.use('/contractors', contractorRoutes);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

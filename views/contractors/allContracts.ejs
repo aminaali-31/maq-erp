@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../head') %>
+        <title>All Contracts</title>
+</head>
+
+<body>
+    <div class="container fluid">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-2">
+                    <a href="javascript:history.back()">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                    <div class="container mt-5">
+                        <h2 class="mb-4">All COntracts</h2>
+                        <a href="/contractors/addContract" class="btn btn-primary mb-3">Add Contract</a>
+                      
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Title</th>
+                                                <th>Contractor Name</th>
+                                                <th>Date</th>
+                                                <th>Total Amount</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% if (contracts.length===0) { %>
+                                                <tr>
+                                                    <td colspan="6" class="text-center">No Contracts</td>
+                                                </tr>
+                                                <% } else { %>
+                                                    <% contracts.forEach(co=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= co.id %>
+                                                            </td>
+                                                            <td>
+                                                                <%= co.co_name %>
+                                                            </td>
+                                                            <td>
+                                                                <%= co.co_name %>
+                                                            </td>
+                                                            <td>
+                                                                <%= co.date.toISOString().split('T')[0] %>
+                                                            </td>
+                                    
+                                                            <td>Rs.<%= Number(co.amount).toFixed(2) %>
+                                                            </td>
+                                                            <td>
+                                                                <a href="/contractors/view/<%= co.id %>"
+                                                                    class="btn btn-info btn-sm">View</a>
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+                                                            <% } %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                    </div>
+                </main>
+        </div>
+    </div>
+</body>
+
+</html>
