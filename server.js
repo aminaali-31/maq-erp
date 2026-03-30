@@ -15,7 +15,6 @@ const hrRoutes = require('./routes/hr.routes');
 const customerRoutes = require('./routes/customer');
 const vendorRoutes = require('./routes/vendor');
 const quotationController = require('./modules/sales/quotations')
-const bcrypt = require('bcrypt')
 const contractorRoutes = require('./routes/contractors');
 
 const app = express();
@@ -77,4 +76,16 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+process.on("SIGTERM", async () => {
+  console.log("Shutting down gracefully...");
+  await db.end(); // close all connections in the pool
+  process.exit(0);
+});
+
+process.on("SIGINT", async () => {
+  console.log("Interrupted, shutting down...");
+  await db.end();
+  process.exit(0);
 });
