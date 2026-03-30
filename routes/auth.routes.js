@@ -29,8 +29,8 @@ router.post('/customers/update/:id', authenticateAndAuthorize([1,3]), updateCust
 
 router.get('/customers/delete/:id', authenticateAndAuthorize([1,3]), deleteCustomer);
 
-router.get('/users',authenticateAndAuthorize([1]),listUsers);
+router.get('/users',authenticateAndAuthorize([1,3]),listUsers);
 
-router.get('/users/edit/:id',authenticateAndAuthorize([1]), showEditUser);
-router.post('/users/edit/:id', authenticateAndAuthorize([1]), updateUser);
+router.get('/users/edit/:id',authenticateAndAuthorize([1,3]), showEditUser);
+router.post('/users/edit/:id', authenticateAndAuthorize([1,3]), updateUser);
 module.exports = router;
