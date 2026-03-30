@@ -209,6 +209,8 @@
                         <span>Jobs</span>
                     </a>
                 </li>
+                <% } %>
+                <% if (user && (Number(user.role_id) === 1 || Number(user.role_id) === 3)) { %>
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="collapse" href="#customersVendorsMenu" role="button">
                         <i class="bi bi-people"></i>
@@ -216,13 +218,14 @@
                     </a>
                     <div class="collapse submenu" id="customersVendorsMenu">
                         <ul class="nav flex-column">
+                             <% if (user && (Number(user.role_id) === 1 )) { %>
                             <li class="nav-item"><a class="nav-link" href="/admin/approvals">Approvals</a></li>
                             <li class="nav-item"><a class="nav-link" href="/auth/users">All Users</a></li>
-                            <% if (user && (Number(user.role_id) === 1 || Number(user.role_id) === 3)) { %>
-                                <li class="nav-item"><a class="nav-link" href="/auth/customers">Customers</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/procure/allVendors">Vendors</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/contractors/all">Contractors</a></li>
-                            <% } %>
+                             <% } %>
+                            <li class="nav-item"><a class="nav-link" href="/auth/customers">Customers</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/procure/allVendors">Vendors</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/contractors/all">Contractors</a></li>
+                           
                         </ul>
                     </div>
                 </li>
