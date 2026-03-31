@@ -5,7 +5,7 @@ This system helps businesses manage **accounts, payments, contracts, customers, 
 
 ---
 
-# 🚀 Key Features
+#  Key Features
 
 - 📊 Real-time business dashboard
 - 📈 Financial charts and analytics
@@ -14,18 +14,18 @@ This system helps businesses manage **accounts, payments, contracts, customers, 
 - 📄 Contract management
 - 🔐 Secure role-based access control
 - ⚡ Fast, reliable, and scalable system
+- 📦 Inventory, purhcase orders management
+- 🛒 Quotations generation , sales management
 
 ---
 
-# 🖥️ System Screenshots
+#  System Screenshots
 
 ##  Main Dashboard
 
 ![Main Dashboard](images/dashboard.png)
 
-Provides an overview of financial activity, recent transactions, and system performance.
-
----
+Provides an overview of financial activity, recent transactions, sale orders, purhcase orders and system performance.
 
 ## Charts & Graph Analytics
 
@@ -33,7 +33,6 @@ Provides an overview of financial activity, recent transactions, and system perf
 
 Visual representation of financial data to help monitor performance and make informed decisions.
 
----
 
 ## Accounts Management
 
@@ -41,7 +40,6 @@ Visual representation of financial data to help monitor performance and make inf
 
 Manage customer, vendor, and company accounts using standard accounting structures.
 
----
 
 ##  Add Payment Form
 
@@ -54,11 +52,13 @@ Record payments quickly with automated accounting and transaction tracking.
 ![Stock Movements](images/stock.png)
 
 Keep track of inventory , from where it comes and where it goes.
----
 
-# ⚙️ Core Modules
+
+#  Core Modules
 
 - Dashboard
+- Inventory Management
+- Sales Management
 - Accounts Management
 - Payments Management
 - Customers & Vendors
@@ -68,7 +68,7 @@ Keep track of inventory , from where it comes and where it goes.
 
 ---
 
-# 🧠 Smart Accounting Automation
+#  Smart Accounting Automation
 
 The system automatically:
 
@@ -81,7 +81,7 @@ This ensures accurate accounting and reduces manual work.
 
 ---
 
-# 🏗️ Technology Stack
+#  Technology Stack
 
 **Backend:** Node.js, Express.js, MySQL  
 **Frontend:** HTML, CSS, Bootstrap, JavaScript  
@@ -89,7 +89,7 @@ This ensures accurate accounting and reduces manual work.
 
 ---
 
-# 🎯 Suitable For
+#  Suitable For
 
 - Small & Medium Businesses
 - Trading Companies
@@ -99,10 +99,9 @@ This ensures accurate accounting and reduces manual work.
 
 ---
 
-# 📞 Contact
+#  Contact
 
 For demos, customization, or deployment:
 
-**Email:** your-email@example.com  
-**Phone:** +92-XXX-XXXXXXX
+**Email:** info@ariesware.com
 
