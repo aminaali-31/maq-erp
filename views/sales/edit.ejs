@@ -84,7 +84,7 @@
                                         </td>
                                         <td>
                                             <input type="date" id="warranty" name="items[<%= index %>][warranty]" class="form-control"
-                                            value="<%= item ? item.warranty : '' %>">
+                                            value="<%= item.warranty %>">
                                         </td>
                                         <td>
                                             <input type="text" class="form-control total" readonly>
@@ -191,8 +191,8 @@
                     <input type="number" name="items[${rowIndex}][quantity]" class="form-control qty" value="1" min="1">
                 </td>
                  <td>
-                    <input type="date" id="warranty" name="items[<%= index %>][warranty]" class="form-control"
-                    value="<%= item ? item.warranty : '' %>">
+                    <input type="date" id="warranty" name="items[${rowIndex}][warranty]" class="form-control"
+                   ">
                  </td>
                 <td>
                     <input type="text" class="form-control total" readonly>
