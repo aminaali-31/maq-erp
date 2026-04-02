@@ -145,7 +145,7 @@
                 const priceField = row.querySelector("input.price");
                 const qtyField = row.querySelector("input.qty");
 
-                if(priceField) priceField.value = data.price || 0;
+                if(priceField) priceField.value = data.sale_price || 0;
                 if(qtyField) {
                     qtyField.max = data.stock || 9999;
                     qtyField.value = 1;
