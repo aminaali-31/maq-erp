@@ -388,7 +388,7 @@ exports.showEditUser = async (req, res) => {
 
         const [roles] = await pool.query(`SELECT id, name FROM roles`);
 
-        res.render('auth/edit', {
+        res.render('auth/editusers', {
             user,
             roles,
             isCustomer,
