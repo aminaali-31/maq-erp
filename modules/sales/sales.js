@@ -236,10 +236,17 @@ exports.updateOrderStatus = async (req, res) => {
         if (!order_id || !status || !progress) {
             return res.redirect('/sales?error=Order id and status required');
         }
+        const [rows] = await pool.execute(
+            'SELECT status from sales_orders WHERE id = ?',
+            [id]
+        )
+        if (rows[0].status === 'signed off') {
+            return res.redirect('/sales?error=Status cannnot be changed after signed off');
+        }
 
         await pool.execute(
             "UPDATE sales_orders SET status=?, progress= ? WHERE id=?",
-            [status,progress,id]
+            [status,progress, id]
         );
 
         res.redirect('/sales/orders?success=Status updated');
