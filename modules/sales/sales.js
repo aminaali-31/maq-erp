@@ -458,7 +458,7 @@ exports.updateEditOrder = async (req, res) => {
 
         // 1️⃣ Get old order items
         const [oldItems] = await connection.query(
-            `SELECT p_id, quantity, batch_id,sale_price
+            `SELECT p_id, quantity, batch_id, sale_price
              FROM so_items 
              WHERE so_id = ?`,
             [orderId]
@@ -532,8 +532,8 @@ exports.updateEditOrder = async (req, res) => {
             await connection.query(`
                 INSERT INTO so_items
                 (so_id, p_id, batch_id, warranty,quantity, sale_price)
-                VALUES (?, ?, ?,?, ?,?)
-            `, [orderId, product_id,item.warranty, batch_id ,qty, price]);
+                VALUES (?, ?, ?, ?, ?, ?)
+            `, [orderId, product_id, batch_id, item.warranty, qty, price]);
 
         }
 

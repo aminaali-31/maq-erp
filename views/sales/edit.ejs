@@ -84,7 +84,7 @@
                                         </td>
                                         <td>
                                             <input type="date" id="warranty" name="items[<%= index %>][warranty]" class="form-control"
-                                            value="<%= item.warranty %>">
+                                            value="<%= item.warranty || new Date().toISOString().split('T')[0] %>">
                                         </td>
                                         <td>
                                             <input type="text" class="form-control total" readonly>
@@ -192,7 +192,7 @@
                 </td>
                  <td>
                     <input type="date" id="warranty" name="items[${rowIndex}][warranty]" class="form-control"
-                   ">
+                   value="<%= new Date().toISOString().split('T')[0] %>">
                  </td>
                 <td>
                     <input type="text" class="form-control total" readonly>
