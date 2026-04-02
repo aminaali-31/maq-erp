@@ -33,4 +33,5 @@ router.get('/users',authenticateAndAuthorize([1,3]),listUsers);
 
 router.get('/users/edit/:id',authenticateAndAuthorize([1,3]), showEditUser);
 router.post('/users/edit/:id', authenticateAndAuthorize([1,3]), updateUser);
+
 module.exports = router;

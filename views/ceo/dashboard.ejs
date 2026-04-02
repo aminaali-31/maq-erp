@@ -31,6 +31,10 @@
                                     user.full_name.slice(1) %>
                             </p>
                         </div>
+                        <h6  onclick="toggleNotifications()">
+                        🔔 
+                        <span id="notifCount" class="badge bg-danger">0</span>
+                        </h6>
                     </div>
 
 
@@ -278,6 +282,52 @@
                 </main>
         </div>
     </div>
+      <div id="notificationSidebar" class="notification-sidebar">
+        <div class="sidebar-header">
+        <h5>Notifications</h5>
+        <button class="btn btn-sm btn-danger"
+                onclick="toggleNotifications()">
+            ✖
+        </button>
+    </div>
+
+    <div class="sidebar-body">
+
+        <% if (notifications.length === 0) { %>
+
+            <p class="text-muted">No notifications</p>
+
+        <% } else { %>
+
+            <% notifications.forEach(n => { %>
+
+                <div class="notification-item">
+
+                    <a  href="/admin/jobs/all" onclick="markAsRead(<%= n.id %>)">
+
+                        <strong>
+                            <%= n.title %>
+                        </strong>
+
+                        <p>
+                            <%= n.message %>
+                        </p>
+
+                        <small class="text-muted">
+                            <%= n.created_at %>
+                        </small>
+
+                    </a>
+
+                </div>
+
+            <% }) %>
+
+        <% } %>
+
+    </div>
+</div>
+
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
 
@@ -399,6 +449,39 @@
                 }
             }
         });
+
+    function toggleNotifications() {
+
+    const sidebar =
+        document.getElementById("notificationSidebar");
+
+    sidebar.classList.toggle("open");
+}
+async function markAsRead(id) {
+
+    await fetch(
+        "/admin/notifications/mark-read/" + id
+    );
+
+    loadNotificationCount();
+}
+
+    async function loadNotificationCount() {
+    try {
+        const res = await fetch("/admin/notifications");
+        const data = await res.json();
+
+        document.getElementById("notifCount").innerText = data.count;
+    } catch (err) {
+        console.error(err);
+    }
+    }
+
+    // Run immediately
+    loadNotificationCount();
+
+    // Then repeat
+    setInterval(loadNotificationCount, 10000);
     </script>
 </body>
 

@@ -2,7 +2,7 @@ const pool = require("../../config/db");
 
 exports.dashboard = async (req, res) => {
   try {
-
+    const userId = req.session.user.role_id;
     /* =========================
        Revenue / Expense / Profit
     ========================= */
@@ -155,6 +155,23 @@ exports.dashboard = async (req, res) => {
             GROUP BY MONTH(so.date)
             ORDER BY MONTH(so.date);
         `);
+        const [rows] = await pool.execute(
+            `SELECT COUNT(*) AS count
+             FROM notifications
+             WHERE user_id = ? AND is_read = 0`,
+            [userId]
+        );
+        const not = rows[0].count
+
+         const [notifications] = await pool.execute(
+            `SELECT *
+             FROM notifications
+             WHERE user_id = ?
+             AND is_read = FALSE
+             ORDER BY created_at DESC
+             LIMIT 10`,
+            [userId]
+        );
 
     res.render("ceo/dashboard", {
       revenue,
@@ -173,13 +190,49 @@ exports.dashboard = async (req, res) => {
       chart,
       topCustomers,
       topProducts,
-      topVendors
+      topVendors,
+      not,
+      notifications,
     });
 
   } catch (err) {
     console.error(err);
     res.status(500).send("Server Error");
   }
+};
+
+
+exports.markAsRead = async (req, res) => {
+
+    const id = req.params.id;
+
+    await pool.execute(
+        `UPDATE notifications
+         SET is_read = 1
+         WHERE id = ?`,
+        [id]
+    );
+
+    res.sendStatus(200);
+};
+
+exports.getUnreadCount = async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+
+        const [rows] = await pool.execute(
+            `SELECT COUNT(*) AS count
+             FROM notifications
+             WHERE user_id = ? AND is_read = 0`,
+            [userId]
+        );
+
+        res.json({ count: rows[0].count });
+
+    } catch (err) {
+        console.error(err);
+        res.json({ count: 0 });
+    }
 };
 
 exports.createJobForm = async (req, res) => {
@@ -265,9 +318,8 @@ exports.changeJobStatus = async (req, res) => {
 
 exports.setJobComment = async (req, res) => {
     const conn = await pool.getConnection();
-
+    const backURL = req.get('Referer') || '/'; // fallback to homepage if no referer
     try {
-        const backURL = req.get('Referer') || '/'; // fallback to homepage if no referer
         const job_id = req.params.id;
         const { comment } = req.body;
 
@@ -279,6 +331,17 @@ exports.setJobComment = async (req, res) => {
         const [result] = await conn.execute(
             `UPDATE jobs SET comment = ? WHERE id = ?`,
             [comment, job_id]
+        );
+            // 2️⃣ Notify CEO (example user_id = 1)
+        await pool.execute(
+            `INSERT INTO notifications (user_id, title, message, link)
+             VALUES (?, ?, ?, ?)`,
+            [
+                1, // CEO user id
+                "Job Comment Updated",
+                `Comment updated for Job #${job_id}`,
+                `/admin/jobs/all`
+            ]
         );
 
         if (result.affectedRows === 0) {

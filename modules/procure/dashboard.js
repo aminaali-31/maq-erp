@@ -165,7 +165,7 @@ exports.getManagerDashboard = async (req, res) => {
 
 exports.getManagerUpdates = async (req, res) => {
     try {
-
+        const userId = req.session.user.role_id;
         const [orders] = await pool.execute(
             "SELECT COUNT(*) AS total FROM sales_orders WHERE status='pending'"
         );
@@ -177,6 +177,13 @@ exports.getManagerUpdates = async (req, res) => {
         const [purchases] = await pool.execute(
             "SELECT COUNT(*) AS total FROM jobs WHERE status='PENDING'"
         );
+        const [rows] = await pool.execute(
+            `SELECT COUNT(*) AS count
+             FROM notifications
+             WHERE user_id = ? AND is_read = 0`,
+            [userId]
+        );
+        const not = rows[0].count
 
         let messageParts = [];
 
@@ -191,7 +198,9 @@ exports.getManagerUpdates = async (req, res) => {
         if (purchases[0].total > 0) {
             messageParts.push(`${purchases[0].total} jobs pendings`);
         }
-
+        if (not > 0 ) {
+            messageParts.push(`${not} notifications`)
+        }
         let message;
 
         if (messageParts.length === 0) {

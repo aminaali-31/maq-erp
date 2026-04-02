@@ -76,7 +76,53 @@ main {
     overflow-x: auto;
 }
 
+.notification-sidebar {
+    position: fixed;
+    top: 0;
+    right: -350px;
+    width: 350px;
+    height: 100%;
+    background: white;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.2);
+    transition: right 0.3s ease;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+}
 
+.notification-sidebar.open {
+    right: 0;
+}
+
+.sidebar-header {
+    padding: 15px;
+    background: #0d6efd;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-body {
+    padding: 10px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.notification-item {
+    border-bottom: 1px solid #eee;
+    padding: 10px;
+}
+
+.notification-item:hover {
+    background: #f8f9fa;
+}
+
+.notification-item a {
+    text-decoration: none;
+    color: black;
+    display: block;
+}
 
 .metric-icon {
     width: 50px;

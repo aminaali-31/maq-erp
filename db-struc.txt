@@ -549,3 +549,14 @@ ADD COLUMN date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
 ----- 4 april
 ALTER TABLE jobs ADD COLUMN comment VARCHAR(255);
+ 
+-- NEW 4 april
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255),
+    message TEXT,
+    link VARCHAR(255),
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
