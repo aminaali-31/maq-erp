@@ -103,7 +103,7 @@ exports.createSalesOrder = async (req, res) => {
             // ===============================
             // Validate warranty date
             // ===============================
-            const warranty =  new Date(item.warranty);
+            const warranty =  new Date(item.warranty) || new Date().toISOString().split('T')[0];
 
             total_amount += sale_price * quantity;
 
@@ -492,12 +492,11 @@ exports.updateEditOrder = async (req, res) => {
         // 4️⃣ Insert new items and deduct stock
         for (const item of items) {
             const productData = JSON.parse(item.product_data);
-            console.log(productData)
             const batch_id = productData.batch_id;
             const product_id = productData.product_id;
             const qty = Number(item.quantity);
             const price = Number(item.sale_price);
-
+            const warranty = item.warranty || new Date().toISOString().split('T')[0];
             // Check batch stock
             const [batch] = await connection.query(`
                 SELECT qty_remaining
@@ -533,7 +532,7 @@ exports.updateEditOrder = async (req, res) => {
                 INSERT INTO so_items
                 (so_id, p_id, batch_id, warranty,quantity, sale_price)
                 VALUES (?, ?, ?, ?, ?, ?)
-            `, [orderId, product_id, batch_id, item.warranty, qty, price]);
+            `, [orderId, product_id, batch_id, warranty, qty, price]);
 
         }
 
