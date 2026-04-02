@@ -14,5 +14,6 @@ router.get('/jobs/create',authenticateAndAuthorize([1]), ceoController.createJob
 router.post('/jobs/create',authenticateAndAuthorize([1]), ceoController.createJob);
 router.get('/jobs/all',authenticateAndAuthorize([1]), ceoController.showAllJobs);
 router.get('/jobs/all/status/:id',authenticateAndAuthorize([1]), ceoController.changeJobStatus);
+router.post('/job/:id', authenticateAndAuthorize([1,3]), ceoController.setJobComment);
 
 module.exports = router;

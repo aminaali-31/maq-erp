@@ -40,6 +40,7 @@
                                     <th>Description</th>
                                     <th>Status</th>
                                     <th>Due Date</th>
+                                    <th>Comment</th>
                                 </tr>
                             </thead>
 
@@ -68,6 +69,18 @@
                                         </td>
                                         <td>
                                             <%= job.due_date.toISOString().split('T')[0] %>
+                                        </td>
+                                        <td>
+                                            <form action="/admin/job/<%= job.id %>" method="POST">
+                                                <input 
+                                                    type="text" 
+                                                    name="comment" 
+                                                    value="<%= job.comment || '' %>" 
+                                                    class="form-control form-control-sm mt-1" 
+                                                    placeholder="Enter comment"
+                                                >
+                                                <button type="submit" class="btn btn-sm btn-primary mt-1">Update</button>
+                                            </form>
                                         </td>
                                     </tr>
 

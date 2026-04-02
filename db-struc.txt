@@ -545,3 +545,7 @@ ADD FOREIGN KEY (account_id) REFERENCES accounts(id);
 
 ALTER TABLE contracts 
 ADD COLUMN date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
+----- 4 april
+ALTER TABLE jobs ADD COLUMN comment VARCHAR(255);

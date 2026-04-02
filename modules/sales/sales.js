@@ -56,7 +56,7 @@ exports.showOrderForm = async (req, res) => {
 };
 
 exports.createSalesOrder = async (req, res) => {
-    const { customer_id, p_status, o_status, items } = req.body;
+    const { customer_id, p_status, o_status, items, date } = req.body;
 
     if (!customer_id || !items || !Array.isArray(items) || items.length === 0) {
         return res.redirect('/sales/orders/new?error=Customer and items are required');
@@ -73,11 +73,12 @@ exports.createSalesOrder = async (req, res) => {
         const [orderResult] = await connection.query(`
             INSERT INTO sales_orders
             (customer_id, status, progress, profit, date, total_amount)
-            VALUES (?, ?, ?, 0, NOW(), 0)
+            VALUES (?, ?, ?, 0, ?, 0)
         `, [
             customer_id,
             p_status || 'pending',
-            o_status || 'pending'
+            o_status || 'pending',
+            date
         ]);
 
         const sales_order_id = orderResult.insertId;

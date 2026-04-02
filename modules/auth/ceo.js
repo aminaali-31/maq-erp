@@ -261,3 +261,36 @@ exports.changeJobStatus = async (req, res) => {
         res.redirect('/admin/jobs/all?error=Unable to update status');
     }
 };
+
+
+exports.setJobComment = async (req, res) => {
+    const conn = await pool.getConnection();
+
+    try {
+        const backURL = req.get('Referer') || '/'; // fallback to homepage if no referer
+        const job_id = req.params.id;
+        const { comment } = req.body;
+
+        if (!job_id || !comment) {
+            return res.status(400).json({ error: 'Job ID and comment are required' });
+        }
+
+        // Update the job's comment
+        const [result] = await conn.execute(
+            `UPDATE jobs SET comment = ? WHERE id = ?`,
+            [comment, job_id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.redirect(backURL);
+        }
+
+        return res.redirect(backURL);
+
+    } catch (err) {
+        console.error(err); // fallback to homepage if no referer
+        return res.redirect(backURL);
+    } finally {
+        conn.release();
+    }
+};

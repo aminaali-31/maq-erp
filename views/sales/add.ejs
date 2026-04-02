@@ -42,6 +42,10 @@
                                         </select>
                                     </div>
                                     <div class="col-md-6 mb-3">
+                                        <label class="form-label">Date</label>
+                                        <input type="date" class="form-control" name="date"  value="new Date().toISOString().split('T')[0];" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
                                         <label class="form-label">Payment Status</label>
                                         <select name="p_status" class="form-control">
                                             <option value="pending" selected>Pending</option>
