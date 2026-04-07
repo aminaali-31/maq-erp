@@ -82,7 +82,7 @@ exports.createPayment = async (req, res) => {
             `INSERT INTO journal
             (date, reference_type, reference_id, name)
             VALUES (?, ?, ?, ?)`,
-            [payment_date, payment_type, paymentId, 'Payment Transaction']
+            [payment_date, payment_type, paymentId, notes || 'Payment Transaction']
         );
         const journalId = journal.insertId;
 
