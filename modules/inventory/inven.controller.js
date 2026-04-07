@@ -165,28 +165,89 @@ exports.updateProduct = async (req, res) => {
 exports.listStockMovements = async (req, res) => {
     try {
 
-        const [rows] = await pool.execute(`
-            SELECT 
-                sm.id,
-                sm.product_id,
-                p.name AS product_name,
-                sm.movement_type,
-                sm.quantity,
-                sm.cost_price,
-                sm.reference_type,
-                sm.reference_id,
-                sm.date
+        let {
+            from,
+            to,
+            product_id,
+            type,
+            category_id,
+            reference
+        } = req.query;
+
+        let where = [];
+        let params = [];
+
+        if (from) {
+            where.push("sm.date >= ?");
+            params.push(from);
+        }
+
+        if (to) {
+            where.push("sm.date <= ?");
+            params.push(to);
+        }
+
+        if (product_id) {
+            where.push("sm.product_id = ?");
+            params.push(product_id);
+        }
+        if (category_id) {
+    where.push("p.category_id = ?");
+    params.push(category_id);
+}
+
+        if (type) {
+            where.push("sm.movement_type = ?");
+            params.push(type);
+        }
+
+        if (reference) {
+            where.push("sm.reference_type = ?");
+            params.push(reference);
+        }
+
+        let sql = `
+            SELECT
+                sm.*,
+                p.name as product_name
             FROM stock_mov sm
-            JOIN products p ON sm.product_id = p.id
-            ORDER BY sm.id DESC
-        `);
+            JOIN products p
+                ON p.id = sm.product_id
+        `;
 
-        res.render('inventory/stock-movements', {
-            movements: rows
-        });
+        if (where.length > 0) {
+            sql += " WHERE " + where.join(" AND ");
+        }
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server Error');
+        sql += " ORDER BY sm.date DESC";
+
+        const [movements] =
+            await pool.execute(sql, params);
+
+        const [products] =
+            await pool.execute(`
+                SELECT id, name
+                FROM products
+                ORDER BY name
+            `);
+        const [categories] = await pool.execute(`
+    SELECT id, name
+    FROM categories
+    ORDER BY name
+`);
+
+        return res.render(
+            "inventory/stock-movements",
+            {
+                movements,
+                products,
+                categories,
+                filters: req.query
+            }
+        );
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send("Server error")
     }
 };
