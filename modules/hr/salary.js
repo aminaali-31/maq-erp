@@ -22,9 +22,9 @@ exports.addPayroll = async (req, res) => {
 
         // 2️⃣ Create Journal Header
         const [journalResult] = await connection.execute(
-            `INSERT INTO journal (reference_type, reference_id,date,name)
-             VALUES (?,?, ?, ?)`,
-            ['PAYROLL', payrollId, payroll_date,`Salary Expense for Employee #${emp_id}`]
+            `INSERT INTO journal (reference_type, reference_id,name)
+             VALUES (?,?, ?)`,
+            ['PAYROLL', payrollId,`Salary Expense for Employee #${emp_id}`]
         );
 
         const journalId = journalResult.insertId;
