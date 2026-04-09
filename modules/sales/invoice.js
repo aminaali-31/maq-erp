@@ -73,7 +73,25 @@ exports.createInvoice = async (req,res)=>{
             if (!salesAcc.length) {
             throw new Error('Sales Revenue account not found');
         }
+        const [stockAcc] = await connection.execute(
+            `SELECT id
+             FROM accounts
+            WHERE name = 'Stocks' `
+            );
+            if (!salesAcc.length) {
+            throw new Error('Stocks account not found');
+        }
+        const [cogsAcc] = await connection.execute(
+            `SELECT id
+             FROM accounts
+            WHERE name = 'COGS' `
+            );
+            if (!salesAcc.length) {
+            throw new Error('COGS account not found');
+        }
             const SALES_ACCOUNT_ID = salesAcc[0].id;
+            const Stock_ACC = stockAcc[0].id;
+            const COGS_ACC = cogsAcc[0].id;
 
             const [journalResult] = await connection.execute(
             `INSERT INTO journal
@@ -105,6 +123,19 @@ exports.createInvoice = async (req,res)=>{
             (journal_id,account_id,debit,credit)
             VALUES (?,?,?,?)`,
             [journal_id,SALES_ACCOUNT_ID,0,total_amount]
+        );
+        await connection.execute(
+            `INSERT INTO journal_entries
+            (journal_id,account_id,debit,credit)
+            VALUES (?,?,?,?)`,
+            [journal_id,COGS_ACC,total_amount,0]
+        );
+
+        await connection.execute(
+            `INSERT INTO journal_entries
+            (journal_id,account_id,debit,credit)
+            VALUES (?,?,?,?)`,
+            [journal_id,Stock_ACC,0,total_amount]
         );
 
         await connection.commit();

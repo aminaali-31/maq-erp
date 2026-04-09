@@ -560,3 +560,6 @@ CREATE TABLE notifications (
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+---- ( 9 april)
+INSERT INTO accounts (name,type) VALUES ('COGS', 'expense');
