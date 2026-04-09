@@ -1,94 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <%- include('../head') %>
-    <title>Products List</title>
+        <title>Products List</title>
 </head>
+
 <body>
     <div class="container fluid">
-    <div class="row position-sticky">
-    <%- include('../sidebar') %>
-    <main class="col-md-9 col-lg-10 p-2">
-        <a href="javascript:history.back()">
+        <div class="row position-sticky">
+            <%- include('../sidebar') %>
+                <main class="col-md-9 col-lg-10 p-2">
+                    <a href="javascript:history.back()">
                         <i class="bi bi-arrow-left"></i>
                     </a>
-       <div class="container mt-5">
-            <h2 class="mb-4">All Products</h2>
-            <a href="/inventory/add" class="btn btn-primary mb-3">Add Product</a>
-            <% if (message) { %>
-                <div class="alert alert-success"><%= message %></div>
-            <% } %>
-            <div class="row mb-3">
-    <div class="col-md-4">
-        <input 
-            type="text" 
-            id="searchInput" 
-            class="form-control"
-            placeholder="Search product name or category..."
-        >
-    </div>
-</div>
-            <div class="table-responsive">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Sr.</th>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Sale Price</th>
-                    <th>Reorder Level</th>
-                    <th>Stock Quantity</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <% if (products.length === 0) { %>
-                    <tr>
-                    <td colspan="7" class="text-center">No products found</td>
-                    </tr>
-                <% } else { %>
-                    <% products.forEach((product,idx) => { %>
-                    <tr>
-                        <td><%= idx+1 %></td>
-                        <td><%= product.name %></td>
-                        <td><%= product.category_name %></td>
-                        <td><%= Number(product.sale_price).toFixed(2) %></td>
-                        <td><%= product.reorder_level %></td>
-                        <td><%= product.quantity %></td>
-                        <td><%= product.is_active %></td>
-                        <td>
-                            <a href="/inventory/products/<%= product.id %>/edit" 
-                            class="btn btn-sm btn-primary">
-                            Edit
-                            </a>
-                        </td>
+                    <div class="container mt-5">
+                        <h2 class="mb-4">All Products</h2>
+                        <a href="/inventory/add" class="btn btn-primary mb-3">Add Product</a>
+                        <% if (message) { %>
+                            <div class="alert alert-success">
+                                <%= message %>
+                            </div>
+                            <% } %>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <input type="text" id="searchInput" class="form-control"
+                                            placeholder="Search product name or category...">
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th onclick="sortTable(0)">Sr.</th>
+                                                <th onclick="sortTable(1)">Name</th>
+                                                <th onclick="sortTable(2)">Category</th>
+                                                <th onclick="sortTable(3)">Sale Price</th>
+                                                <th onclick="sortTable(4)">Reorder Level</th>
+                                                <th onclick="sortTable(5)">Stock Quantity</th>
+                                                <th onclick="sortTable(6)">Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% if (products.length===0) { %>
+                                                <tr>
+                                                    <td colspan="7" class="text-center">No products found</td>
+                                                </tr>
+                                                <% } else { %>
+                                                    <% products.forEach((product,idx)=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= idx+1 %>
+                                                            </td>
+                                                            <td>
+                                                                <%= product.name %>
+                                                            </td>
+                                                            <td>
+                                                                <%= product.category_name %>
+                                                            </td>
+                                                            <td>
+                                                                <%= Number(product.sale_price).toFixed(2) %>
+                                                            </td>
+                                                            <td>
+                                                                <%= product.reorder_level %>
+                                                            </td>
+                                                            <td>
+                                                                <%= product.quantity %>
+                                                            </td>
+                                                            <td>
+                                                                <%= product.is_active %>
+                                                            </td>
+                                                            <td>
+                                                                <a href="/inventory/products/<%= product.id %>/edit"
+                                                                    class="btn btn-sm btn-primary">
+                                                                    Edit
+                                                                </a>
+                                                            </td>
 
-                    </tr>
-                    <% }) %>
-                <% } %>
-                </tbody>
-            </table>
-            </div>
-            </div>
-    </main>
-    </div>
+                                                        </tr>
+                                                        <% }) %>
+                                                            <% } %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                    </div>
+                </main>
+        </div>
     </div>
     <script>
-document.getElementById("searchInput").addEventListener("keyup", function () {
-    let filter = this.value.toLowerCase();
-    let rows = document.querySelectorAll("tbody tr");
+        document.getElementById("searchInput").addEventListener("keyup", function () {
+            let filter = this.value.toLowerCase();
+            let rows = document.querySelectorAll("tbody tr");
 
-    rows.forEach(row => {
-        let text = row.innerText.toLowerCase();
+            rows.forEach(row => {
+                let text = row.innerText.toLowerCase();
 
-        if (text.includes(filter)) {
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
+                if (text.includes(filter)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        });
+    </script>
+    <script>
+        function sortTable(columnIndex) {
+            const table = document.querySelector("table tbody");
+            const rows = Array.from(table.rows);
+
+            const isNumeric = !isNaN(rows[0].cells[columnIndex].innerText);
+
+            rows.sort((a, b) => {
+                let x = a.cells[columnIndex].innerText.toLowerCase();
+                let y = b.cells[columnIndex].innerText.toLowerCase();
+
+                if (isNumeric) {
+                    x = parseFloat(x) || 0;
+                    y = parseFloat(y) || 0;
+                    return x - y;
+                } else {
+                    return x.localeCompare(y);
+                }
+            });
+
+            rows.forEach(row => table.appendChild(row));
         }
-    });
-});
-</script>
+    </script>
 </body>
+
 </html>
