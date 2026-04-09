@@ -34,7 +34,7 @@ exports.addExpense = async (req, res) => {
         const [journalResult] = await connection.query(
             `INSERT INTO journal (reference_type, reference_id, date, name)
              VALUES ('expense', ?, ?, ?)`,
-            [expense_id, expense_date, title|| 'Expense']
+            [expense_id, expense_date, title || 'Expense']
         );
 
         const journal_id = journalResult.insertId;
