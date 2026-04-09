@@ -29,6 +29,16 @@
                                         <%= error %>
                                     </div>
                                     <% } %>
+                                                                            <div class="row mb-3">
+    <div class="col-md-4">
+        <input 
+            type="text" 
+            id="searchInput" 
+            class="form-control"
+            placeholder="Search product name or category..."
+        >
+    </div>
+</div>
 
                                         <div class="card p-2">
                                             <div class="table-responsive">
@@ -77,6 +87,22 @@
                 </main>
         </div>
     </div>
+            <script>
+document.getElementById("searchInput").addEventListener("keyup", function () {
+    let filter = this.value.toLowerCase();
+    let rows = document.querySelectorAll("tbody tr");
+
+    rows.forEach(row => {
+        let text = row.innerText.toLowerCase();
+
+        if (text.includes(filter)) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+});
+</script>
 </body>
 
 </html>

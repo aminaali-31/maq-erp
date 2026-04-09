@@ -19,6 +19,9 @@
 
                         <h3 class="mb-4 fw-bold">All Accounts</h3>
                         <a href="/accounts/add" class="btn btn-outline-primary mb-3">Add account</a>
+                        <div class="mb-3">
+                            <input type="text" id="accountSearch" class="form-control" placeholder="Search accounts...">
+                        </div>
                         <div class="row">
 
                             <% accounts.forEach(a=>{ %>
@@ -35,14 +38,17 @@
 
                                                     <!-- Account Header -->
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                                        <% if (a.name === 'expense') { %>
+                                                        <% if (a.name==='expense' ) { %>
                                                             <h5 class="fw-semibold mb-0">Office Expense</h5>
-                                                        <% } else { %>
-                                                            <h5 class="fw-semibold mb-0"><%= a.name %></h5>
-                                                        <% } %>
-                                                        <span class="badge bg-light text-dark text-capitalize">
-                                                            <%= a.type %>
-                                                        </span>
+                                                            <% } else { %>
+                                                                <h5 class="fw-semibold mb-0">
+                                                                    <%= a.name %>
+                                                                </h5>
+                                                                <% } %>
+                                                                    <span
+                                                                        class="badge bg-light text-dark text-capitalize">
+                                                                        <%= a.type %>
+                                                                    </span>
 
                                                     </div>
 
@@ -90,141 +96,171 @@
 
                                         <% }) %>
 
-                                       <% let receivable=Number(rec.balance) || 0; let recClass="text-secondary" ; if(receivable>
-                                    0) recClass = "text-success";
-                                    else if(receivable < 0) recClass="text-danger" ; %>
+                                            <% let receivable=Number(rec.balance) || 0; let recClass="text-secondary" ;
+                                                if(receivable>
+                                                0) recClass = "text-success";
+                                                else if(receivable < 0) recClass="text-danger" ; %>
 
-                                        <div class="col-xl-4 col-lg-6 mb-4">
+                                                    <div class="col-xl-4 col-lg-6 mb-4">
 
-                                            <div class="card border-0 shadow-sm h-100">
+                                                        <div class="card border-0 shadow-sm h-100">
 
-                                                <div class="card-body">
+                                                            <div class="card-body">
 
-                                                    <!-- Account Header -->
-                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                                <!-- Account Header -->
+                                                                <div
+                                                                    class="d-flex justify-content-between align-items-center mb-3">
 
-                                                        <h5 class="fw-semibold mb-0">
-                                                            Receivable
-                                                        </h5>
+                                                                    <h5 class="fw-semibold mb-0">
+                                                                        Receivable
+                                                                    </h5>
 
-                                                        <span class="badge bg-light text-dark text-capitalize">
-                                                            asset
-                                                        </span>
+                                                                    <span
+                                                                        class="badge bg-light text-dark text-capitalize">
+                                                                        asset
+                                                                    </span>
 
+                                                                </div>
+
+                                                                <hr>
+
+                                                                <!-- Debit Credit Row -->
+                                                                <div class="d-flex justify-content-between small mb-2">
+                                                                    <span class="text-muted">Total Debit</span>
+                                                                    <span class="fw-semibold">
+                                                                        <%= Number(rec.total_debit ||
+                                                                            0).toLocaleString() %>
+                                                                    </span>
+                                                                </div>
+
+                                                                <div class="d-flex justify-content-between small mb-2">
+                                                                    <span class="text-muted">Total Credit</span>
+                                                                    <span class="fw-semibold">
+                                                                        <%= Number(rec.total_credit ||
+                                                                            0).toLocaleString() %>
+                                                                    </span>
+                                                                </div>
+
+                                                                <hr>
+
+                                                                <!-- Balance Display -->
+                                                                <div
+                                                                    class="d-flex justify-content-between align-items-center">
+
+                                                                    <span class="text-muted">Balance</span>
+
+                                                                    <span class="fs-5 fw-bold <%= recClass %>">
+                                                                        <%= receivable.toLocaleString() %>
+                                                                    </span>
+
+                                                                </div>
+
+                                                                <!-- Ledger Button -->
+                                                                <div class="mt-3 text-end">
+                                                                    <a href="/accounts/receivables"
+                                                                        class="btn btn-sm btn-outline-primary">
+                                                                        View Ledger
+                                                                    </a>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
                                                     </div>
 
-                                                    <hr>
+                                                    <% let payable=Number(pay.balance) || 0; let
+                                                        payClass="text-secondary" ; if(payable>
+                                                        0) payClass = "text-success";
+                                                        else if(payable < 0) payClass="text-danger" ; %>
 
-                                                    <!-- Debit Credit Row -->
-                                                    <div class="d-flex justify-content-between small mb-2">
-                                                        <span class="text-muted">Total Debit</span>
-                                                        <span class="fw-semibold">
-                                                            <%= Number(rec.total_debit || 0).toLocaleString() %>
-                                                        </span>
-                                                    </div>
+                                                            <div class="col-xl-4 col-lg-6 mb-4">
 
-                                                    <div class="d-flex justify-content-between small mb-2">
-                                                        <span class="text-muted">Total Credit</span>
-                                                        <span class="fw-semibold">
-                                                            <%= Number(rec.total_credit || 0).toLocaleString() %>
-                                                        </span>
-                                                    </div>
+                                                                <div class="card border-0 shadow-sm h-100">
 
-                                                    <hr>
+                                                                    <div class="card-body">
 
-                                                    <!-- Balance Display -->
-                                                    <div class="d-flex justify-content-between align-items-center">
+                                                                        <!-- Account Header -->
+                                                                        <div
+                                                                            class="d-flex justify-content-between align-items-center mb-3">
 
-                                                        <span class="text-muted">Balance</span>
+                                                                            <h5 class="fw-semibold mb-0">
+                                                                                Payables
+                                                                            </h5>
 
-                                                        <span class="fs-5 fw-bold <%= recClass %>">
-                                                            <%= receivable.toLocaleString() %>
-                                                        </span>
+                                                                            <span
+                                                                                class="badge bg-light text-dark text-capitalize">
+                                                                                liability
+                                                                            </span>
 
-                                                    </div>
+                                                                        </div>
 
-                                                    <!-- Ledger Button -->
-                                                    <div class="mt-3 text-end">
-                                                        <a href="/accounts/receivables"
-                                                            class="btn btn-sm btn-outline-primary">
-                                                            View Ledger
-                                                        </a>
-                                                    </div>
+                                                                        <hr>
 
-                                                </div>
-                                            </div>
-                                        </div>
+                                                                        <!-- Debit Credit Row -->
+                                                                        <div
+                                                                            class="d-flex justify-content-between small mb-2">
+                                                                            <span class="text-muted">Total Debit</span>
+                                                                            <span class="fw-semibold">
+                                                                                <%= Number(pay.total_debit ||
+                                                                                    0).toLocaleString() %>
+                                                                            </span>
+                                                                        </div>
 
-                                        <% let payable=Number(pay.balance) || 0; let payClass="text-secondary" ; if(payable>
-                                    0) payClass = "text-success";
-                                    else if(payable < 0) payClass="text-danger" ; %>
+                                                                        <div
+                                                                            class="d-flex justify-content-between small mb-2">
+                                                                            <span class="text-muted">Total Credit</span>
+                                                                            <span class="fw-semibold">
+                                                                                <%= Number(pay.total_credit ||
+                                                                                    0).toLocaleString() %>
+                                                                            </span>
+                                                                        </div>
 
-                                        <div class="col-xl-4 col-lg-6 mb-4">
+                                                                        <hr>
 
-                                            <div class="card border-0 shadow-sm h-100">
+                                                                        <!-- Balance Display -->
+                                                                        <div
+                                                                            class="d-flex justify-content-between align-items-center">
 
-                                                <div class="card-body">
+                                                                            <span class="text-muted">Balance</span>
 
-                                                    <!-- Account Header -->
-                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                                            <span class="fs-5 fw-bold <%= payClass %>">
+                                                                                <%= payable.toLocaleString() %>
+                                                                            </span>
 
-                                                        <h5 class="fw-semibold mb-0">
-                                                          Payables
-                                                        </h5>
+                                                                        </div>
 
-                                                        <span class="badge bg-light text-dark text-capitalize">
-                                                            liability
-                                                        </span>
+                                                                        <!-- Ledger Button -->
+                                                                        <div class="mt-3 text-end">
+                                                                            <a href="/accounts/payables"
+                                                                                class="btn btn-sm btn-outline-primary">
+                                                                                View Ledger
+                                                                            </a>
+                                                                        </div>
 
-                                                    </div>
-
-                                                    <hr>
-
-                                                    <!-- Debit Credit Row -->
-                                                    <div class="d-flex justify-content-between small mb-2">
-                                                        <span class="text-muted">Total Debit</span>
-                                                        <span class="fw-semibold">
-                                                            <%= Number(pay.total_debit || 0).toLocaleString() %>
-                                                        </span>
-                                                    </div>
-
-                                                    <div class="d-flex justify-content-between small mb-2">
-                                                        <span class="text-muted">Total Credit</span>
-                                                        <span class="fw-semibold">
-                                                            <%= Number(pay.total_credit || 0).toLocaleString() %>
-                                                        </span>
-                                                    </div>
-
-                                                    <hr>
-
-                                                    <!-- Balance Display -->
-                                                    <div class="d-flex justify-content-between align-items-center">
-
-                                                        <span class="text-muted">Balance</span>
-
-                                                        <span class="fs-5 fw-bold <%= payClass %>">
-                                                            <%= payable.toLocaleString() %>
-                                                        </span>
-
-                                                    </div>
-
-                                                    <!-- Ledger Button -->
-                                                    <div class="mt-3 text-end">
-                                                        <a href="/accounts/payables"
-                                                            class="btn btn-sm btn-outline-primary">
-                                                            View Ledger
-                                                        </a>
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
 
                         </div>
                     </div>
                 </main>
         </div>
     </div>
+    <script>
+        const searchInput = document.getElementById('accountSearch');
+        searchInput.addEventListener('input', function () {
+            const filter = this.value.toLowerCase();
+            const cards = document.querySelectorAll('.row > .col-xl-4'); // all account cards
+
+            cards.forEach(card => {
+                const name = card.querySelector('h5.fw-semibold').innerText.toLowerCase();
+                if (name.includes(filter)) {
+                    card.style.display = ''; // show
+                } else {
+                    card.style.display = 'none'; // hide
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -15,114 +15,145 @@
                         <i class="bi bi-arrow-left"></i>
                     </a>
                     <div class="container mt-5">
-                    <h3>Sales Orders</h3>
-                    <a href="/sales/orders/new" class="btn btn-primary mb-3">New Order</a>
-                    <% if(success){ %>
-                        <div class="alert alert-success">
-                            <%= success %>
-                        </div>
-                        <% } %>
-                            <% if(error){ %>
-                                <div class="alert alert-danger">
-                                    <%= error %>
-                                </div>
-                                <% } %>
-                                    <div class="card p-2">
-                                        <div class="table-responsive">
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Sr.</th>
-                                                    <th>Customer</th>
-                                                    <th>Total Amount</th>
-                                                    <th>Payment Status</th>
-                                                    <th>Order Status</th>
-                                                    <th>Date</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <% orders.forEach((order, idx)=> { %>
-                                                    <tr>
-                                                        <td>
-                                                            <%= idx+1 %>
-                                                        </td>
-                                                        <td>
-                                                            <%= order.customer_name %>
-                                                        </td>
-                                                        <td>
-                                                            <%= Number(order.total_amount).toLocaleString() %>
-                                                        </td>
-                                                        <td>
-                                                            <form action="/sales/orders/status" method="POST"
-                                                                class="d-flex gap-2">
-                                                                <input type="hidden" name="order_id"
-                                                                    value="<%= order.id %>">
-                                                                <select name="status"
-                                                                    class="form-select form-select-sm">
-                                                                    <option value="pending" <%=order.status==='pending'
-                                                                        ?'selected':'' %>>Pending</option>
-                                                                    <option value="completed"
-                                                                        <%=order.status==='completed' ?'selected':'' %>
-                                                                        >Paid</option>
-                                                                    
-                                                                </select>
-                                                            </td>
-                                                            <td>
-                                                                <input type="hidden" name="order_id"
-                                                                    value="<%= order.id %>">
+                        <h3>Sales Orders</h3>
+                        <a href="/sales/orders/new" class="btn btn-primary mb-3">New Order</a>
+                        <% if(success){ %>
+                            <div class="alert alert-success">
+                                <%= success %>
+                            </div>
+                            <% } %>
+                                <% if(error){ %>
+                                    <div class="alert alert-danger">
+                                        <%= error %>
+                                    </div>
+                                    <% } %>
+                                        <div class="row mb-3">
+                                            <div class="col-md-4">
+                                                <input type="text" id="searchInput" class="form-control"
+                                                    placeholder="Search product name or category...">
+                                            </div>
+                                        </div>
+                                        <div class="card p-2">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Sr.</th>
+                                                            <th>Customer</th>
+                                                            <th>Total Amount</th>
+                                                            <th>Payment Status</th>
+                                                            <th>Order Status</th>
+                                                            <th>Date</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% orders.forEach((order, idx)=> { %>
+                                                            <tr>
+                                                                <td>
+                                                                    <%= idx+1 %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= order.customer_name %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= Number(order.total_amount).toLocaleString() %>
+                                                                </td>
+                                                                <td>
+                                                                    <form action="/sales/orders/status" method="POST"
+                                                                        class="d-flex gap-2">
+                                                                        <input type="hidden" name="order_id"
+                                                                            value="<%= order.id %>">
+                                                                        <select name="status"
+                                                                            class="form-select form-select-sm">
+                                                                            <option value="pending"
+                                                                                <%=order.status==='pending'
+                                                                                ?'selected':'' %>>Pending</option>
+                                                                            <option value="completed"
+                                                                                <%=order.status==='completed'
+                                                                                ?'selected':'' %>
+                                                                                >Paid</option>
+
+                                                                        </select>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="hidden" name="order_id"
+                                                                        value="<%= order.id %>">
                                                                     <div class="d-flex align-items-center gap-2">
 
 
-                                                                <select name="progress" class="form-select form-select-sm">
+                                                                        <select name="progress"
+                                                                            class="form-select form-select-sm">
 
-                                                                    <option value="pending"
-                                                                    <%= order.progress === 'pending' ? 'selected' : '' %>>
-                                                                    Pending
-                                                                    </option>
+                                                                            <option value="pending"
+                                                                                <%=order.progress==='pending'
+                                                                                ? 'selected' : '' %>>
+                                                                                Pending
+                                                                            </option>
 
-                                                                    <option value="happening"
-                                                                    <%= order.progress === 'happening' ? 'selected' : '' %>>
-                                                                    Happening
-                                                                    </option>
+                                                                            <option value="happening"
+                                                                                <%=order.progress==='happening'
+                                                                                ? 'selected' : '' %>>
+                                                                                Happening
+                                                                            </option>
 
-                                                                    <option value="halted"
-                                                                    <%= order.progress === 'halted' ? 'selected' : '' %>>
-                                                                    Halted
-                                                                    </option>
+                                                                            <option value="halted"
+                                                                                <%=order.progress==='halted'
+                                                                                ? 'selected' : '' %>>
+                                                                                Halted
+                                                                            </option>
 
-                                                                    <option value="signed off"
-                                                                    <%= order.progress === 'signed off' ? 'selected' : '' %>>
-                                                                    Signed off
-                                                                    </option>
+                                                                            <option value="signed off"
+                                                                                <%=order.progress==='signed off'
+                                                                                ? 'selected' : '' %>>
+                                                                                Signed off
+                                                                            </option>
 
-                                                                    </select>
-                                                                <button class="btn btn-sm btn-primary">
-                                                                    Update
-                                                                </button>
-                                                                </div>
-                                                            </form>
-                                                        </td>
-                                                        <td>
-                                                            <%= new Date(order.date).toLocaleDateString() %>
-                                                        </td>
-                                                        <td>
-                                                            <a href="/sales/orders/view/<%= order.id %>" class="btn btn-primary">View</a>
-                                                            <% if(order.progress === 'pending'){ %>
-                                                                <a href="/sales/orders/edit/<%= order.id %>" class="btn btn-primary">
-                                                                    Edit
-                                                                </a>
-                                                            <% } %>
-                                                        </td>
-                                                    </tr>
-                                                    <% }) %>
-                                            </tbody>
-                                        </table>
+                                                                        </select>
+                                                                        <button class="btn btn-sm btn-primary">
+                                                                            Update
+                                                                        </button>
+                                                                    </div>
+                                                                    </form>
+                                                                </td>
+                                                                <td>
+                                                                    <%= new Date(order.date).toLocaleDateString() %>
+                                                                </td>
+                                                                <td>
+                                                                    <a href="/sales/orders/view/<%= order.id %>"
+                                                                        class="btn btn-primary">View</a>
+                                                                    <% if(order.progress==='pending' ){ %>
+                                                                        <a href="/sales/orders/edit/<%= order.id %>"
+                                                                            class="btn btn-primary">
+                                                                            Edit
+                                                                        </a>
+                                                                        <% } %>
+                                                                </td>
+                                                            </tr>
+                                                            <% }) %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
                 </main>
         </div>
     </div>
+    <script>
+        document.getElementById("searchInput").addEventListener("keyup", function () {
+            let filter = this.value.toLowerCase();
+            let rows = document.querySelectorAll("tbody tr");
+
+            rows.forEach(row => {
+                let text = row.innerText.toLowerCase();
+
+                if (text.includes(filter)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
