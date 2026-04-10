@@ -563,3 +563,20 @@ CREATE TABLE notifications (
 
 ---- ( 9 april)
 INSERT INTO accounts (name,type) VALUES ('COGS', 'expense');
+
+---- 9 april latest
+
+ALTER TABLE products 
+ADD COLUMN type ENUM('product','service') 
+NOT NULL DEFAULT 'product';
+ALTER TABLE expenses ADD COLUMN type ENUM('office','order') DEFAULT 'office';
+ALTER TABLE expenses 
+ADD COLUMN sale_order_id INT NULL;
+ALTER TABLE expenses
+ADD CONSTRAINT fk_expense_sale_order
+FOREIGN KEY (sale_order_id)
+REFERENCES sales_orders(id)
+ON DELETE SET NULL;
+
+---- 10 april
+UPDATE accounts SET type = 'expense' WHERE id = 14;

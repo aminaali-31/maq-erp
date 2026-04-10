@@ -217,8 +217,8 @@ exports.createContract = async (req, res) => {
             [
                 journalId,
                 contractorAccountId,
-                amount,
-                0
+                0,
+                amount
             ]
         );
 
@@ -230,8 +230,8 @@ exports.createContract = async (req, res) => {
             [
                 journalId,
                 payableAccountId,
-                0,
-                amount
+                amount,
+                0
             ]
         );
 

@@ -13,7 +13,7 @@ exports.products = async (req, res) => {
 exports.addProduct = async (req, res) => {
     const connection = await pool.getConnection();
     try {
-        const { name, category_id, sale_price, reorder_level, is_active } = req.body;
+        const { name, category_id, sale_price, reorder_level, is_active, type } = req.body;
 
         // Basic validation
         if (!name || !category_id ||  !sale_price) {
@@ -30,9 +30,9 @@ exports.addProduct = async (req, res) => {
 
         // Insert into products
         const [productResult] = await connection.execute(
-            `INSERT INTO products (name, category_id, sale_price, reorder_level, is_active)
-             VALUES (?, ?, ?,  ?, ?)`,
-            [name, category_id, sale_price, reorderLevelValue, isActiveValue]
+            `INSERT INTO products (name, category_id, sale_price, reorder_level, is_active, type)
+             VALUES (?, ?, ?,  ?, ?, ?)`,
+            [name, category_id, sale_price, reorderLevelValue, isActiveValue, type]
         );
 
         // Initialize inventory_level

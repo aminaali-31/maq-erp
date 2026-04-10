@@ -16,31 +16,66 @@ exports.showOrderForm = async (req, res) => {
         // Get Products
         // =============================
         const [products] = await pool.execute(`
-            SELECT 
-                p.id AS product_id,
-                p.name,
-                p.sale_price,
-                b.id AS batch_id,
-                b.batch_no,
-                b.qty_remaining,
-                b.cost_price
-            FROM products p
-            JOIN inventory_batches b 
-            ON b.product_id = p.id
-            WHERE b.qty_remaining > 0
-            `);
-        
-       
-        const productOptions = products.map(p => ({
-            value: JSON.stringify({
-                product_id: p.product_id,
-                batch_id: p.batch_id,
-                sale_price: Number(p.sale_price),
-                cost_price: Number(p.cost_price),
-                stock: Number(p.qty_remaining)
-            }),
-            label: `${p.name} | Batch ${p.batch_no} | Stock:${p.qty_remaining} |  Cost:${p.cost_price}`
-        }));
+    SELECT 
+        p.id AS product_id,
+        p.name,
+        p.type,
+        p.sale_price,
+
+        b.id AS batch_id,
+        b.batch_no,
+        b.qty_remaining,
+        b.cost_price
+
+    FROM products p
+
+    LEFT JOIN inventory_batches b 
+        ON b.product_id = p.id
+
+    WHERE
+        (
+            p.type = 'service'
+        )
+        OR
+        (
+            p.type = 'product'
+            AND b.qty_remaining > 0
+        )
+
+    ORDER BY p.name
+`);
+
+
+        const productOptions = products.map(p => {
+
+            const isService = p.type === 'service';
+
+            return {
+                value: JSON.stringify({
+                    product_id: p.product_id,
+
+                    batch_id: isService ? null : p.batch_id,
+
+                    sale_price: Number(p.sale_price),
+
+                    cost_price: Number(
+                        isService
+                            ? (p.cost_price || 0)
+                            : p.cost_price
+                    ),
+
+                    stock: isService
+                        ? null
+                        : Number(p.qty_remaining),
+
+                    type: p.type
+                }),
+
+                label: isService
+                    ? `${p.name} | Service`
+                    : `${p.name} | Batch ${p.batch_no} | Stock:${p.qty_remaining} | Cost:${p.cost_price}`
+            };
+        });
 
         res.render('sales/add', {
             customers,
@@ -103,54 +138,71 @@ exports.createSalesOrder = async (req, res) => {
             // ===============================
             // Validate warranty date
             // ===============================
-            const warranty =  new Date(item.warranty) || new Date().toISOString().split('T')[0];
+            const warranty = new Date(item.warranty) || new Date().toISOString().split('T')[0];
 
             total_amount += sale_price * quantity;
 
             if (!quantity || quantity <= 0) {
                 throw new Error("Invalid quantity for product " + product_id);
             }
+            const [productRows] = await connection.query(`
+            SELECT type, name
+            FROM products
+            WHERE id = ?
+        `, [product_id]);
+
+            if (!productRows.length) {
+                throw new Error(`Product ${product_id} not found`);
+            }
+
+            const product = productRows[0];
 
             // ===============================
             // Check batch stock
             // ===============================
-            const [batchRows] = await connection.query(`
+
+            if (product.type === 'product') {
+                const [batchRows] = await connection.query(`
                 SELECT qty_remaining, cost_price
                 FROM inventory_batches
                 WHERE id = ? AND product_id = ?
             `, [batch_id, product_id]);
 
-            if (!batchRows.length) {
-                throw new Error(`Batch ${batch_id} for product ${product_id} not found`);
-            }
+                if (!batchRows.length) {
+                    throw new Error(`Batch ${batch_id} for product ${product_id} not found`);
+                }
 
-            const batch = batchRows[0];
-            if (quantity > batch.qty_remaining) {
-                throw new Error(`Batch stock insufficient for product ${product_id}`);
-            }
+                const batch = batchRows[0];
+                if (quantity > batch.qty_remaining) {
+                    throw new Error(`Batch stock insufficient for product ${product_id}`);
+                }
 
-            const cost_price = Number(batch.cost_price);
-            const profit = (sale_price - cost_price) * quantity;
-            total_profit += profit;
+                const cost_price = Number(batch.cost_price);
+                const profit = (sale_price - cost_price) * quantity;
+                total_profit += profit;
 
-            // ===============================
-            // Deduct batch stock
-            // ===============================
-            await connection.query(`
+                // ===============================
+                // Deduct batch stock
+                // ===============================
+                await connection.query(`
                 UPDATE inventory_batches
                 SET qty_remaining = qty_remaining - ?
                 WHERE id = ?
             `, [quantity, batch_id]);
 
-            // ===============================
-            // Insert stock movement
-            // ===============================
-            await connection.query(`
+                // ===============================
+                // Insert stock movement
+                // ===============================
+                await connection.query(`
                 INSERT INTO stock_mov
                 (product_id, batch_id, quantity, movement_type, cost_price, reference_id, reference_type, date)
                 VALUES (?, ?, ?, 'OUT', ?, ?, 'Sales Order', NOW())
             `, [product_id, batch_id, quantity, cost_price, sales_order_id]);
+            }
+            else if (product.type === 'service') {
+                total_profit += sale_price;
 
+            }
             // ===============================
             // Insert order item
             // ===============================
@@ -161,13 +213,12 @@ exports.createSalesOrder = async (req, res) => {
             `, [
                 sales_order_id,
                 product_id,
-                batch_id,
+                product.type === 'product' ? batch_id : null,
                 quantity,
                 sale_price,
                 warranty
             ]);
         }
-
         // ===============================
         // Update Sales Order totals
         // ===============================
@@ -232,7 +283,7 @@ exports.updateOrderStatus = async (req, res) => {
 
         const { order_id, status, progress } = req.body;
         let id = parseInt(order_id);
-        
+
         if (!order_id || !status || !progress) {
             return res.redirect('/sales?error=Order id and status required');
         }
@@ -246,7 +297,7 @@ exports.updateOrderStatus = async (req, res) => {
 
         await pool.execute(
             "UPDATE sales_orders SET status=?, progress= ? WHERE id=?",
-            [status,progress, id]
+            [status, progress, id]
         );
 
         res.redirect('/sales/orders?success=Status updated');
@@ -361,7 +412,7 @@ exports.editOrderForm = async (req, res) => {
 
         // 5️⃣ Add sale order items that may have zero stock
         for (const item of items) {
-            const exists = productOptions.find(opt => 
+            const exists = productOptions.find(opt =>
                 opt.product_id == item.p_id && opt.batch_id == item.batch_id
             );
 
@@ -400,7 +451,7 @@ exports.editOrderForm = async (req, res) => {
 
         // 6️⃣ Mark selected items
         productOptions = productOptions.map(opt => {
-            const selectedItem = items.find(item => 
+            const selectedItem = items.find(item =>
                 item.p_id == opt.product_id && item.batch_id == opt.batch_id
             );
             return {
@@ -467,7 +518,7 @@ exports.updateEditOrder = async (req, res) => {
 
         // 2️⃣ Restore previous stock
         for (const item of oldItems) {
-            
+
             // restore batch stock
             await connection.query(`
                 UPDATE inventory_batches
@@ -475,11 +526,11 @@ exports.updateEditOrder = async (req, res) => {
                 WHERE id = ?
             `, [item.quantity, item.batch_id]);
 
-             await connection.query(`
+            await connection.query(`
                     INSERT INTO stock_mov
                     (product_id, batch_id, quantity, movement_type, reference_type, reference_id,cost_price)
                     VALUES (?, ?, ?, 'IN', 'sales_order', ?,?)
-                `, [item.p_id, item.batch_id, item.quantity, orderId,item.sale_price]);
+                `, [item.p_id, item.batch_id, item.quantity, orderId, item.sale_price]);
         }
 
         // 3️⃣ Delete previous order items

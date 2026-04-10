@@ -38,6 +38,21 @@
                                                 <label class="form-label">Expense Title</label>
                                                 <input type="text" name="title" class="form-control" required>
                                             </div>
+                                            <div class="mb-3">
+                                                <label for="type" class="form-label">Type</label>
+                                                <select name="type" id="type" class="form-control">
+                                                        <option value="order">Order Expense</option>
+                                                        <option value="office">Office Expense</option>
+                                                </select>
+                                            </div>
+                                             <div class="mb-3" id="order_id">
+                                                <label for="order" class="form-label">Order Reference</label>
+                                                <select name="order_id" class="form-control">
+                                                    <% orders.forEach(o => { %>
+                                                        <option value="<%= o.id %>">Sale order #<%= o.id %>| Amount <%= o.total_amount %> </option>
+                                                    <% }) %>
+                                                </select>
+                                            </div>
                                             <!-- Amount -->
                                             <div class="mb-3">
                                                 <label class="form-label">Amount</label>
@@ -69,6 +84,28 @@
                 </main>
         </div>
     </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const typeSelect = document.getElementById("type");
+    const orderDiv = document.getElementById("order_id");
+
+    function toggleOrderField() {
+        if (typeSelect.value === "order") {
+            orderDiv.style.display = "block";
+        } else {
+            orderDiv.style.display = "none";
+        }
+    }
+
+    // Run on page load
+    toggleOrderField();
+
+    // Run when selection changes
+    typeSelect.addEventListener("change", toggleOrderField);
+
+});
+</script>
 </body>
 
 </html>
