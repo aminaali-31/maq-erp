@@ -577,6 +577,4 @@ ADD CONSTRAINT fk_expense_sale_order
 FOREIGN KEY (sale_order_id)
 REFERENCES sales_orders(id)
 ON DELETE SET NULL;
-
----- 10 april
 UPDATE accounts SET type = 'expense' WHERE id = 14;

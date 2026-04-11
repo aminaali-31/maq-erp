@@ -39,7 +39,6 @@
                                                 <th>Date</th>
                                                 <th>Customer</th>
                                                 <th class="text-end">Total Amount</th>
-                                                <th>Action</th>
                                             </tr>
                                         </thead>
 
@@ -62,14 +61,6 @@
 
                                                     <td class="text-end fw-bold">
                                                         <%= Number(inv.total_amount || 0).toLocaleString() %>
-                                                    </td>
-                                                    <td class="text-center">
-
-                                                        <a href="/invoices/view/<%= inv.id %>"
-                                                            class="btn btn-sm btn-info">
-                                                            View
-                                                        </a>
-
                                                     </td>
                                                 </tr>
 

@@ -382,33 +382,67 @@ exports.editOrderForm = async (req, res) => {
 
         // 3️⃣ Get all product batches with stock
         const [products] = await pool.execute(`
-            SELECT 
-                p.id AS product_id,
-                p.name,
-                p.sale_price,
-                b.id AS batch_id,
-                b.batch_no,
-                b.qty_remaining,
-                b.cost_price
-            FROM products p
-            JOIN inventory_batches b ON b.product_id = p.id
-            WHERE b.qty_remaining > 0
-        `);
+    SELECT 
+        p.id AS product_id,
+        p.name,
+        p.type,
+        p.sale_price,
 
-        // 4️⃣ Prepare product options
-        let productOptions = products.map(p => ({
-            value: JSON.stringify({
+        b.id AS batch_id,
+        b.batch_no,
+        b.qty_remaining,
+        b.cost_price
+
+    FROM products p
+
+    LEFT JOIN inventory_batches b 
+        ON b.product_id = p.id
+
+    WHERE
+        (
+            p.type = 'service'
+        )
+        OR
+        (
+            p.type = 'product'
+            AND b.qty_remaining > 0
+        )
+
+    ORDER BY p.name
+`);
+
+
+        let productOptions = products.map(p => {
+
+            const isService = p.type === 'service';
+
+            return {
+
+                value: JSON.stringify({
+                    product_id: p.product_id,
+                    batch_id: isService ? null : p.batch_id,
+                    sale_price: Number(p.sale_price),
+                    cost_price: Number(
+                        isService
+                            ? (p.cost_price || 0)
+                            : p.cost_price
+                    ),
+                    stock: isService
+                        ? null
+                        : Number(p.qty_remaining),
+                    type: p.type
+                }),
+
+                label: isService
+                    ? `${p.name} | Service`
+                    : `${p.name} | Batch ${p.batch_no} | Stock:${p.qty_remaining} | Cost:${p.cost_price}`,
+
+                // 🔴 REQUIRED FIELDS
                 product_id: p.product_id,
-                batch_id: p.batch_id,
-                sale_price: Number(p.sale_price),
-                cost_price: Number(p.cost_price),
-                stock: Number(p.qty_remaining)
-            }),
-            label: `${p.name} | Batch ${p.batch_no} | Stock:${p.qty_remaining} | Cost:${p.cost_price}`,
-            product_id: p.product_id,
-            batch_id: p.batch_id,
-            selected: false // default, will mark later
-        }));
+                batch_id: isService ? null : p.batch_id,
+                type: p.type
+            };
+        });
 
         // 5️⃣ Add sale order items that may have zero stock
         for (const item of items) {
@@ -516,22 +550,56 @@ exports.updateEditOrder = async (req, res) => {
         );
 
 
-        // 2️⃣ Restore previous stock
         for (const item of oldItems) {
 
-            // restore batch stock
-            await connection.query(`
-                UPDATE inventory_batches
-                SET qty_remaining = qty_remaining + ?
-                WHERE id = ?
-            `, [item.quantity, item.batch_id]);
+    const [product] = await connection.query(`
+        SELECT type
+        FROM products
+        WHERE id = ?
+    `, [item.p_id]);
 
-            await connection.query(`
-                    INSERT INTO stock_mov
-                    (product_id, batch_id, quantity, movement_type, reference_type, reference_id,cost_price)
-                    VALUES (?, ?, ?, 'IN', 'sales_order', ?,?)
-                `, [item.p_id, item.batch_id, item.quantity, orderId, item.sale_price]);
-        }
+    if (product[0].type === 'service') {
+        continue;
+    }
+
+    // Get batch cost price
+
+    const [[batch]] = await connection.query(`
+        SELECT cost_price
+        FROM inventory_batches
+        WHERE id = ?
+    `, [item.batch_id]);
+
+    // Restore stock
+
+    await connection.query(`
+        UPDATE inventory_batches
+        SET qty_remaining = qty_remaining + ?
+        WHERE id = ?
+    `, [item.quantity, item.batch_id]);
+
+    // Record movement
+
+    await connection.query(`
+        INSERT INTO stock_mov
+        (
+            product_id,
+            batch_id,
+            quantity,
+            movement_type,
+            reference_type,
+            reference_id,
+            cost_price
+        )
+        VALUES (?, ?, ?, 'IN', 'sales_order', ?, ?)
+    `, [
+        item.p_id,
+        item.batch_id,
+        item.quantity,
+        orderId,
+        batch.cost_price
+    ]);
+}
 
         // 3️⃣ Delete previous order items
         await connection.query(
@@ -542,49 +610,102 @@ exports.updateEditOrder = async (req, res) => {
 
         // 4️⃣ Insert new items and deduct stock
         for (const item of items) {
+
             const productData = JSON.parse(item.product_data);
-            const batch_id = productData.batch_id;
+
             const product_id = productData.product_id;
+            const product_type = productData.type;
+
             const qty = Number(item.quantity);
             const price = Number(item.sale_price);
-            const warranty = item.warranty || new Date().toISOString().split('T')[0];
-            // Check batch stock
+
+            const warranty =
+                item.warranty ||
+                new Date().toISOString().split('T')[0];
+
+            /*
+                SERVICE PRODUCT
+            */
+
+            if (product_type === 'service') {
+
+                await connection.query(`
+            INSERT INTO so_items
+            (so_id, p_id, warranty, quantity, sale_price)
+            VALUES (?, ?, ?, ?, ?)
+        `, [
+                    orderId,
+                    product_id,
+                    warranty,
+                    qty,
+                    price
+                ]);
+
+                continue;
+            }
+
+            /*
+                STOCK PRODUCT
+            */
+
+            const batch_id = productData.batch_id;
+
+            if (!batch_id)
+                throw new Error("Batch required for product");
+
+            // Check stock
+
             const [batch] = await connection.query(`
-                SELECT qty_remaining
-                FROM inventory_batches
-                WHERE id = ?
-            `, [batch_id]);
+        SELECT qty_remaining
+        FROM inventory_batches
+        WHERE id = ?
+    `, [batch_id]);
 
-            if (batch.length === 0) {
+            if (batch.length === 0)
                 throw new Error("Batch not found");
-            }
 
-            if (batch[0].qty_remaining < qty) {
-                throw new Error("Not enough stock for selected batch");
-            }
+            if (batch[0].qty_remaining < qty)
+                throw new Error("Not enough stock");
 
-            // Deduct batch stock
+            // Deduct stock
+
             await connection.query(`
-                UPDATE inventory_batches
-                SET qty_remaining = qty_remaining - ?
-                WHERE id = ?
-            `, [qty, batch_id]);
+        UPDATE inventory_batches
+        SET qty_remaining = qty_remaining - ?
+        WHERE id = ?
+    `, [qty, batch_id]);
 
-            // record stock movement (OUT)
+            // Stock movement
+
             await connection.query(`
-                INSERT INTO stock_mov
-                (product_id, batch_id, quantity, movement_type, reference_type, reference_id,cost_price)
-                VALUES (?, ?, ?, 'OUT', 'sales_order', ?,?)
-            `, [product_id, batch_id, qty, orderId, productData.cost_price]);
+        INSERT INTO stock_mov
+        (product_id, batch_id, quantity,
+         movement_type, reference_type,
+         reference_id, cost_price)
+        VALUES (?, ?, ?, 'OUT', 'sales_order', ?, ?)
+    `, [
+                product_id,
+                batch_id,
+                qty,
+                orderId,
+                productData.cost_price
+            ]);
 
+            // Insert item
 
-            // Insert new order item
             await connection.query(`
-                INSERT INTO so_items
-                (so_id, p_id, batch_id, warranty,quantity, sale_price)
-                VALUES (?, ?, ?, ?, ?, ?)
-            `, [orderId, product_id, batch_id, warranty, qty, price]);
-
+        INSERT INTO so_items
+        (so_id, p_id, batch_id, warranty,
+         quantity, sale_price)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `, [
+                orderId,
+                product_id,
+                batch_id,
+                warranty,
+                qty,
+                price
+            ]);
         }
 
         await connection.commit();
