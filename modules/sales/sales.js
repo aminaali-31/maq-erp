@@ -552,35 +552,35 @@ exports.updateEditOrder = async (req, res) => {
 
         for (const item of oldItems) {
 
-    const [product] = await connection.query(`
+            const [product] = await connection.query(`
         SELECT type
         FROM products
         WHERE id = ?
     `, [item.p_id]);
 
-    if (product[0].type === 'service') {
-        continue;
-    }
+            if (product[0].type === 'service') {
+                continue;
+            }
 
-    // Get batch cost price
+            // Get batch cost price
 
-    const [[batch]] = await connection.query(`
+            const [[batch]] = await connection.query(`
         SELECT cost_price
         FROM inventory_batches
         WHERE id = ?
     `, [item.batch_id]);
 
-    // Restore stock
+            // Restore stock
 
-    await connection.query(`
+            await connection.query(`
         UPDATE inventory_batches
         SET qty_remaining = qty_remaining + ?
         WHERE id = ?
     `, [item.quantity, item.batch_id]);
 
-    // Record movement
+            // Record movement
 
-    await connection.query(`
+            await connection.query(`
         INSERT INTO stock_mov
         (
             product_id,
@@ -593,13 +593,13 @@ exports.updateEditOrder = async (req, res) => {
         )
         VALUES (?, ?, ?, 'IN', 'sales_order', ?, ?)
     `, [
-        item.p_id,
-        item.batch_id,
-        item.quantity,
-        orderId,
-        batch.cost_price
-    ]);
-}
+                item.p_id,
+                item.batch_id,
+                item.quantity,
+                orderId,
+                batch.cost_price
+            ]);
+        }
 
         // 3️⃣ Delete previous order items
         await connection.query(
@@ -607,7 +607,7 @@ exports.updateEditOrder = async (req, res) => {
             [orderId]
         );
 
-
+        let total_amount = 0;
         // 4️⃣ Insert new items and deduct stock
         for (const item of items) {
 
@@ -618,7 +618,7 @@ exports.updateEditOrder = async (req, res) => {
 
             const qty = Number(item.quantity);
             const price = Number(item.sale_price);
-
+            total_amount = total_amount + (price * qty);
             const warranty =
                 item.warranty ||
                 new Date().toISOString().split('T')[0];
@@ -707,7 +707,21 @@ exports.updateEditOrder = async (req, res) => {
                 price
             ]);
         }
+        const [profitRows] = await connection.query(`
+    SELECT 
+        SUM((si.sale_price - ib.cost_price) * si.quantity) AS profit
+    FROM so_items si
+    JOIN inventory_batches ib ON si.batch_id = ib.id
+    WHERE si.so_id = ?
+`, [orderId]);
 
+        const profit = profitRows[0].profit || 0;
+        await connection.query(`
+    UPDATE sales_orders
+    SET total_amount = ?,
+        profit = ?
+    WHERE id = ?
+`, [total_amount, profit, orderId]);
         await connection.commit();
 
         res.redirect(`/sales/orders/edit/${orderId}?success=Order updated`);
