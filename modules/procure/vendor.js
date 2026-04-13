@@ -6,13 +6,13 @@ exports.addVendor = async (req, res) => {
     const conn = await db.getConnection();
 
     try {
-        const { name, password, phone, email, address, payment_terms } = req.body;
+        const { name, password, phone, email, address, payment_terms, is_active } = req.body;
         // Basic validation
         if (!name || name.trim() === '' ||  !password || !email) {
             return res.redirect('/procure/addVendor?message=Vendor name and password are required');
         }
         const hashedPassword = await bcrypt.hash(password, 12);
-
+        const val = is_active ? 'active':'inactive';
         await conn.beginTransaction();
 
         const [result] = await conn.execute(
@@ -26,9 +26,9 @@ exports.addVendor = async (req, res) => {
         // 2️⃣ Auto-create Account for vendor
         const accountName = `${name}`;
         const [accountResult] = await conn.execute(
-            `INSERT INTO accounts (name, type)
-             VALUES (?, ?)`,
-            [accountName, 'liability']
+            `INSERT INTO accounts (name, type, status)
+             VALUES (?, ?, ?)`,
+            [accountName, 'liability', val]
         );
 
         const accountId = accountResult.insertId;

@@ -16,9 +16,20 @@
                     </a>
                     <div class="container mt-4">
 
-                        <h3 class="mb-4">
+                        <h3 class="mb-2">
                             <%= account.name %> Ledger
                         </h3>
+                        <form method="POST" action="/accounts/change/<%= account.id %>">
+                            <!-- Send current status -->
+                            <input 
+                                type="hidden" 
+                                name="current_status" 
+                                value="<%= account.status %>"
+                            >
+                            <button type="submit" class="btn btn-secondary">
+                                <%= account.status == 'active' ? 'Inactivate' : 'Activate' %>
+                            </button>
+                        </form>
 
                         <div class="card shadow-sm border-0">
 

@@ -202,10 +202,10 @@ exports.addCustomer = async (req, res) => {
     const conn = await pool.getConnection();
 
     try {
-        const { name, email,  password, phone, address, description } = req.body;
+        const { name, email,  password, phone, address, description, is_active } = req.body;
 
         const hashedPassword = await bcrypt.hash(password, 12);
-
+        const val = is_active ? 'active':'inactive';
         await conn.beginTransaction();
 
         // 1️⃣ Insert Customer
@@ -220,9 +220,9 @@ exports.addCustomer = async (req, res) => {
         // 2️⃣ Auto-create Account for Customer
         const accountName = `${name}`;
         const [accountResult] = await conn.execute(
-            `INSERT INTO accounts (name, type)
-             VALUES (?, ?)`,
-            [accountName, 'asset']
+            `INSERT INTO accounts (name, type, status)
+             VALUES (?, ?, ?)`,
+            [accountName, 'asset', val]
         );
 
         const accountId = accountResult.insertId;

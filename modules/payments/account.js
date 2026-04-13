@@ -135,6 +135,7 @@ exports.accountSummary = async (req, res) => {
     SELECT 
         a.name AS account_name,
         a.type,
+        a.status
         a.id,
         COALESCE(SUM(
             CASE 
@@ -196,6 +197,7 @@ exports.showAllAccounts = async (req, res) => {
                     a.id,
                     a.name,
                     a.type,
+                    a.status,
                     IFNULL(SUM(je.debit),0) AS total_debit,
                     IFNULL(SUM(je.credit),0) AS total_credit,
 
@@ -280,3 +282,22 @@ exports.storeAccount = async (req, res) => {
         res.redirect('/accounts/add?message=Unable to add Account')
     }
 };
+
+exports.changeStat = async (req,res) => {
+    const id = req.params.id;
+    const val = req.body.current_status;
+    const newStat  = val == 'active'? 'inactive':'active';
+    try {
+        await pool.execute(
+            `UPDATE accounts
+                SET status = ?
+                WHERE id = ?`,
+            [newStat,id]
+        )
+    res.redirect('/accounts/allAccounts');
+
+    } catch (error) {
+        console.error(error);
+        res.redirect('/accounts/allAccounts')
+    }
+}

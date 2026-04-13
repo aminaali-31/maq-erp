@@ -578,3 +578,6 @@ FOREIGN KEY (sale_order_id)
 REFERENCES sales_orders(id)
 ON DELETE SET NULL;
 UPDATE accounts SET type = 'expense' WHERE id = 14;
+
+--- 13 april
+ALTER TABLE accounts ADD COLUMN status ENUM('active','inactive') NOT NULL DEFAULT 'active';

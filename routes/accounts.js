@@ -24,4 +24,6 @@ router.get('/receivables',authenticateAndAuthorize([1,2,3]),  accountController.
 
 router.get('/allAccounts',authenticateAndAuthorize([1,2,3]),  accountController.showAllAccounts);
 
+router.post('/change/:id',authenticateAndAuthorize([1,2,3]), accountController.changeStat);
+
 module.exports = router;

@@ -19,8 +19,45 @@
 
                         <h3 class="mb-4 fw-bold">All Accounts</h3>
                         <a href="/accounts/add" class="btn btn-outline-primary mb-3">Add account</a>
-                        <div class="mb-3">
-                            <input type="text" id="accountSearch" class="form-control" placeholder="Search accounts...">
+                        <div class="row mb-3 align-items-end">
+
+                            <!-- Search -->
+                            <div class="col-md-4">
+                                <label class="form-label">Search</label>
+                                <input type="text" id="accountSearch" class="form-control"
+                                    placeholder="Search accounts...">
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div class="col-md-3">
+                                <label class="form-label">Status</label>
+                                <select id="statusFilter" class="form-select">
+                                    <option value="">All</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+
+                            <!-- Account Type Filter -->
+                            <div class="col-md-3">
+                                <label class="form-label">Account Type</label>
+                                <select id="typeFilter" class="form-select">
+                                    <option value="">All</option>
+                                    <option value="asset">Asset</option>
+                                    <option value="liability">Liability</option>
+                                    <option value="expense">Expense</option>
+                                    <option value="income">Income</option>
+                                    <option value="equity">Equity</option>
+                                </select>
+                            </div>
+
+                            <!-- Clear Filters -->
+                            <div class="col-md-2">
+                                <button class="btn btn-outline-secondary w-100" id="clearFilters" type="button">
+                                    Clear
+                                </button>
+                            </div>
+
                         </div>
                         <div class="row">
 
@@ -30,7 +67,8 @@
                                     0) balanceClass = "text-success";
                                     else if(balance < 0) balanceClass="text-danger" ; %>
 
-                                        <div class="col-xl-4 col-lg-6 mb-4">
+                                        <div class="col-xl-4 col-lg-6 mb-4 account-card" data-name="<%= a.name %>"
+                                            data-type="<%= a.type %>" data-status="<%= a.status %>">
 
                                             <div class="card border-0 shadow-sm h-100">
 
@@ -247,18 +285,56 @@
     </div>
     <script>
         const searchInput = document.getElementById('accountSearch');
-        searchInput.addEventListener('input', function () {
-            const filter = this.value.toLowerCase();
-            const cards = document.querySelectorAll('.row > .col-xl-4'); // all account cards
+        const statusFilter = document.getElementById('statusFilter');
+        const typeFilter = document.getElementById('typeFilter');
+        const clearBtn = document.getElementById('clearFilters');
+
+        function filterAccounts() {
+
+            const search = searchInput.value.toLowerCase();
+            const status = statusFilter.value.toLowerCase().trim();
+            const type = typeFilter.value;
+
+            const cards = document.querySelectorAll('.account-card');
 
             cards.forEach(card => {
-                const name = card.querySelector('h5.fw-semibold').innerText.toLowerCase();
-                if (name.includes(filter)) {
-                    card.style.display = ''; // show
-                } else {
-                    card.style.display = 'none'; // hide
+
+                const name = card.dataset.name.toLowerCase();
+                const cardStatus = card.dataset.status.toLowerCase().trim();
+                const cardType = card.dataset.type;
+
+                let show = true;
+
+                // Search filter
+                if (search && !name.includes(search)) {
+                    show = false;
                 }
+
+                // Status filter
+                if (status && cardStatus !== status) {
+                    show = false;
+                }
+
+                // Type filter
+                if (type && cardType !== type) {
+                    show = false;
+                }
+
+                card.style.display = show ? '' : 'none';
+
             });
+
+        }
+
+        searchInput.addEventListener('input', filterAccounts);
+        statusFilter.addEventListener('change', filterAccounts);
+        typeFilter.addEventListener('change', filterAccounts);
+
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            statusFilter.value = '';
+            typeFilter.value = '';
+            filterAccounts();
         });
     </script>
 </body>
