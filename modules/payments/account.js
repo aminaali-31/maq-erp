@@ -135,7 +135,6 @@ exports.accountSummary = async (req, res) => {
     SELECT 
         a.name AS account_name,
         a.type,
-        a.status
         a.id,
         COALESCE(SUM(
             CASE 
