@@ -161,7 +161,7 @@ exports.showInvoiceForm = async (req,res)=>{
     );
 
     const [salesOrders] = await pool.execute(
-        "SELECT id,total_amount FROM sales_orders;"
+        "SELECT id,total_amount FROM sales_orders WHERE status = 'pending' AND progress = 'signed off';"
     );
 
     res.render("sales/invoice",{
