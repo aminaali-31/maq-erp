@@ -169,13 +169,14 @@
 
                                             </div>
                                             <!--Cash card-->
-                                             <% let cashBalance=Number(cash.balance) || 0; let cashClass="text-secondary" ; if(cashBalance>
+                                             <% assets.forEach(as=> { %>
+                                             <% let cashBalance=Number(as.balance) || 0; let cashClass="text-secondary" ; if(cashBalance>
                                 0) cashClass = "text-success";
-                                else if(cashBalance < 0) recClass="text-danger" ; %>
+                                else if(cashBalance < 0) cashClass="text-danger" ; %>
 
                                     <div class="col-xl-4 col-lg-6 mb-4">
 
-                                        <a href="/accounts/ledger/<%= cash.id %>" class="text-decoration-none text-dark d-block">
+                                        <a href="/accounts/ledger/<%= as.id %>" class="text-decoration-none text-dark d-block">
 
                                             <div class="card border-0 shadow-sm h-100">
 
@@ -183,7 +184,7 @@
 
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
 
-                                                        <h5 class="fw-semibold mb-0">Cash</h5>
+                                                        <h5 class="fw-semibold mb-0"><%- as.account_name %></h5>
 
                                                         <span class="badge bg-light text-dark">Asset</span>
 
@@ -194,14 +195,14 @@
                                                     <div class="d-flex justify-content-between small mb-2">
                                                         <span class="text-muted">Total Debit</span>
                                                         <span class="fw-semibold">
-                                                            <%= Number(cash.total_debit || 0).toLocaleString() %>
+                                                            <%= Number(as.total_debit || 0).toLocaleString() %>
                                                         </span>
                                                     </div>
 
                                                     <div class="d-flex justify-content-between small mb-2">
                                                         <span class="text-muted">Total Credit</span>
                                                         <span class="fw-semibold">
-                                                            <%= Number(cash.total_credit || 0).toLocaleString() %>
+                                                            <%= Number(as.total_credit || 0).toLocaleString() %>
                                                         </span>
                                                     </div>
 
@@ -223,6 +224,7 @@
                                         </a>
 
                                     </div>
+                                     <% }) %>
 
                                             <% accounts.forEach(a=> { %>
                                                 <div class="col-xl-4 col-lg-6 mb-4">
