@@ -158,7 +158,7 @@ exports.accountSummary = async (req, res) => {
     FROM accounts a
     LEFT JOIN journal_entries je ON je.account_id = a.id
     LEFT JOIN journal j ON j.id = je.journal_id
-    WHERE a.name IN ('Sales Revenue', 'Stocks')
+    WHERE a.name = 'Sales Revenue'
     GROUP BY a.id, a.name
 `);
 const [assets] = await pool.execute(`
