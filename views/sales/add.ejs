@@ -71,7 +71,8 @@
                                     <thead>
                                         <tr>
                                             <th style="width:35%">Product</th>
-                                            <th style="width:15%">Price</th>
+                                            <th style="width:15%">Sale Price</th>
+                                            <th style="width:15%">Cost Price</th>
                                             <th style="width:10%">Quantity</th>
                                             <th style="width:20%">Warranty Till</th>
                                             <th style="width:20%">Total</th>
@@ -92,6 +93,9 @@
                                     </td>
                                     <td>
                                         <input type="number" step="0.01" name="items[0][sale_price]" class="form-control price">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="items[0][cost_price]" class="form-control cost" readonly>
                                     </td>
                                     <td>
                                         <input type="number" name="items[0][quantity]" class="form-control qty" value="1" min="1">
@@ -153,6 +157,9 @@ ${productsData.map(opt =>
 <input type="number" step="0.01" name="items[${rowIndex}][sale_price]" class="form-control price">
 </td>
 <td>
+<input type="number" step="0.01" name="items[${rowIndex}][cost_price]" class="form-control cost" readonly>
+</td>
+<td>
 <input type="number" name="items[${rowIndex}][quantity]" class="form-control qty" value="1" min="1">
 </td>
 <td>
@@ -187,6 +194,10 @@ document.addEventListener("change", function(e){
         const priceField = row.querySelector("input.price");
         if(priceField){
             priceField.value = data.sale_price || 0;
+        }
+        const costPrice = row.querySelector("input.cost");
+        if(costPrice) {
+            costPrice.value = data.cost_price || 0;
         }
 
         // ⭐ Set Stock Limit

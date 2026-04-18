@@ -71,7 +71,8 @@
                                         <th>Product</th>
                                         <th>Quantity</th>
                                         <th>Warranty till</th>
-                                        <th>Price</th>
+                                        <th>Cost Price</th>
+                                        <th>Sale Price</th>
                                         <th>Subtotal</th>
                                     </tr>
                                 </thead>
@@ -88,6 +89,9 @@
                                             </td>
                                             <td>
                                                 <%= item.warranty ? item.warranty.toISOString().split('T')[0] : 'No warranty' %>
+                                            </td>
+                                            <td>
+                                                <%= Number(item.cost_price).toLocaleString() %>
                                             </td>
                                             <td>
                                                 <%= Number(item.sale_price).toLocaleString() %>

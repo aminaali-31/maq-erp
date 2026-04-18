@@ -338,12 +338,15 @@ exports.viewSalesOrder = async (req, res) => {
                 si.p_id,
                 p.name AS product_name,
                 si.warranty,
-                SUM(si.quantity) AS total_quantity,
-                si.sale_price
+                si.quantity AS total_quantity,
+                si.sale_price,
+                b.cost_price AS cost_price
             FROM so_items si
-            JOIN products p ON si.p_id = p.id
+            JOIN products p 
+                ON si.p_id = p.id
+            LEFT JOIN inventory_batches b 
+                ON b.product_id = p.id
             WHERE si.so_id = ?
-            GROUP BY si.p_id, si.sale_price, p.name,si.warranty
         `, [order_id]);
 
         res.render('sales/view', {
@@ -376,7 +379,12 @@ exports.editOrderForm = async (req, res) => {
 
         // 2️⃣ Load order items
         const [items] = await pool.execute(
-            `SELECT * FROM so_items WHERE so_id = ?`,
+            `SELECT si.*,
+            b.cost_price AS cost_price
+            FROM so_items si
+            LEFT JOIN inventory_batches b 
+            ON b.id = si.batch_id
+            WHERE so_id = ?`,
             [orderId]
         );
 
@@ -391,7 +399,7 @@ exports.editOrderForm = async (req, res) => {
         b.id AS batch_id,
         b.batch_no,
         b.qty_remaining,
-        b.cost_price
+        b.cost_price AS cost_price
 
     FROM products p
 
@@ -446,6 +454,7 @@ exports.editOrderForm = async (req, res) => {
 
         // 5️⃣ Add sale order items that may have zero stock
         for (const item of items) {
+            console.log(item)
             const exists = productOptions.find(opt =>
                 opt.product_id == item.p_id && opt.batch_id == item.batch_id
             );
