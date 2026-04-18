@@ -345,7 +345,7 @@ exports.viewSalesOrder = async (req, res) => {
             JOIN products p 
                 ON si.p_id = p.id
             LEFT JOIN inventory_batches b 
-                ON b.id = si.id
+                ON b.id = si.batch_id
             WHERE si.so_id = ?
         `, [order_id]);
 
