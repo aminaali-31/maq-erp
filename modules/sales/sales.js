@@ -380,8 +380,8 @@ exports.editOrderForm = async (req, res) => {
 
         // 2️⃣ Load order items
         const [items] = await pool.execute(
-            `SELECT si.*,
-            FROM so_items si
+            `SELECT *
+            FROM so_items 
             WHERE so_id = ?`,
             [orderId]
         );
@@ -598,7 +598,7 @@ exports.updateEditOrder = async (req, res) => {
             reference_id,
             cost_price
         )
-        VALUES (?, ?, ?, 'IN', 'sales_order', ?, ?)
+        VALUES (?, ?, ?, 'IN', 'Sales_Order Edit', ?, ?)
     `, [
                 item.p_id,
                 item.batch_id,
@@ -689,7 +689,7 @@ exports.updateEditOrder = async (req, res) => {
         (product_id, batch_id, quantity,
          movement_type, reference_type,
          reference_id, cost_price)
-        VALUES (?, ?, ?, 'OUT', 'sales_order', ?, ?)
+        VALUES (?, ?, ?, 'OUT', 'Sales_Order Edit', ?, ?)
     `, [
                 product_id,
                 batch_id,

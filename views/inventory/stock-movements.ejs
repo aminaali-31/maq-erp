@@ -174,7 +174,7 @@
                                                             minimumFractionDigits: 2 }) %>
                                                     </td>
                                                     <td>
-                                                        <% if (m.reference_type==='Sales Order' ) { %>
+                                                        <% if (m.reference_type ==='Sales Order' ||m.reference_type ==='Sales Order Edit'  ) { %>
                                                             <a href="/sales/orders/view/<%= m.reference_id %>"
                                                                 class="text-dark">
                                                                 <%= m.reference_type %> #<%= m.reference_id %>
