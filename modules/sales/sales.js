@@ -208,7 +208,7 @@ exports.createSalesOrder = async (req, res) => {
             // ===============================
             await connection.query(`
                 INSERT INTO so_items
-                (so_id, p_id, batch_id, quantity, sale_price, warranty)
+                (so_id, p_id, batch_id, quantity, sale_price,cost_price, warranty)
                 VALUES (?, ?, ?, ?, ?, ?)
             `, [
                 sales_order_id,
@@ -216,6 +216,7 @@ exports.createSalesOrder = async (req, res) => {
                 product.type === 'product' ? batch_id : null,
                 quantity,
                 sale_price,
+                cost_price,
                 warranty
             ]);
         }
@@ -380,10 +381,7 @@ exports.editOrderForm = async (req, res) => {
         // 2️⃣ Load order items
         const [items] = await pool.execute(
             `SELECT si.*,
-            b.cost_price AS cost_price
             FROM so_items si
-            LEFT JOIN inventory_batches b 
-            ON b.id = si.batch_id
             WHERE so_id = ?`,
             [orderId]
         );
@@ -718,9 +716,8 @@ exports.updateEditOrder = async (req, res) => {
         }
         const [profitRows] = await connection.query(`
     SELECT 
-        SUM((si.sale_price - ib.cost_price) * si.quantity) AS profit
+        SUM((si.sale_price - si.cost_price) * si.quantity) AS profit
     FROM so_items si
-    JOIN inventory_batches ib ON si.batch_id = ib.id
     WHERE si.so_id = ?
 `, [orderId]);
 

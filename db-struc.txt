@@ -581,3 +581,21 @@ UPDATE accounts SET type = 'expense' WHERE id = 14;
 
 --- 13 april
 ALTER TABLE accounts ADD COLUMN status ENUM('active','inactive') NOT NULL DEFAULT 'active';
+
+---- 18 april
+ALTER TABLE so_items ADD cost_price DECIMAL(10,2);
+UPDATE so_items si
+JOIN stock_mov sm 
+    ON sm.reference_id = si.so_id
+   AND sm.product_id = si.p_id
+   AND sm.batch_id = si.batch_id
+   AND sm.movement_type = 'OUT'
+SET si.cost_price = sm.cost_price;
+UPDATE sales_orders so
+SET so.profit = (
+    SELECT SUM(
+        (si.sale_price - COALESCE(si.cost_price, 0)) * si.quantity
+    )
+    FROM so_items si
+    WHERE si.so_id = so.id
+);
