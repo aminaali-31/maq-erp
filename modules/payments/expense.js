@@ -13,15 +13,18 @@ exports.showExpenseForm = async (req, res) => {
             WHERE so.progress IN ('pending','happening')`
         );
         const [items] = await pool.execute(
-            `SELECT si.*, p.name AS name
-            FROM so_items si
-            JOIN products p ON si.p_id = p.id
-            WHERE p.type = 'Service'
-            AND si.so_id IN (
-                SELECT id
-                FROM sales_orders
-                WHERE progress IN ('pending','happening')
-            )`
+            `SELECT DISTINCT
+    p.id,
+    p.name
+FROM so_items si
+JOIN products p ON si.p_id = p.id
+WHERE p.type = 'Service'
+AND si.so_id IN (
+    SELECT id
+    FROM sales_orders
+    WHERE progress IN ('pending','happening')
+);`
+            
         );
 
         res.render('payments/addExpense', { accounts, orders, items, success: req.query.success, error: req.query.error });
