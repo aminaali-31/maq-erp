@@ -7,11 +7,26 @@ exports.showExpenseForm = async (req, res) => {
             SELECT * FROM accounts`);
 
         const [orders] = await pool.execute(
-            `SELECT * FROM sales_orders`
+            `SELECT so.*, c.name as customer_name
+            FROM sales_orders so
+            LEFT JOIN customers c ON c.id = so.customer_id
+            WHERE so.progress IN ('pending','happening')`
+        );
+        const [items] = await pool.execute(
+            `SELECT si.*, p.name AS name
+            FROM so_items si
+            JOIN products p ON si.p_id = p.id
+            WHERE p.type = 'Service'
+            AND si.so_id IN (
+                SELECT id
+                FROM sales_orders
+                WHERE progress IN ('pending','happening')
+            )`
         );
 
-        res.render('payments/addExpense', { accounts, orders, success: req.query.success, error: req.query.error });
+        res.render('payments/addExpense', { accounts, orders, items, success: req.query.success, error: req.query.error });
     } catch (e) {
+        console.error(e);
         res.status(500).send("Database Error")
     }
 }
@@ -21,7 +36,7 @@ exports.addExpense = async (req, res) => {
 
     try {
 
-        const { title, amount, account, expense_date, type, order_id } = req.body;
+        const { title, amount, account, expense_date, type, order_id, item_id } = req.body;
 
         await connection.beginTransaction();
         const account_id = parseInt(account)
@@ -52,6 +67,11 @@ exports.addExpense = async (req, res) => {
 
         const expense_id = expenseResult.insertId;
         if (type === 'order') {
+            await connection.query(
+                `UPDATE so_items SET cost_price = cost_price + ?
+                WHERE so_items.id = ?`,
+                [amount, item_id]
+            )
             await connection.query(
                 `UPDATE sales_orders
                 SET profit = profit - ?
@@ -111,7 +131,9 @@ exports.listExpenses = async (req, res) => {
                 expenses.title,
                 expenses.amount,
                 expenses.expense_date,
-                expenses.status
+                expenses.status,
+                expenses.type,
+                expenses.sale_order_id
             FROM expenses
             ORDER BY expenses.expense_date DESC
         `);

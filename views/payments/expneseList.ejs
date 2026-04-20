@@ -31,6 +31,8 @@
                                     <th>Title</th>
                                     <th>Amount</th>
                                     <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Refere</th>
                                 </tr>
                             </thead>
 
@@ -65,6 +67,18 @@
 
                                                 <td>
                                                     <%= expense.expense_date.toISOString().split('T')[0]  %>
+                                                </td>
+                                                <td>
+                                                    <%= expense.type %>
+                                                </td>
+                                                <td>
+                                                    <% if(expense.sale_order_id) { %>
+                                                    <a href="/sales/orders/view/<%= expense.sale_order_id %>">
+                                                        Sale Order # <%= expense.sale_order_id %>
+                                                    </a>
+                                                    <% } else { %>
+                                                        <p>None</p>
+                                                    <% } %>
                                                 </td>
 
                                             </tr>

@@ -49,7 +49,15 @@
                                                 <label for="order" class="form-label">Order Reference</label>
                                                 <select name="order_id" class="form-control">
                                                     <% orders.forEach(o => { %>
-                                                        <option value="<%= o.id %>">Sale order #<%= o.id %>| Amount <%= o.total_amount %> </option>
+                                                        <option value="<%= o.id %>">Sale order #<%= o.id %>| Amount <%= o.total_amount %> | Name <%= o.customer_name %> </option>
+                                                    <% }) %>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3" id="item_id">
+                                                <label for="item" class="form-label">Item Reference</label>
+                                                <select name="item_id" class="form-control">
+                                                    <% items.forEach(i => { %>
+                                                        <option value="<%= i.id %>"> <%= i.name  %> </option>
                                                     <% }) %>
                                                 </select>
                                             </div>
@@ -89,12 +97,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const typeSelect = document.getElementById("type");
     const orderDiv = document.getElementById("order_id");
+    const itemDiv = document.getElementById("item_id")
 
     function toggleOrderField() {
         if (typeSelect.value === "order") {
             orderDiv.style.display = "block";
+            itemDiv.style.display = "block";
         } else {
             orderDiv.style.display = "none";
+            itemDiv.style.display = "none";
         }
     }
 
