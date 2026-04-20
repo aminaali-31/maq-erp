@@ -40,7 +40,7 @@
                                                 <% salesOrders.forEach(o=> { %>
                                                     <option value="<%= o.id %>">
                                                         Order #<%= o.id %>
-                                                            - Amount <%= o.total_amount %>
+                                                            - Amount <%= o.total_amount %> | Customer <%= o.customer_name %>
                                                     </option>
                                                     <% }) %>
 

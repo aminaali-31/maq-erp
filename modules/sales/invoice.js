@@ -156,16 +156,15 @@ exports.createInvoice = async (req,res)=>{
 
 exports.showInvoiceForm = async (req,res)=>{
 
-    const [customers] = await pool.execute(
-        "SELECT id,name FROM customers"
-    );
 
     const [salesOrders] = await pool.execute(
-        "SELECT id,total_amount FROM sales_orders WHERE status = 'pending' AND progress = 'signed off';"
+        `SELECT so.id,so.total_amount, c.name as customer_name
+        FROM sales_orders so
+        LEFT JOIN customers c ON c.id = so.customer_id
+        WHERE status = 'pending' AND progress = 'signed off';`
     );
 
     res.render("sales/invoice",{
-        customers,
         salesOrders
     });
 };
