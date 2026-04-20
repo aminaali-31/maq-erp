@@ -136,24 +136,32 @@ exports.dashboard = async (req, res) => {
             `);
     // In your controller
         const [profits] = await pool.query(`
+           SELECT
+            s.month,
+            COALESCE(s.sales_profit,0) 
+            - COALESCE(e.expense,0) AS profit
+        FROM
+        (
             SELECT
-                MONTH(so.date) AS month,
-                SUM(so.profit) - COALESCE(SUM(e.expense),0) AS profit
-            FROM sales_orders so
-            LEFT JOIN
-            (
-                SELECT
-                    MONTH(j.date) AS month,
-                    SUM(je.debit) AS expense
-                FROM journal_entries je
-                JOIN accounts a ON je.account_id = a.id
-                JOIN journal j ON je.journal_id = j.id
-                WHERE a.name = 'Office Expenses'
-                GROUP BY MONTH(j.date)
-            ) e ON e.month = MONTH(so.date)
-            WHERE so.date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
-            GROUP BY MONTH(so.date)
-            ORDER BY MONTH(so.date);
+                MONTH(date) AS month,
+                SUM(profit) AS sales_profit
+            FROM sales_orders
+            WHERE date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+            GROUP BY MONTH(date)
+        ) s
+        LEFT JOIN
+        (
+            SELECT
+                MONTH(j.date) AS month,
+                SUM(je.debit) AS expense
+            FROM journal_entries je
+            JOIN accounts a ON je.account_id = a.id
+            JOIN journal j ON je.journal_id = j.id
+            WHERE a.name = 'Office Expenses'
+            GROUP BY MONTH(j.date)
+        ) e
+        ON s.month = e.month
+        ORDER BY s.month;
         `);
         const [rows] = await pool.execute(
             `SELECT COUNT(*) AS count
