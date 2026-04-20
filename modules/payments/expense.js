@@ -13,18 +13,19 @@ exports.showExpenseForm = async (req, res) => {
             WHERE so.progress IN ('pending','happening')`
         );
         const [items] = await pool.execute(
-            `SELECT DISTINCT
-    p.id,
-    p.name
-FROM so_items si
-JOIN products p ON si.p_id = p.id
-WHERE p.type = 'Service'
-AND si.so_id IN (
-    SELECT id
-    FROM sales_orders
-    WHERE progress IN ('pending','happening')
-);`
-            
+            `SELECT 
+            si.id AS item_id,
+            si.so_id,
+            si.p_id,
+            si.quantity,
+            si.sale_price,
+            si.cost_price,
+            p.name AS product_name
+        FROM so_items si
+        JOIN products p ON p.id = si.p_id
+        WHERE p.type = 'service'
+;`
+
         );
 
         res.render('payments/addExpense', { accounts, orders, items, success: req.query.success, error: req.query.error });
@@ -71,15 +72,25 @@ exports.addExpense = async (req, res) => {
         const expense_id = expenseResult.insertId;
         if (type === 'order') {
             await connection.query(
-                `UPDATE so_items SET cost_price = cost_price + ?
-                WHERE so_items.id = ?`,
+                `UPDATE so_items 
+                SET cost_price = COALESCE(cost_price, 0) + ? 
+                WHERE id = ?;`,
                 [amount, item_id]
-            )
+            );
             await connection.query(
-                `UPDATE sales_orders
-                SET profit = profit - ?
-                WHERE id = ?`,
-                [amount, order_id]
+                `UPDATE sales_orders so
+                JOIN (
+                    SELECT 
+                        so_id,
+                        SUM(quantity * sale_price) AS total_sale,
+                        SUM(quantity * COALESCE(cost_price,0)) AS total_cost
+                    FROM so_items
+                    GROUP BY so_id
+                ) x ON x.so_id = so.id
+                SET 
+                    so.profit = COALESCE(x.total_sale,0) - COALESCE(x.total_cost,0)
+                WHERE so.id = ?;`,
+                [order_id]
             );
         }
         // 2️⃣ Create journal

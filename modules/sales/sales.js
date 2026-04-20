@@ -160,7 +160,7 @@ exports.createSalesOrder = async (req, res) => {
             // ===============================
             // Check batch stock
             // ===============================
-
+            let cost_price = 0;
             if (product.type === 'product') {
                 const [batchRows] = await connection.query(`
                 SELECT qty_remaining, cost_price
@@ -177,7 +177,7 @@ exports.createSalesOrder = async (req, res) => {
                     throw new Error(`Batch stock insufficient for product ${product_id}`);
                 }
 
-                const cost_price = Number(batch.cost_price);
+                cost_price = Number(batch.cost_price);
                 const profit = (sale_price - cost_price) * quantity;
                 total_profit += profit;
 
@@ -208,8 +208,8 @@ exports.createSalesOrder = async (req, res) => {
             // ===============================
             await connection.query(`
                 INSERT INTO so_items
-                (so_id, p_id, batch_id, quantity, sale_price,cost_price, warranty)
-                VALUES (?, ?, ?, ?, ?, ?)
+                (so_id, p_id, batch_id, quantity, sale_price, cost_price, warranty)
+                VALUES (?, ?, ?, ?, ?, ?,?)
             `, [
                 sales_order_id,
                 product_id,
@@ -341,12 +341,10 @@ exports.viewSalesOrder = async (req, res) => {
                 si.warranty,
                 si.quantity AS total_quantity,
                 si.sale_price,
-                b.cost_price AS cost_price
+                si.cost_price AS cost_price
             FROM so_items si
             JOIN products p 
                 ON si.p_id = p.id
-            LEFT JOIN inventory_batches b 
-                ON b.id = si.batch_id
             WHERE si.so_id = ?
         `, [order_id]);
 
