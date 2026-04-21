@@ -142,7 +142,7 @@ exports.createSalesOrder = async (req, res) => {
 
             total_amount += sale_price * quantity;
 
-            if (!quantity || quantity <= 0) {
+            if (!quantity) {
                 throw new Error("Invalid quantity for product " + product_id);
             }
             const [productRows] = await connection.query(`
