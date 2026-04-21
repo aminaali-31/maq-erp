@@ -620,7 +620,7 @@ exports.updateEditOrder = async (req, res) => {
 
             const product_id = productData.product_id;
             const product_type = productData.type;
-
+            
             const qty = Number(item.quantity);
             const price = Number(item.sale_price);
             total_amount = total_amount + (price * qty);
@@ -701,20 +701,21 @@ exports.updateEditOrder = async (req, res) => {
             await connection.query(`
         INSERT INTO so_items
         (so_id, p_id, batch_id, warranty,
-         quantity, sale_price)
-        VALUES (?, ?, ?, ?, ?, ?)
+         quantity, sale_price,cost_price)
+        VALUES (?, ?, ?, ?, ?, ?,?)
     `, [
                 orderId,
                 product_id,
                 batch_id,
                 warranty,
                 qty,
-                price
+                price,
+                productData.cost_price
             ]);
         }
         const [profitRows] = await connection.query(`
     SELECT 
-        SUM((si.sale_price - si.cost_price) * si.quantity) AS profit
+        SUM((si.sale_price - COALESCE(si.cost_price,0)) * si.quantity) AS profit
     FROM so_items si
     WHERE si.so_id = ?
 `, [orderId]);
