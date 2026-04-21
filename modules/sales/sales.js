@@ -39,7 +39,6 @@ exports.showOrderForm = async (req, res) => {
         OR
         (
             p.type = 'product'
-            AND b.qty_remaining > 0
         )
 
     ORDER BY p.name
