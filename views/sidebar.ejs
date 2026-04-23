@@ -203,6 +203,8 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
+            <% } %>
+            <% if(user && (Number(user.role_id)===1 || Number(user.role_id)===3)){ %>
                 <li class="nav-item">
                     <a href="/admin/jobs/all" class="nav-link">
                         <i class="bi bi-briefcase"></i>

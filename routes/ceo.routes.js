@@ -10,11 +10,11 @@ router.post('/approve/:approvalId', authenticateAndAuthorize([1]), approveRole);
 router.get('/pendings', authenticateAndAuthorize([1,3]), pedningController.getDashboard);
 router.get('/dashboard', authenticateAndAuthorize([1]), ceoController.dashboard);
 
-router.get('/jobs/create',authenticateAndAuthorize([1]), ceoController.createJobForm);
-router.post('/jobs/create',authenticateAndAuthorize([1]), ceoController.createJob);
-router.get('/jobs/all',authenticateAndAuthorize([1]), ceoController.showAllJobs);
-router.get('/jobs/all/status/:id',authenticateAndAuthorize([1]), ceoController.changeJobStatus);
+router.get('/jobs/create',authenticateAndAuthorize([1,3]), ceoController.createJobForm);
+router.post('/jobs/create',authenticateAndAuthorize([1,3]), ceoController.createJob);
+router.get('/jobs/all',authenticateAndAuthorize([1,3]), ceoController.showAllJobs);
+router.get('/jobs/all/status/:id',authenticateAndAuthorize([1,3]), ceoController.changeJobStatus);
 router.post('/job/:id', authenticateAndAuthorize([1,3]), ceoController.setJobComment);
 router.get('/notifications', authenticateAndAuthorize([1,3]), ceoController.getUnreadCount);
-router.get( "/notifications/mark-read/:id", ceoController.markAsRead);
+router.get( "/notifications/mark-read/:id", authenticateAndAuthorize([1,3]), ceoController.markAsRead);
 module.exports = router;
