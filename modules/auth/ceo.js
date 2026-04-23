@@ -10,7 +10,7 @@ exports.dashboard = async (req, res) => {
     const [finance] = await pool.query(`
       SELECT
         SUM(CASE WHEN a.name='Sales Revenue' THEN je.credit-je.debit ELSE 0 END) AS revenue,
-        SUM(CASE WHEN a.name='Office Expenses' THEN je.debit-je.credit ELSE 0 END) AS expenses
+        SUM(CASE WHEN a.name='expense' THEN je.debit-je.credit ELSE 0 END) AS expenses
       FROM journal_entries je
       JOIN accounts a ON a.id = je.account_id
       JOIN journal j ON j.id = je.journal_id
@@ -157,7 +157,7 @@ exports.dashboard = async (req, res) => {
             FROM journal_entries je
             JOIN accounts a ON je.account_id = a.id
             JOIN journal j ON je.journal_id = j.id
-            WHERE a.name = 'Office Expenses'
+            WHERE a.name = 'expense'
             GROUP BY MONTH(j.date)
         ) e
         ON s.month = e.month
