@@ -426,11 +426,17 @@
 
         const profitData = <%- JSON.stringify(profits) %>;
         const profitsValues = profitData.map(x => x.profit);
-
+        const profitLabels = profitData.map(x => {
+        const monthNames = [
+            "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ];
+        return `${monthNames[x.month]} ${x.year}`;
+    });
         new Chart(document.getElementById("profitChart"), {
             type: "line",
             data: {
-                labels: labels,
+                labels: profitLabels,
                 datasets: [{
                     label: "Profit",
                     data: profitsValues,
