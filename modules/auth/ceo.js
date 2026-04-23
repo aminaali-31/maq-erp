@@ -292,7 +292,15 @@ exports.showAllJobs = async (req,res) => {
   try {
 
     const [jobs] =await pool.execute(`
-      SELECT * FROM jobs`);
+      SELECT * FROM jobs
+      ORDER BY
+      CASE status
+        WHEN 'PENDING' THEN 1
+        WHEN 'IN_PROGRESS' THEN 2
+        WHEN 'COMPLETED' THEN 3
+        WHEN 'CANCELLED' THEN 4
+        ELSE 5
+    END;`);
 
     res.render('jobs/all', {jobs, success:req.query.success, error: req.query.error});
   } catch (e) {
