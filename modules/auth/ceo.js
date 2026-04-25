@@ -247,12 +247,16 @@ exports.getUnreadCount = async (req, res) => {
 exports.createJobForm = async (req, res) => {
     try {
 
-        const [employees] = await pool.execute(
-            `SELECT id, name FROM employees`
-        );
+        const [users] = await pool.execute(
+            `SELECT id, name, 'employee' AS type FROM employees
+            UNION ALL
+            SELECT id, name, 'vendor' AS type FROM vendors
+            UNION ALL
+            SELECT id, name, 'contractor' AS type FROM contractors;`
+            );
 
         res.render('jobs/create', {
-            employees,
+            users,
             error: req.query.error || null,
             success: req.query.success || null
         });
@@ -265,9 +269,9 @@ exports.createJobForm = async (req, res) => {
 
 exports.createJob = async (req, res) => {
 
-    const { title, description, employee_id, show_date, due_date } = req.body;
-
-    if (!title || !employee_id || !show_date) {
+    const { title, description, user, show_date, due_date } = req.body;
+    const [assigned_to_type, assigned_to_id] = user.split("-");
+    if (!title || !user || !show_date) {
         return res.redirect('/admin/jobs/create?error=Required fields missing');
     }
 
@@ -275,9 +279,9 @@ exports.createJob = async (req, res) => {
 
         await pool.execute(
             `INSERT INTO jobs
-            (title, description, employee_id, show_date, due_date, status)
-            VALUES (?, ?, ?, ?, ?, 'PENDING')`,
-            [title, description, employee_id, show_date, due_date]
+            (title, description, assigned_to_id, assigned_to_type, show_date, due_date, status)
+            VALUES (?, ?, ?, ?, ?, ?, 'PENDING')`,
+            [title, description, assigned_to_id, assigned_to_type, show_date, due_date]
         );
 
         res.redirect('/admin/jobs/all?success=Job created');
@@ -292,16 +296,39 @@ exports.createJob = async (req, res) => {
 exports.showAllJobs = async (req,res) => {
   try {
 
-    const [jobs] =await pool.execute(`
-      SELECT * FROM jobs
-      ORDER BY
-      CASE status
-        WHEN 'PENDING' THEN 1
-        WHEN 'IN_PROGRESS' THEN 2
-        WHEN 'COMPLETED' THEN 3
-        WHEN 'CANCELLED' THEN 4
-        ELSE 5
-    END;`);
+    const [jobs] = await pool.execute(`
+        SELECT
+            j.*,
+
+            COALESCE(
+                e.name,
+                v.name,
+                c.name
+            ) AS name
+
+        FROM jobs j
+
+        LEFT JOIN employees e
+            ON j.assigned_to_id = e.id
+            AND j.assigned_to_type = 'employee'
+
+        LEFT JOIN vendors v
+            ON j.assigned_to_id = v.id
+            AND j.assigned_to_type = 'vendor'
+
+        LEFT JOIN contractors c
+            ON j.assigned_to_id = c.id
+            AND j.assigned_to_type = 'contractor'
+
+        ORDER BY
+        CASE j.status
+            WHEN 'PENDING' THEN 1
+            WHEN 'IN_PROGRESS' THEN 2
+            WHEN 'COMPLETED' THEN 3
+            WHEN 'CANCELLED' THEN 4
+            ELSE 5
+        END;
+        `);
 
     res.render('jobs/all', {jobs, success:req.query.success, error: req.query.error});
   } catch (e) {

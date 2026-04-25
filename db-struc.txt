@@ -599,3 +599,16 @@ SET so.profit = (
     FROM so_items si
     WHERE si.so_id = so.id
 );
+
+----- 25 april
+ALTER TABLE jobs
+DROP FOREIGN KEY jobs_ibfk_1;
+
+ALTER TABLE jobs
+DROP COLUMN employee_id,
+ADD COLUMN assigned_to_id INT NOT NULL AFTER description,
+ADD COLUMN assigned_to_type ENUM(
+    'employee',
+    'vendor',
+    'contractor'
+) NOT NULL AFTER assigned_to_id;

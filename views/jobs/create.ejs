@@ -42,13 +42,13 @@
 
                             <div class="mb-3">
                                 <label>Assign Employee</label>
-                                <select name="employee_id" class="form-control" required>
+                                <select name="user" class="form-control" required>
 
                                     <option value="">Select Employee</option>
 
-                                    <% employees.forEach(emp=> { %>
-                                        <option value="<%= emp.id %>">
-                                            <%= emp.name %>
+                                    <% users.forEach(user=> { %>
+                                        <option value="<%= user.type %>-<%= user.id %>">
+                                            <%= user.name %>
                                         </option>
                                         <% }) %>
 
