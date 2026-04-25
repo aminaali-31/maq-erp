@@ -280,7 +280,7 @@
                                                     </td>
 
                                                     <td class="font-monospace">
-                                                        <%= job.due_date.toISOString().split('T')[0] %>
+                                                        <%= job.due_date.toLocaleDateString('en-CA') %>
                                                     </td>
                                                     <td>
                                                         <form action="/admin/job/<%= job.id %>" method="POST">
