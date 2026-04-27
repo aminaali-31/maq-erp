@@ -160,6 +160,11 @@ exports.viewPO = async (req, res) => {
             FROM purchase_orders po
             JOIN vendors v ON po.vendor_id = v.id
             WHERE po.id = ?
+            ORDER BY
+            CASE po.status
+                WHEN 'Pending' THEN 1
+                WHEN 'Completed' THEN 2
+            END;
         `, [poId]);
 
         if (!po) {

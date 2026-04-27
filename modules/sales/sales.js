@@ -325,6 +325,15 @@ exports.viewSalesOrder = async (req, res) => {
             FROM sales_orders so
             LEFT JOIN customers c ON so.customer_id = c.id
             WHERE so.id = ?
+            ORDER BY 
+            CASE so.progress
+                WHEN 'pending' THEN 1
+                WHEN 'happening' THEN 2
+                WHEN 'halted' THEN 3
+                WHEN 'signed off' THEN 4
+                ELSE 5
+            END;
+
         `, [order_id]);
 
         if (orderRows.length === 0) {
