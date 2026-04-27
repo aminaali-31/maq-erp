@@ -139,7 +139,11 @@ exports.listAllPOs = async (req, res) => {
             JOIN vendors v ON po.vendor_id = v.id
             LEFT JOIN po_items pi ON pi.po_id = po.id
             GROUP BY po.id
-            ORDER BY po.order_date DESC
+            ORDER BY
+            CASE po.status
+                WHEN 'Pending' THEN 1
+                WHEN 'Completed' THEN 2
+            END;
         `);
 
         const message = req.query.message || null;
@@ -160,11 +164,6 @@ exports.viewPO = async (req, res) => {
             FROM purchase_orders po
             JOIN vendors v ON po.vendor_id = v.id
             WHERE po.id = ?
-            ORDER BY
-            CASE po.status
-                WHEN 'Pending' THEN 1
-                WHEN 'Completed' THEN 2
-            END;
         `, [poId]);
 
         if (!po) {
