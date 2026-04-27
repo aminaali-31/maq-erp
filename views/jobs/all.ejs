@@ -41,7 +41,7 @@
                                     <th>Description</th>
                                     <th>Status</th>
                                     <th>Due Date</th>
-                                    <th>Comment</th>
+                                    <th style="min-width: 250px;">Comment</th>
                                 </tr>
                             </thead>
 
@@ -74,7 +74,7 @@
                                         <td>
                                             <%= job.due_date.toLocaleDateString('en-CA') %>
                                         </td>
-                                        <td>
+                                        <td style="min-width: 250px; white-space: normal;">
                                             <form action="/admin/job/<%= job.id %>" method="POST">
                                                 <input 
                                                     type="text" 
