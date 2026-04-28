@@ -142,7 +142,7 @@ exports.listAllPOs = async (req, res) => {
             ORDER BY
             CASE po.status
                 WHEN 'Pending' THEN 1
-                WHEN 'Completed' THEN 2
+                WHEN 'Received' THEN 2
             END;
         `);
 
