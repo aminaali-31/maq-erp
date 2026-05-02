@@ -54,7 +54,7 @@ exports.addQuotationForm = async (req, res) => {
                 b.qty_remaining,
                 b.cost_price
             FROM products p
-            JOIN inventory_batches b 
+            LEFT JOIN inventory_batches b 
             ON b.product_id = p.id
             `);
 
