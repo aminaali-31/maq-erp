@@ -8,8 +8,10 @@ exports.showOrderForm = async (req, res) => {
         // =============================
         // Get Customers
         // =============================
-        const [customers] = await pool.execute(`
-            SELECT id , name FROM customers
+        const [quotations] = await pool.execute(`
+            SELECT q.id as q_id, q.title, q.grand_total,  c.name as name , c.id as cus_id 
+            FROM quotations q
+            JOIN customers c ON q.customer_id = c.id
         `);
 
         // =============================
@@ -78,7 +80,7 @@ exports.showOrderForm = async (req, res) => {
         });
 
         res.render('sales/add', {
-            customers,
+            quotations,
             productOptions,
             success: req.query.success,
             error: req.query.error
@@ -91,14 +93,17 @@ exports.showOrderForm = async (req, res) => {
 };
 
 exports.createSalesOrder = async (req, res) => {
-    const { customer_id, p_status, o_status, items, date } = req.body;
+    const { data, p_status, o_status, items, date } = req.body;
 
-    if (!customer_id || !items || !Array.isArray(items) || items.length === 0) {
+    if (!data|| !items || !Array.isArray(items) || items.length === 0) {
         return res.redirect('/sales/orders/new?error=Customer and items are required');
     }
 
     const connection = await pool.getConnection();
-
+    const Data = JSON.parse(data);
+    const customer_id = Data.customer_id;
+    const quotation_id = Data.quotation_id;
+    const grand_Total = Data.grand_total;
     try {
         await connection.beginTransaction();
 
@@ -107,10 +112,11 @@ exports.createSalesOrder = async (req, res) => {
         // ===============================
         const [orderResult] = await connection.query(`
             INSERT INTO sales_orders
-            (customer_id, status, progress, profit, date, total_amount)
-            VALUES (?, ?, ?, 0, ?, 0)
+            (customer_id, quotation_id, status, progress, profit, date, total_amount)
+            VALUES (?, ?, ?, ?, 0, ?, 0)
         `, [
             customer_id,
+            quotation_id,
             p_status || 'pending',
             o_status || 'pending',
             date
@@ -121,8 +127,7 @@ exports.createSalesOrder = async (req, res) => {
         // ===============================
         // Calculate Profit + Process Items
         // ===============================
-        let total_profit = 0;
-        let total_amount = 0;
+        let total_cost = 0;
 
         for (const item of items) {
             if (!item.product_data) {
@@ -133,14 +138,12 @@ exports.createSalesOrder = async (req, res) => {
             const product_id = productData.product_id;
             const batch_id = productData.batch_id;
             const quantity = Number(item.quantity);
-            const sale_price = Number(item.sale_price);
-
             // ===============================
             // Validate warranty date
             // ===============================
-            const warranty = new Date(item.warranty) || new Date().toISOString().split('T')[0];
-
-            total_amount += sale_price * quantity;
+            const warranty = item.warranty
+            ? new Date(item.warranty)
+            : new Date().toISOString().split('T')[0];
 
             if (!quantity) {
                 throw new Error("Invalid quantity for product " + product_id);
@@ -178,9 +181,7 @@ exports.createSalesOrder = async (req, res) => {
                 }
 
                 cost_price = Number(batch.cost_price);
-                const profit = (sale_price - cost_price) * quantity;
-                total_profit += profit;
-
+                total_cost += cost_price * quantity
                 // ===============================
                 // Deduct batch stock
                 // ===============================
@@ -199,27 +200,23 @@ exports.createSalesOrder = async (req, res) => {
                 VALUES (?, ?, ?, 'OUT', ?, ?, 'Sales Order', NOW())
             `, [product_id, batch_id, quantity, cost_price, sales_order_id]);
             }
-            else if (product.type === 'service') {
-                total_profit += sale_price;
-
-            }
             // ===============================
             // Insert order item
             // ===============================
             await connection.query(`
                 INSERT INTO so_items
-                (so_id, p_id, batch_id, quantity, sale_price, cost_price, warranty)
-                VALUES (?, ?, ?, ?, ?, ?,?)
+                (so_id, p_id, batch_id, quantity, cost_price, warranty)
+                VALUES (?, ?, ?, ?, ?, ?)
             `, [
                 sales_order_id,
                 product_id,
                 product.type === 'product' ? batch_id : null,
                 quantity,
-                sale_price,
                 cost_price,
                 warranty
             ]);
         }
+        let total_profit = Number(grand_Total || 0) - total_cost;
         // ===============================
         // Update Sales Order totals
         // ===============================
@@ -229,7 +226,7 @@ exports.createSalesOrder = async (req, res) => {
             WHERE id = ?
         `, [
             Number(total_profit).toFixed(2),
-            total_amount,
+            total_cost,
             sales_order_id
         ]);
 
@@ -328,9 +325,13 @@ exports.viewSalesOrder = async (req, res) => {
                 so.*,
                 c.name AS customer_name,
                 c.phone,
-                c.address
+                c.address,
+                q.title AS title,
+                q.id AS q_id,
+                q.grand_total AS sale_total
             FROM sales_orders so
             LEFT JOIN customers c ON so.customer_id = c.id
+            LEFT JOIN quotations q ON so.quotation_id = q.id
             WHERE so.id = ?
 
         `, [order_id]);
@@ -348,7 +349,6 @@ exports.viewSalesOrder = async (req, res) => {
                 p.name AS product_name,
                 si.warranty,
                 si.quantity AS total_quantity,
-                si.sale_price,
                 si.cost_price AS cost_price
             FROM so_items si
             JOIN products p 
@@ -374,7 +374,10 @@ exports.editOrderForm = async (req, res) => {
 
         // 1️⃣ Get the order
         const [orders] = await pool.execute(
-            `SELECT * FROM sales_orders WHERE id = ? AND status = 'pending'`,
+            `SELECT so.* , q.grand_total AS sale_total
+            FROM sales_orders so
+            JOIN quotations q ON so.quotation_id = q.id
+            WHERE so.id = ? AND status = 'pending'`,
             [orderId]
         );
 
@@ -458,7 +461,6 @@ exports.editOrderForm = async (req, res) => {
 
         // 5️⃣ Add sale order items that may have zero stock
         for (const item of items) {
-            console.log(item)
             const exists = productOptions.find(opt =>
                 opt.product_id == item.p_id && opt.batch_id == item.batch_id
             );
@@ -540,6 +542,7 @@ exports.updateEditOrder = async (req, res) => {
         await connection.beginTransaction();
 
         const orderId = req.params.id;
+        const grand_total = req.body.grand_total
         const items = req.body.items; // array of order items
 
         /*
@@ -556,7 +559,7 @@ exports.updateEditOrder = async (req, res) => {
 
         // 1️⃣ Get old order items
         const [oldItems] = await connection.query(
-            `SELECT p_id, quantity, batch_id, sale_price
+            `SELECT p_id, quantity, batch_id, cost_price
              FROM so_items 
              WHERE so_id = ?`,
             [orderId]
@@ -574,14 +577,6 @@ exports.updateEditOrder = async (req, res) => {
             if (product[0].type === 'service') {
                 continue;
             }
-
-            // Get batch cost price
-
-            const [[batch]] = await connection.query(`
-        SELECT cost_price
-        FROM inventory_batches
-        WHERE id = ?
-    `, [item.batch_id]);
 
             // Restore stock
 
@@ -610,7 +605,7 @@ exports.updateEditOrder = async (req, res) => {
                 item.batch_id,
                 item.quantity,
                 orderId,
-                batch.cost_price
+                item.cost_price
             ]);
         }
 
@@ -620,7 +615,7 @@ exports.updateEditOrder = async (req, res) => {
             [orderId]
         );
 
-        let total_amount = 0;
+        let total_cost = 0;
         // 4️⃣ Insert new items and deduct stock
         for (const item of items) {
 
@@ -630,8 +625,8 @@ exports.updateEditOrder = async (req, res) => {
             const product_type = productData.type;
             
             const qty = Number(item.quantity);
-            const price = Number(item.sale_price);
-            total_amount = total_amount + (price * qty);
+            const price = Number(item.cost_price);
+            total_cost = total_cost + (price * qty);
             const warranty =
                 item.warranty ||
                 new Date().toISOString().split('T')[0];
@@ -644,7 +639,7 @@ exports.updateEditOrder = async (req, res) => {
 
                 await connection.query(`
             INSERT INTO so_items
-            (so_id, p_id, warranty, quantity, sale_price)
+            (so_id, p_id, warranty, quantity, cost_price)
             VALUES (?, ?, ?, ?, ?)
         `, [
                     orderId,
@@ -701,7 +696,7 @@ exports.updateEditOrder = async (req, res) => {
                 batch_id,
                 qty,
                 orderId,
-                productData.cost_price
+                price
             ]);
 
             // Insert item
@@ -709,32 +704,24 @@ exports.updateEditOrder = async (req, res) => {
             await connection.query(`
         INSERT INTO so_items
         (so_id, p_id, batch_id, warranty,
-         quantity, sale_price,cost_price)
-        VALUES (?, ?, ?, ?, ?, ?,?)
+         quantity,cost_price)
+        VALUES (?, ?, ?, ?, ?,?)
     `, [
                 orderId,
                 product_id,
                 batch_id,
                 warranty,
                 qty,
-                price,
-                productData.cost_price
+                price
             ]);
         }
-        const [profitRows] = await connection.query(`
-    SELECT 
-        SUM((si.sale_price - COALESCE(si.cost_price,0)) * si.quantity) AS profit
-    FROM so_items si
-    WHERE si.so_id = ?
-`, [orderId]);
-
-        const profit = profitRows[0].profit || 0;
+        const profit = grand_total - total_cost;
         await connection.query(`
     UPDATE sales_orders
     SET total_amount = ?,
         profit = ?
     WHERE id = ?
-`, [total_amount, profit, orderId]);
+`, [total_cost, profit, orderId]);
         await connection.commit();
 
         res.redirect(`/sales/orders/edit/${orderId}?success=Order updated`);

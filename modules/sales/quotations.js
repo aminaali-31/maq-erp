@@ -44,34 +44,77 @@ exports.listQuotations = async (req, res) => {
 // Show Add Quotation Form
 exports.addQuotationForm = async (req, res) => {
     try {
+        const [customers] = await pool.execute(`
+            SELECT id , name FROM customers
+        `);
+
+        // =============================
+        // Get Products
+        // =============================
         const [products] = await pool.execute(`
-            SELECT 
-                p.id AS product_id,
-                p.name,
-                p.sale_price,
-                b.id AS batch_id,
-                b.batch_no,
-                b.qty_remaining,
-                b.cost_price
-            FROM products p
-            LEFT JOIN inventory_batches b 
-            ON b.product_id = p.id
-            `);
+    SELECT 
+        p.id AS product_id,
+        p.name,
+        p.type,
+        p.sale_price,
+
+        b.id AS batch_id,
+        b.batch_no,
+        b.qty_remaining,
+        b.cost_price
+
+    FROM products p
+
+    LEFT JOIN inventory_batches b 
+        ON b.product_id = p.id
+
+    WHERE
+        (
+            p.type = 'service'
+        )
+        OR
+        (
+            p.type = 'product'
+            AND b.qty_remaining > 0
+        )
+
+    ORDER BY p.name
+`);
 
 
-        const productOptions = products.map(p => ({
-            value: JSON.stringify({
-                product_id: p.product_id,
-                batch_id: p.batch_id,
-                sale_price: Number(p.sale_price),
-                cost_price: Number(p.cost_price),
-                name: p.name,
-                stock: Number(p.qty_remaining)
-            }),
-            label: `${p.name} | Batch ${p.batch_no} | Stock:${p.qty_remaining} |  Cost:${p.cost_price}`
-        }));
+        const productOptions = products.map(p => {
+
+            const isService = p.type === 'service';
+
+            return {
+                value: JSON.stringify({
+                    product_id: p.product_id,
+
+                    batch_id: isService ? null : p.batch_id,
+
+                    sale_price: Number(p.sale_price),
+
+                    cost_price: Number(
+                        isService
+                            ? (p.cost_price || 0)
+                            : p.cost_price
+                    ),
+
+                    stock: isService
+                        ? null
+                        : Number(p.qty_remaining),
+
+                    type: p.type
+                }),
+
+                label: isService
+                    ? `${p.name} | Service`
+                    : `${p.name} | Batch ${p.batch_no} | Stock:${p.qty_remaining} | Cost:${p.cost_price}`
+            };
+        });
 
         res.render('quotations/add', {
+            customers,
             productOptions,
             success: req.query.success,
             error: req.query.error
@@ -84,52 +127,47 @@ exports.addQuotationForm = async (req, res) => {
 
 // Create Quotation with batch-aware cost
 exports.createQuotation = async (req, res) => {
-    const { title, items } = req.body; // items = [{product_id, batch_id, quantity, sale_price, name, category}]
+    const { title, customer_id, date, items } = req.body; // items = [{product_id, batch_id, quantity, sale_price, name, category}]
+    console.log(customer_id);
+    console.log(date)
+    console.log(items)
     const published = req.body.published ? 'yes' : 'no';
     const conn = await pool.getConnection();
 
     try {
         await conn.beginTransaction();
-
         // Insert quotation header
         const [quoResult] = await conn.execute(`
-            INSERT INTO quotations (title, grand_total, margin, profit, is_published)
-            VALUES (?, 0, 0, 0, ?)
-        `, [title, published]);
+            INSERT INTO quotations (title, customer_id, date, grand_total, is_published)
+            VALUES (?,?,?, 0, ?)
+        `, [title, customer_id, date, published]);
 
         const qoId = quoResult.insertId;
 
         let grandTotal = 0;
-        let totalCost = 0;
 
         for (let item of items) {
             const productData = JSON.parse(item.product_data);
             const product_id = productData.product_id;
-            const batch_id = productData.batch_id;
+            const batch_id = productData.batch_id || null;
             const quantity = Number(item.quantity);
             const salePrice = Number(item.sale_price);
-            const name = productData.name
-            const category = productData.category || null;
             const costPrice = productData.cost_price;
 
             // Insert quotation item
             await conn.execute(`
                 INSERT INTO qo_items
-                (qo_id, product_id, batch_id, quantity, name, category, cost_price, sale_price)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            `, [qoId, product_id, batch_id, quantity, name, category, costPrice, salePrice]);
+                (qo_id, product_id, batch_id, quantity, cost_price, sale_price)
+                VALUES (?, ?, ?, ?, ?, ?)
+            `, [qoId, product_id, batch_id, quantity, costPrice, salePrice]);
 
             grandTotal += quantity * salePrice;
-            totalCost += quantity * costPrice;
         }
-
-        const margin = grandTotal > 0 ? ((grandTotal - totalCost) / grandTotal) * 100 : 0;
-        const profit = grandTotal - totalCost;
 
         // Update quotation totals
         await conn.execute(`
-            UPDATE quotations SET grand_total = ?, margin = ?, profit = ? WHERE id = ?
-        `, [grandTotal, margin, profit, qoId]);
+            UPDATE quotations SET grand_total = ? WHERE id = ?
+        `, [grandTotal, qoId]);
 
         await conn.commit();
         res.redirect(`/sales/quotations/${qoId}`);
@@ -147,10 +185,19 @@ exports.createQuotation = async (req, res) => {
 exports.viewQuotation = async (req, res) => {
     try {
         const quoId = req.params.id;
-        const [[quotation]] = await pool.execute('SELECT * FROM quotations WHERE id = ?', [quoId]);
+        const [[quotation]] = await pool.execute(`
+            SELECT q.*, c.name as name
+            FROM quotations q
+            JOIN customers c ON q.customer_id = c.id
+            WHERE q.id = ?`,
+            [quoId]);
         if (!quotation) return res.status(404).send('Quotation not found');
 
-        const [items] = await pool.execute('SELECT * FROM qo_items WHERE qo_id = ?', [quoId]);
+        const [items] = await pool.execute(`
+            SELECT q.*, p.name as name FROM qo_items q
+            JOIN products p ON q.product_id = p.id
+            WHERE qo_id = ?`,
+            [quoId]);
         res.render('quotations/view', { quotation, items });
     } catch (err) {
         console.error(err);

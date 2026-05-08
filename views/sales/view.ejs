@@ -26,6 +26,9 @@
                             <p><b>Name:</b>
                                 <%= order.customer_name %>
                             </p>
+                            <p><b>Reference Quotation:</b>
+                                <a href="/sales/quotations/view/<%= order.q_id %>"> <%= order.title %> </a>
+                            </p>
                             <p><b>Phone:</b>
                                 <%= order.phone || '-' %>
                             </p>
@@ -40,7 +43,10 @@
                             <p><b>Status:</b> <span class="badge bg-info">
                                     <%= order.status %>
                                 </span></p>
-                            <p><b>Total Amount:</b>
+                            <p><b>Total Quotated Amount:</b>
+                                <%= Number(order.sale_total).toLocaleString() %>
+                                </p>
+                            <p><b>Total Cost:</b>
                                 <%= Number(order.total_amount).toLocaleString() %>
                             </p>
                             <p><b>Total Profit:</b>
@@ -72,7 +78,6 @@
                                         <th>Quantity</th>
                                         <th>Warranty till</th>
                                         <th>Cost Price</th>
-                                        <th>Sale Price</th>
                                         <th>Subtotal</th>
                                     </tr>
                                 </thead>
@@ -94,10 +99,7 @@
                                                 <%= Number(item.cost_price).toLocaleString() %>
                                             </td>
                                             <td>
-                                                <%= Number(item.sale_price).toLocaleString() %>
-                                            </td>
-                                            <td>
-                                                <%= (item.total_quantity * item.sale_price).toLocaleString() %>
+                                                <%= (item.total_quantity * item.cost_price).toLocaleString() %>
                                             </td>
                                         </tr>
                                         <% }) %>

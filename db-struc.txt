@@ -612,3 +612,23 @@ ADD COLUMN assigned_to_type ENUM(
     'vendor',
     'contractor'
 ) NOT NULL AFTER assigned_to_id;
+
+
+--- 8 May ----
+ALTER TABLE quotations ADD COLUMN customer_id INT NOT NULL;
+ALTER TABLE quotations
+ADD CONSTRAINT fk_quotation_customer
+FOREIGN KEY (customer_id)
+REFERENCES customers(id)
+ON DELETE SET NULL;
+ALTER TABLE quotations DROP COLUMN margin;
+ALTER TABLE quotations DROP COLUMN profit;
+ALTER TABLE qo_items DROP COLUMN category;
+ALTER TABLE qo_items DROP COLUMN name;
+ALTER TABLE sales_orders ADD COLUMN quotation_id INT NULL;
+ALTER TABLE sales_orders
+ADD CONSTRAINT fk_sale_quotation
+FOREIGN KEY (quotation_id)
+REFERENCES quotations(id)
+ON DELETE SET NULL;
+ALTER TABLE so_items DROP COLUMN sale_price;
