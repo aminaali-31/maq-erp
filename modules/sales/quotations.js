@@ -64,21 +64,9 @@ exports.addQuotationForm = async (req, res) => {
         b.cost_price
 
     FROM products p
-
     LEFT JOIN inventory_batches b 
         ON b.product_id = p.id
-
-    WHERE
-        (
-            p.type = 'service'
-        )
-        OR
-        (
-            p.type = 'product'
-            AND b.qty_remaining > 0
-        )
-
-    ORDER BY p.name
+    ORDER BY p.name;
 `);
 
 
