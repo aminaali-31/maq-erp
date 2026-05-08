@@ -49,7 +49,7 @@
                                                 <label for="order" class="form-label">Order Reference</label>
                                                 <select name="order_id" class="form-control">
                                                     <% orders.forEach(o=> { %>
-                                                        <option value="<%= o.id %>">Sale order #<%= o.id %>| Amount <%=
+                                                        <option value="<%= o.id %>">Sale order #<%= o.id %>| Total Cost <%=
                                                                     o.total_amount %> | Name <%= o.customer_name %>
                                                         </option>
                                                         <% }) %>

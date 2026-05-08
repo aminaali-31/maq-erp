@@ -615,7 +615,7 @@ ADD COLUMN assigned_to_type ENUM(
 
 
 --- 8 May ----
-ALTER TABLE quotations ADD COLUMN customer_id INT NOT NULL;
+ALTER TABLE quotations MODIFY COLUMN customer_id INT NULL;
 ALTER TABLE quotations
 ADD CONSTRAINT fk_quotation_customer
 FOREIGN KEY (customer_id)

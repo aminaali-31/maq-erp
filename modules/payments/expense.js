@@ -18,7 +18,6 @@ exports.showExpenseForm = async (req, res) => {
             si.so_id,
             si.p_id,
             si.quantity,
-            si.sale_price,
             si.cost_price,
             p.name AS product_name
         FROM so_items si
