@@ -43,8 +43,8 @@ exports.addExpense = async (req, res) => {
 
         await connection.beginTransaction();
         const account_id = parseInt(account)
-        const expenseResult;
-        const expense_acc;
+        let expenseResult;
+        let expense_acc;
         if (type == 'order') {
             [expenseResult] = await connection.query(
                 `INSERT INTO expenses (title, amount, expense_date, status, type, sale_order_id)
