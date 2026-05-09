@@ -632,3 +632,5 @@ FOREIGN KEY (quotation_id)
 REFERENCES quotations(id)
 ON DELETE SET NULL;
 ALTER TABLE so_items DROP COLUMN sale_price;
+
+ALTER TABLE sales_orders ADD COLUMN quoted_amount INT NULL;

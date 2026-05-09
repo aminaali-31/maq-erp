@@ -112,14 +112,15 @@ exports.createSalesOrder = async (req, res) => {
         // ===============================
         const [orderResult] = await connection.query(`
             INSERT INTO sales_orders
-            (customer_id, quotation_id, status, progress, profit, date, total_amount)
-            VALUES (?, ?, ?, ?, 0, ?, 0)
+            (customer_id, quotation_id, status, progress, profit, date, total_amount, quoted_amount)
+            VALUES (?, ?, ?, ?, 0, ?, 0, ?)
         `, [
             customer_id,
             quotation_id,
             p_status || 'pending',
             o_status || 'pending',
-            date
+            date,
+            grand_Total
         ]);
 
         const sales_order_id = orderResult.insertId;
@@ -374,10 +375,9 @@ exports.editOrderForm = async (req, res) => {
 
         // 1️⃣ Get the order
         const [orders] = await pool.execute(
-            `SELECT so.* , q.grand_total AS sale_total
-            FROM sales_orders so
-            JOIN quotations q ON so.quotation_id = q.id
-            WHERE so.id = ? AND status = 'pending'`,
+            `SELECT *
+            FROM sales_orders 
+            WHERE id = ? AND status = 'pending'`,
             [orderId]
         );
 
@@ -402,7 +402,6 @@ exports.editOrderForm = async (req, res) => {
         p.name,
         p.type,
         p.sale_price,
-
         b.id AS batch_id,
         b.batch_no,
         b.qty_remaining,
@@ -719,9 +718,10 @@ exports.updateEditOrder = async (req, res) => {
         await connection.query(`
     UPDATE sales_orders
     SET total_amount = ?,
+        quoted_amount = ?,
         profit = ?
     WHERE id = ?
-`, [total_cost, profit, orderId]);
+`, [total_cost, grand_total, profit, orderId]);
         await connection.commit();
 
         res.redirect(`/sales/orders/edit/${orderId}?success=Order updated`);
