@@ -73,18 +73,20 @@ exports.addExpense = async (req, res) => {
             await connection.query(
                 `UPDATE so_items
                 SET 
-                    cost_price = COALESCE(cost_price, 0) + ?,
-                    total_amount = COALESCE(total_amount, 0) + ?
+                    cost_price = COALESCE(cost_price, 0) + ?
                 WHERE id = ?;`,
-                [amount,amount, item_id]
+                [amount, item_id]
             );
             await connection.query(
             `UPDATE sales_orders so
             JOIN quotations q 
                 ON q.id = so.quotation_id
-            SET so.profit = q.grand_total - so.total_amount;`,
-                [order_id]
-            );
+            SET 
+                so.total_amount = COALESCE(so.total_amount, 0) + ?,
+                so.profit = q.grand_total - (COALESCE(so.total_amount, 0) + ?)
+            WHERE so.id = ?`,
+            [amount, amount, order_id]
+        );
         }
         // 2️⃣ Create journal
         const [journalResult] = await connection.query(
