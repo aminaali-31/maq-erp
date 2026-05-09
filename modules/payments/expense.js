@@ -43,8 +43,8 @@ exports.addExpense = async (req, res) => {
 
         await connection.beginTransaction();
         const account_id = parseInt(account)
-        let expenseResult;
-        let expense_acc;
+        const expenseResult;
+        const expense_acc;
         if (type == 'order') {
             [expenseResult] = await connection.query(
                 `INSERT INTO expenses (title, amount, expense_date, status, type, sale_order_id)
@@ -71,24 +71,18 @@ exports.addExpense = async (req, res) => {
         const expense_id = expenseResult.insertId;
         if (type === 'order') {
             await connection.query(
-                `UPDATE so_items 
-                SET cost_price = COALESCE(cost_price, 0) + ? 
+                `UPDATE so_items
+                SET 
+                    cost_price = COALESCE(cost_price, 0) + ?,
+                    total_amount = COALESCE(total_amount, 0) + ?
                 WHERE id = ?;`,
-                [amount, item_id]
+                [amount,amount, item_id]
             );
             await connection.query(
-                `UPDATE sales_orders so
-                JOIN (
-                    SELECT 
-                        so_id,
-                        SUM(quantity * sale_price) AS total_sale,
-                        SUM(quantity * COALESCE(cost_price,0)) AS total_cost
-                    FROM so_items
-                    GROUP BY so_id
-                ) x ON x.so_id = so.id
-                SET 
-                    so.profit = COALESCE(x.total_sale,0) - COALESCE(x.total_cost,0)
-                WHERE so.id = ?;`,
+            `UPDATE sales_orders so
+            JOIN quotations q 
+                ON q.id = so.quotation_id
+            SET so.profit = q.grand_total - so.total_amount;`,
                 [order_id]
             );
         }
