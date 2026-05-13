@@ -542,7 +542,7 @@ exports.updateEditOrder = async (req, res) => {
         await connection.beginTransaction();
 
         const orderId = req.params.id;
-        const grand_total = req.body.grand_total
+        const grand_total = Number(req.body.grand_total);
         const items = req.body.items; // array of order items
 
         /*
