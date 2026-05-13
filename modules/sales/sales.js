@@ -375,8 +375,9 @@ exports.editOrderForm = async (req, res) => {
 
         // 1️⃣ Get the order
         const [orders] = await pool.execute(
-            `SELECT *
-            FROM sales_orders 
+            `SELECT so.*, q.grand_total as quoted_amount
+            FROM sales_orders so
+            LEFT JOIN quotations q ON so.id = q.id
             WHERE id = ? AND status = 'pending'`,
             [orderId]
         );
@@ -739,118 +740,4 @@ exports.updateEditOrder = async (req, res) => {
 
     }
 
-};
-
-exports.updateOrder = async (req, res) => {
-
-    const connection = await pool.getConnection();
-
-    try {
-
-        const orderId = req.params.id;
-
-        const { items, status } = req.body;
-
-        await connection.beginTransaction();
-
-        // =============================
-        // Check Order Status First ⭐
-        // =============================
-
-        const [orders] = await connection.execute(
-            `SELECT status FROM sales_orders WHERE id = ?`,
-            [orderId]
-        );
-
-        if (!orders.length || orders[0].status !== 'pending') {
-            throw new Error("Only pending orders can be edited");
-        }
-
-        // =============================
-        // Delete old items
-        // =============================
-
-        await connection.execute(
-            `DELETE FROM so_items
-             WHERE sales_order_id = ?`,
-            [orderId]
-        );
-
-        // =============================
-        // Insert new items
-        // =============================
-
-        let totalProfit = 0;
-        let total_amount = 0;
-
-        for (let item of items) {
-
-            const productData = JSON.parse(item.product_data);
-
-            const product_id = productData.product_id;
-            const batch_id = productData.batch_id;
-
-            const quantity = Number(item.quantity);
-            const sale_price = Number(item.sale_price);
-            total_amount = total_amount + (sale_price * quantity);
-            const [batchRows] = await connection.execute(
-                `SELECT cost_price, qty_remaining
-                 FROM inventory_batches
-                 WHERE id = ?`,
-                [batch_id]
-            );
-
-            if (!batchRows.length) {
-                throw new Error("Invalid batch selection");
-            }
-
-            const batch = batchRows[0];
-
-            if (quantity > batch.qty_remaining) {
-                throw new Error("Batch stock insufficient");
-            }
-
-            const profit = (sale_price - batch.cost_price) * quantity;
-
-            totalProfit += profit;
-
-            await connection.execute(
-                `INSERT INTO so_items
-                (so_id, p_id,
-                 quantity, sale_price)
-                VALUES (?, ?, ?, ?)`,
-                [
-                    orderId,
-                    product_id,
-                    quantity,
-                    sale_price,
-                ]
-            );
-        }
-
-        // Update profit
-        await connection.execute(
-            `UPDATE sales_orders
-             SET profit = ?,
-             total_amount = ?,
-             WHERE id = ?`,
-            [totalProfit.toFixed(2), total_amount.toFixed(2), orderId]
-        );
-
-        await connection.commit();
-
-        res.redirect('/sales/orders?success=Order updated');
-
-    } catch (error) {
-
-        await connection.rollback();
-
-        console.error(error.message);
-
-        res.redirect('/sales/orders?error=' +
-            encodeURIComponent(error.message));
-
-    } finally {
-        connection.release();
-    }
 };
