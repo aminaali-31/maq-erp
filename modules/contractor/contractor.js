@@ -66,7 +66,7 @@ exports.createContractor = async (req, res) => {
         const [accountResult] = await pool.execute(
             `INSERT INTO accounts (name, type)
              VALUES (?, ?)`,
-            [accountName, 'liability']
+            [accountName, 'expense']
         );
 
         const accountId = accountResult.insertId;

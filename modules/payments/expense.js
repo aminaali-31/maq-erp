@@ -79,13 +79,18 @@ exports.addExpense = async (req, res) => {
             );
             await connection.query(
             `UPDATE sales_orders so
-            JOIN quotations q 
+            LEFT JOIN quotations q 
                 ON q.id = so.quotation_id
             SET 
                 so.total_amount = COALESCE(so.total_amount, 0) + ?,
-                so.profit = q.grand_total - (COALESCE(so.total_amount, 0) + ?)
+                so.profit = CASE
+                WHEN q.grand_total IS NOT NULL
+                    THEN q.grand_total - (COALESCE(so.total_amount, 0) + ?)
+                ELSE
+                    COALESCE(so.profit, 0) - ?
+                    END
             WHERE so.id = ?`,
-            [amount, amount, order_id]
+            [amount, amount, amount, order_id]
         );
         }
         // 2️⃣ Create journal
