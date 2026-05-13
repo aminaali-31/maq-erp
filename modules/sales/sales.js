@@ -377,7 +377,7 @@ exports.editOrderForm = async (req, res) => {
         const [orders] = await pool.execute(
             `SELECT so.*, q.grand_total as quoted_amount
             FROM sales_orders so
-            LEFT JOIN quotations q ON so.id = q.id
+            LEFT JOIN quotations q ON so.quotation_id = q.id
             WHERE so.id = ? AND so.status = 'pending'`,
             [orderId]
         );
