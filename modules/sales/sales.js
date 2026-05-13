@@ -378,7 +378,7 @@ exports.editOrderForm = async (req, res) => {
             `SELECT so.*, q.grand_total as quoted_amount
             FROM sales_orders so
             LEFT JOIN quotations q ON so.id = q.id
-            WHERE id = ? AND status = 'pending'`,
+            WHERE so.id = ? AND so.status = 'pending'`,
             [orderId]
         );
 
