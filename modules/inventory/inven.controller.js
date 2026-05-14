@@ -254,7 +254,7 @@ exports.listStockMovements = async (req, res) => {
             sql += " WHERE " + where.join(" AND ");
         }
 
-        sql += " ORDER BY sm.date DESC";
+        sql += " ORDER BY sm.date DESC, sm.id DESC";
 
         const [movements] =
             await pool.execute(sql, params);
