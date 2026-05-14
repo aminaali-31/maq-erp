@@ -141,6 +141,7 @@
                                         <th>Type</th>
                                         <th>Quantity</th>
                                         <th>Cost Price</th>
+                                        <th>Party Name</th>
                                         <th>Reference</th>
                                         <th>Date</th>
                                     </tr>
@@ -174,7 +175,10 @@
                                                             minimumFractionDigits: 2 }) %>
                                                     </td>
                                                     <td>
-                                                        <% if (m.reference_type ==='Sales Order' ||m.reference_type ==='Sales Order Edit'  ) { %>
+                                                        <%= m.party_name %>
+                                                    </td>
+                                                    <td>
+                                                        <% if (m.reference_type ==='Sales Order' ||m.reference_type ==='Sales_Order Edit'  ) { %>
                                                             <a href="/sales/orders/view/<%= m.reference_id %>"
                                                                 class="text-dark">
                                                                 <%= m.reference_type %> #<%= m.reference_id %>

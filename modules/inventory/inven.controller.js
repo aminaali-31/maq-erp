@@ -207,13 +207,37 @@ exports.listStockMovements = async (req, res) => {
         }
 
         let sql = `
-            SELECT
-                sm.*,
-                p.name as product_name
-            FROM stock_mov sm
-            JOIN products p
-                ON p.id = sm.product_id
-        `;
+        SELECT
+            sm.*,
+            p.name AS product_name,
+
+            c.name AS customer_name,
+            v.name AS vendor_name,
+
+            CASE
+                WHEN sm.movement_type = 'OUT' THEN c.name
+                WHEN sm.movement_type = 'IN' THEN v.name
+            END AS party_name
+
+        FROM stock_mov sm
+
+        JOIN products p
+            ON p.id = sm.product_id
+
+        LEFT JOIN sales_orders so
+            ON sm.reference_id = so.id
+            AND sm.movement_type = 'OUT'
+
+        LEFT JOIN customers c
+            ON c.id = so.customer_id
+
+        LEFT JOIN purchase_orders po
+            ON sm.reference_id = po.id
+            AND sm.movement_type = 'IN'
+
+        LEFT JOIN vendors v
+            ON v.id = po.vendor_id
+    `;
 
         if (where.length > 0) {
             sql += " WHERE " + where.join(" AND ");
