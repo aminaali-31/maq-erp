@@ -233,14 +233,18 @@ exports.listStockMovements = async (req, res) => {
 
         LEFT JOIN sales_orders so
             ON sm.reference_id = so.id
-            AND sm.movement_type = 'OUT'
+            AND sm.reference_type IN (
+                'Sales Order',
+                'Sales_Order Edit',
+                'sales order'
+            )
 
         LEFT JOIN customers c
             ON c.id = so.customer_id
 
         LEFT JOIN purchase_orders po
             ON sm.reference_id = po.id
-            AND sm.movement_type = 'IN'
+            AND sm.reference_type = 'Purchase order'
 
         LEFT JOIN vendors v
             ON v.id = po.vendor_id
