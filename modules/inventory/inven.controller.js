@@ -215,9 +215,16 @@ exports.listStockMovements = async (req, res) => {
             v.name AS vendor_name,
 
             CASE
-                WHEN sm.movement_type = 'OUT' THEN c.name
-                WHEN sm.movement_type = 'IN' THEN v.name
-            END AS party_name
+            WHEN sm.reference_type IN (
+                'Sales Order',
+                'Sales_Order Edit',
+                'sales order'
+            )
+            THEN c.name
+
+            WHEN sm.reference_type = 'Purchase order'
+            THEN v.name
+        END AS party_name
 
         FROM stock_mov sm
 
