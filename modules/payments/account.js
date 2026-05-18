@@ -95,6 +95,7 @@ exports.showReceivable = async (req, res) => {
                 ON je.account_id = a.id
             LEFT JOIN journal j 
                 ON je.journal_id = j.id
+            WHERE a.type = 'asset'
             GROUP BY c.id, c.name
             ORDER BY c.name;`)
 
