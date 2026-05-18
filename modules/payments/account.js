@@ -118,6 +118,7 @@ exports.accountSummary = async (req, res) => {
                 ON c.account_id = a.id
             LEFT JOIN journal_entries je 
                 ON je.account_id = a.id
+            WHERE a.account_type = 'asset';
         `);
 
         const [payable] = await pool.execute(`

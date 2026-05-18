@@ -51,7 +51,7 @@ exports.addExpense = async (req, res) => {
              VALUES (?, ?, ?, 'PAID', ?, ?)`,
                 [title, amount, expense_date, type, order_id]
             );
-            const [rows] = await pool.execute(
+            const [rows] = await connection.query(
                 `SELECT id FROM accounts WHERE name = 'Order Expenses'`
             );
             expense_acc = rows[0].id;
@@ -62,7 +62,7 @@ exports.addExpense = async (req, res) => {
              VALUES (?, ?, ?, 'PAID', ?)`,
                 [title, amount, expense_date, type]
             );
-            const [rows] = await pool.execute(
+            const [rows] = await connection.query(
                 `SELECT id FROM accounts WHERE name = 'expense'`
             );
             expense_acc = rows[0].id;
