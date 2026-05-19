@@ -41,6 +41,7 @@
                                                             <th>Sr.</th>
                                                             <th>Customer</th>
                                                             <th>Total Amount</th>
+                                                            <th>Profit</th>
                                                             <th>Payment Status</th>
                                                             <th>Order Status</th>
                                                             <th>Date</th>
@@ -58,6 +59,9 @@
                                                                 </td>
                                                                 <td>
                                                                     <%= Number(order.total_amount).toLocaleString() %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= Number(order.profit).toLocaleString() %>
                                                                 </td>
                                                                 <td>
                                                                     <form action="/sales/orders/status" method="POST"

@@ -255,6 +255,7 @@ exports.listSalesOrders = async (req, res) => {
                 so.id,
                 c.name AS customer_name,
                 so.total_amount,
+                so.profit,
                 so.status,
                 so.progress,
                 so.date
