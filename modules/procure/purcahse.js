@@ -75,7 +75,7 @@ exports.addPurchaseOrder = async (req, res) => {
             calculatedTotal += total;
 
             // Insert PO Items
-            await conn.execute(
+                await conn.execute(
                 `INSERT INTO po_items (po_id, product_id, quantity, unit_price, total)
                 VALUES (?, ?, ?, ?, ?)`,
                 [poId, item.product_id, quantity, unit_price, total]
@@ -93,9 +93,9 @@ exports.addPurchaseOrder = async (req, res) => {
 
             await conn.execute(
                 `INSERT INTO inventory_batches
-                (product_id, batch_no, qty_received, qty_remaining, cost_price)
+                (product_id, batch_no, qty_received, qty_remaining, cost_price, purchase_order_id)
                 VALUES (?, ?, ?, ?, ?)`,
-                [item.product_id, batchNo, quantity, quantity, unit_price]
+                [item.product_id, batchNo, quantity, quantity, unit_price,poId]
             );
         }
 

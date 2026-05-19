@@ -634,3 +634,11 @@ ON DELETE SET NULL;
 ALTER TABLE so_items DROP COLUMN sale_price;
 
 ALTER TABLE sales_orders ADD COLUMN quoted_amount INT NULL;
+
+--- 19 May
+ALTER TABLE inventory_batches ADD COLUMN purchase_order_id INT NULL;
+ALTER TABLE inventory_batches
+ADD CONSTRAINT fk_po_id
+FOREIGN KEY (purchase_order_id_id)
+REFERENCES purchase_orders(id)
+ON DELETE SET NULL;

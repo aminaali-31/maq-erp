@@ -27,7 +27,8 @@ exports.showOrderForm = async (req, res) => {
         b.id AS batch_id,
         b.batch_no,
         b.qty_remaining,
-        b.cost_price
+        b.cost_price,
+        b.purchase_order_id
 
     FROM products p
 
@@ -57,7 +58,6 @@ exports.showOrderForm = async (req, res) => {
                     product_id: p.product_id,
 
                     batch_id: isService ? null : p.batch_id,
-
                     sale_price: Number(p.sale_price),
 
                     cost_price: Number(
@@ -75,7 +75,7 @@ exports.showOrderForm = async (req, res) => {
 
                 label: isService
                     ? `${p.name} | Service`
-                    : `${p.name} | Batch ${p.batch_no} | Stock:${p.qty_remaining} | Cost:${p.cost_price}`
+                    : `${p.name} | Batch ${p.batch_no} | Stock:${p.qty_remaining} | Cost:${p.cost_price} | PO: ${p.purchase_order_id}`
             };
         });
 
@@ -407,6 +407,7 @@ exports.editOrderForm = async (req, res) => {
         b.id AS batch_id,
         b.batch_no,
         b.qty_remaining,
+        b.purchase_order_id,
         b.cost_price AS cost_price
 
     FROM products p
@@ -451,7 +452,7 @@ exports.editOrderForm = async (req, res) => {
 
                 label: isService
                     ? `${p.name} | Service`
-                    : `${p.name} | Batch ${p.batch_no} | Stock:${p.qty_remaining} | Cost:${p.cost_price}`,
+                    : `${p.name} | Batch ${p.batch_no} | Stock:${p.qty_remaining} | Cost:${p.cost_price} | PO: ${p.purchase_order_id}`,
 
                 // 🔴 REQUIRED FIELDS
                 product_id: p.product_id,
