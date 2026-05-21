@@ -132,6 +132,38 @@
     </div>
 
 </form>
+<!-- Totals Summary -->
+<div class="row mb-3">
+
+    <div class="col-md-6">
+        <div class="card border-success shadow-sm">
+            <div class="card-body">
+                <h6 class="text-success mb-1">
+                    Total IN Quantity
+                </h6>
+
+                <h4 class="fw-bold mb-0">
+                    <%= totalIn.toLocaleString() %>
+                </h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-danger shadow-sm">
+            <div class="card-body">
+                <h6 class="text-danger mb-1">
+                    Total OUT Quantity
+                </h6>
+
+                <h4 class="fw-bold mb-0">
+                    <%= totalOut.toLocaleString() %>
+                </h4>
+            </div>
+        </div>
+    </div>
+
+</div>
                         <div class="table-responsive">
                             <table class="table">
                                 <thead>

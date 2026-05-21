@@ -270,6 +270,44 @@ exports.listStockMovements = async (req, res) => {
     FROM categories
     ORDER BY name
 `);
+const [totals] = await pool.execute(
+    `
+    SELECT
+
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN sm.movement_type = 'IN'
+                    THEN sm.quantity
+                    ELSE 0
+                END
+            ),
+            0
+        ) AS totalIn,
+
+        COALESCE(
+            SUM(
+                CASE
+                    WHEN sm.movement_type = 'OUT'
+                    THEN sm.quantity
+                    ELSE 0
+                END
+            ),
+            0
+        ) AS totalOut
+
+    FROM stock_mov sm
+
+    JOIN products p
+        ON p.id = sm.product_id
+
+    ${where.length > 0
+        ? "WHERE " + where.join(" AND ")
+        : ""
+    }
+    `,
+    params
+);
 
         return res.render(
             "inventory/stock-movements",
@@ -277,7 +315,9 @@ exports.listStockMovements = async (req, res) => {
                 movements,
                 products,
                 categories,
-                filters: req.query
+                filters: req.query,
+                totalIn:totals[0].totalIn,
+                totalOut:totals[0].totalOut
             }
         );
 
