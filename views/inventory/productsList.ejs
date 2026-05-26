@@ -28,62 +28,79 @@
                                             placeholder="Search product name or category...">
                                     </div>
                                 </div>
-                                <div class="table-responsive">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th onclick="sortTable(0)">Sr.</th>
-                                                <th onclick="sortTable(1)">Name</th>
-                                                <th onclick="sortTable(2)">Category</th>
-                                                <th onclick="sortTable(3)">Sale Price</th>
-                                                <th onclick="sortTable(4)">Reorder Level</th>
-                                                <th onclick="sortTable(5)">Stock Quantity</th>
-                                                <th onclick="sortTable(6)">Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <% if (products.length===0) { %>
-                                                <tr>
-                                                    <td colspan="7" class="text-center">No products found</td>
-                                                </tr>
-                                                <% } else { %>
-                                                    <% products.forEach((product,idx)=> { %>
-                                                        <tr>
-                                                            <td>
-                                                                <%= idx+1 %>
-                                                            </td>
-                                                            <td>
-                                                                <%= product.name %>
-                                                            </td>
-                                                            <td>
-                                                                <%= product.category_name %>
-                                                            </td>
-                                                            <td>
-                                                                <%= Number(product.sale_price).toFixed(2) %>
-                                                            </td>
-                                                            <td>
-                                                                <%= product.reorder_level %>
-                                                            </td>
-                                                            <td>
-                                                                <%= product.quantity %>
-                                                            </td>
-                                                            <td>
-                                                                <%= product.is_active %>
-                                                            </td>
-                                                            <td>
-                                                                <a href="/inventory/products/<%= product.id %>/edit"
-                                                                    class="btn btn-sm btn-primary">
-                                                                    Edit
-                                                                </a>
-                                                            </td>
+                                <% let grandTotal=products.reduce((total, product)=> {
+                                    return total + (Number(product.sale_price) * Number(product.quantity));
+                                    }, 0);
+                                    %>
 
-                                                        </tr>
-                                                        <% }) %>
-                                                            <% } %>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                    <div class="mb-3">
+                                        <h4>
+                                            Grand Total:
+                                            <span class="text-success">
+                                                <%= grandTotal.toFixed(2) %>
+                                            </span>
+                                        </h4>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th onclick="sortTable(0)">Sr.</th>
+                                                    <th onclick="sortTable(1)">Name</th>
+                                                    <th onclick="sortTable(2)">Category</th>
+                                                    <th onclick="sortTable(3)">Sale Price</th>
+                                                    <th onclick="sortTable(4)">Reorder Level</th>
+                                                    <th onclick="sortTable(5)">Stock Quantity</th>
+                                                    <th onclick="sortTable(7)">Subtotal</th>
+                                                    <th onclick="sortTable(6)">Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (products.length===0) { %>
+                                                    <tr>
+                                                        <td colspan="7" class="text-center">No products found</td>
+                                                    </tr>
+                                                    <% } else { %>
+                                                        <% products.forEach((product,idx)=> { %>
+                                                            <tr>
+                                                                <td>
+                                                                    <%= idx+1 %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= product.name %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= product.category_name %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= Number(product.sale_price).toFixed(2) %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= product.reorder_level %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= product.quantity %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= (product.sale_price * product.quantity).toFixed(2) %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= product.is_active %>
+                                                                </td>
+                                                                <td>
+                                                                    <a href="/inventory/products/<%= product.id %>/edit"
+                                                                        class="btn btn-sm btn-primary">
+                                                                        Edit
+                                                                    </a>
+                                                                </td>
+
+                                                            </tr>
+                                                            <% }) %>
+                                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
                     </div>
                 </main>
         </div>
