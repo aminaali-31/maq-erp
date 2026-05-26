@@ -62,7 +62,8 @@
                                                     <th onclick="sortTable(4)">Reorder Level</th>
                                                     <th onclick="sortTable(5)">Stock Quantity</th>
                                                     <th onclick="sortTable(6)">Subtotal</th>
-                                                    <th onclick="sortTable(7)">Status</th>
+                                                    <th onclick="sortTable(7)">Percent</th>
+                                                    <th onclick="sortTable(8)">Status</th>
                                                     <th>Actions</th>
                                                 </tr>
                                             </thead>
@@ -84,7 +85,7 @@
                                                                     <%= product.category_name %>
                                                                 </td>
                                                                 <td>
-                                                                    <%= Number(product.sale_price).toFixed(2) %>
+                                                                    <%= Number(product.sale_price).toLocaleString() %>
                                                                 </td>
                                                                 <td>
                                                                     <%= product.reorder_level %>
@@ -94,6 +95,9 @@
                                                                 </td>
                                                                 <td>
                                                                     <%= (product.sale_price * product.quantity).toLocaleString() %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= ((product.sale_price * product.quantity) / grandTotal * 100).toFixed(2) %>
                                                                 </td>
                                                                 <td>
                                                                     <%= product.is_active %>
