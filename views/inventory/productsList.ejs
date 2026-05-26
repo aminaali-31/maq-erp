@@ -37,7 +37,7 @@
                                         <h4>
                                             Grand Total:
                                             <span class="text-success">
-                                                <%= grandTotal.toFixed(2) %>
+                                                PKR <%= grandTotal.toFixed(2).toLocaleString() %>
                                             </span>
                                         </h4>
                                     </div>
@@ -51,8 +51,8 @@
                                                     <th onclick="sortTable(3)">Sale Price</th>
                                                     <th onclick="sortTable(4)">Reorder Level</th>
                                                     <th onclick="sortTable(5)">Stock Quantity</th>
-                                                    <th onclick="sortTable(7)">Subtotal</th>
-                                                    <th onclick="sortTable(6)">Status</th>
+                                                    <th onclick="sortTable(6)">Subtotal</th>
+                                                    <th onclick="sortTable(7)">Status</th>
                                                     <th>Actions</th>
                                                 </tr>
                                             </thead>
@@ -83,7 +83,7 @@
                                                                     <%= product.quantity %>
                                                                 </td>
                                                                 <td>
-                                                                    <%= (product.sale_price * product.quantity).toFixed(2) %>
+                                                                    <%= (product.sale_price * product.quantity).toLocaleString() %>
                                                                 </td>
                                                                 <td>
                                                                     <%= product.is_active %>
