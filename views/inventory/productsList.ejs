@@ -4,8 +4,12 @@
 <head>
     <%- include('../head') %>
         <title>Products List</title>
+        <style>
+            th:hover {
+                cursor: pointer;
+            }
+        </style>
 </head>
-
 <body>
     <div class="container fluid">
         <div class="row position-sticky">
@@ -40,6 +44,12 @@
                                                 PKR <%= grandTotal.toLocaleString() %>
                                             </span>
                                         </h4>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>
+                                        <input type="checkbox" onchange="hideZero()" id="hideZeroCheckbox">
+                                            Hide 0 qty products
+                                        </label>
                                     </div>
                                     <div class="table-responsive">
                                         <table class="table">
@@ -121,6 +131,23 @@
             });
         });
     </script>
+<script>
+    function hideZero() {
+        const checked = document.getElementById("hideZeroCheckbox").checked;
+        const rows = document.querySelectorAll("tbody tr");
+
+        rows.forEach(row => {
+            // Stock Quantity is column index 5
+            const qty = parseInt(row.cells[5].innerText.trim()) || 0;
+
+            if (checked && qty === 0) {
+                row.style.display = "none";
+            } else {
+                row.style.display = "";
+            }
+        });
+    }
+</script>
 <script>
     let sortDirections = {};
 
