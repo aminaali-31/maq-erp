@@ -544,8 +544,15 @@ exports.updateEditOrder = async (req, res) => {
         await connection.beginTransaction();
 
         const orderId = req.params.id;
+        const date = req.body.date;
         const grand_total = Number(req.body.grand_total);
         const items = req.body.items; // array of order items
+
+        await connection.query(`
+            UPDATE sales_orders
+            SET date = ?
+            WHERE id = ?`,
+        [date, orderId]);
 
         /*
         items format expected:

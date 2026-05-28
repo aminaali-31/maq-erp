@@ -38,6 +38,10 @@
                                 </div>
                                     <input type="text" class="form-control" value="<%= order.quoted_amount ? order.quoted_amount : order.total_amount %>" name="grand_total" hidden>
                             </div>
+                            <div class="col-md-6 mb-3">
+                                        <label class="form-label">Date</label>
+                                        <input type="date" class="form-control" name="date"   value="<%= order.date ? new Date(order.date).toISOString().split('T')[0] : '' %>" required>
+                            </div>
                         </div>
 
                         <!-- Order Items -->
