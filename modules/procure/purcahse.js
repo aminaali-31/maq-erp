@@ -94,7 +94,7 @@ exports.addPurchaseOrder = async (req, res) => {
             await conn.execute(
                 `INSERT INTO inventory_batches
                 (product_id, batch_no, qty_received, qty_remaining, cost_price, purchase_order_id)
-                VALUES (?, ?, ?, ?, ?)`,
+                VALUES (?, ?, ?, ?, ?,?)`,
                 [item.product_id, batchNo, quantity, quantity, unit_price,poId]
             );
         }
