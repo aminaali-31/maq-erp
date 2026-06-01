@@ -139,12 +139,12 @@ exports.dashboard = async (req, res) => {
                 UNION ALL
 
                 SELECT
-                    MONTH(date) AS month,
+                    MONTH(order_date) AS month,
                     0 AS sales,
                     SUM(total_amount) AS purchases
                 FROM purchase_orders
-                WHERE date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
-                GROUP BY MONTH(date)
+                WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+                GROUP BY MONTH(order_date)
             ) t
             GROUP BY month
             ORDER BY month
