@@ -2,6 +2,16 @@
 <html lang="en">
 
 <head>
+    <style>
+    .sortable {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .sortable:hover {
+        color: #0d6efd;
+    }
+</style>
     <%- include('../head') %>
         <title>Orders List</title>
 </head>
@@ -39,18 +49,22 @@
                                                     <thead>
                                                         <tr>
                                                             <th>Sr.</th>
-                                                            <th>Customer</th>
-                                                            <th>Total Amount</th>
-                                                            <th>Profit</th>
+                                                            <th class="sortable" data-sort="customer">Customer ↕</th>
+                                                            <th class="sortable" data-sort="amount">Total Amount ↕</th>
+                                                            <th class="sortable" data-sort="profit">Profit ↕</th>
                                                             <th>Payment Status</th>
                                                             <th>Order Status</th>
-                                                            <th>Date</th>
+                                                            <th class="sortable" data-sort="date">Date ↕</th>
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <% orders.forEach((order, idx)=> { %>
-                                                            <tr>
+                                                            <tr
+                                                                data-customer="<%= order.customer_name.toLowerCase() %>"
+                                                                data-amount="<%= order.total_amount %>"
+                                                                data-profit="<%= order.profit %>"
+                                                                data-date="<%= new Date(order.date).getTime() %>">
                                                                 <td>
                                                                     <%= idx+1 %>
                                                                 </td>
@@ -158,6 +172,52 @@
             });
         });
     </script>
+    <script>
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("tbody tr");
+
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(filter) ? "" : "none";
+        });
+    });
+
+    let sortDirection = {};
+
+    document.querySelectorAll(".sortable").forEach(header => {
+        header.addEventListener("click", function () {
+            const key = this.dataset.sort;
+            const tbody = document.querySelector("tbody");
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+
+            sortDirection[key] = sortDirection[key] === "asc" ? "desc" : "asc";
+
+            rows.sort((a, b) => {
+                let aValue = a.dataset[key];
+                let bValue = b.dataset[key];
+
+                if (key === "amount" || key === "profit" || key === "date") {
+                    aValue = Number(aValue);
+                    bValue = Number(bValue);
+                }
+
+                if (aValue < bValue) {
+                    return sortDirection[key] === "asc" ? -1 : 1;
+                }
+
+                if (aValue > bValue) {
+                    return sortDirection[key] === "asc" ? 1 : -1;
+                }
+
+                return 0;
+            });
+
+            tbody.innerHTML = "";
+            rows.forEach(row => tbody.appendChild(row));
+        });
+    });
+</script>
 </body>
 
 </html>
