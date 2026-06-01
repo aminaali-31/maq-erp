@@ -426,6 +426,8 @@
 
         const profitData = <%- JSON.stringify(profits) %>;
         const profitsValues = profitData.map(x => x.profit);
+        const salesValues = profitData.map(x => x.sales_revenue);
+        const expenseValues = profitData.map(x => x.expense);
         const profitLabels = profitData.map(x => {
         const monthNames = [
             "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -440,11 +442,28 @@
                 datasets: [{
                     label: "Profit",
                     data: profitsValues,
-                    fill: true, // fill under the line
+                    fill: false, // fill under the line
                     borderColor: "#7C4DFF",
                     backgroundColor: "#7C4DFF26",
                     tension: 0.3 // smooth curve
-                }]
+                },
+                  {
+                    label: "Sales Revenue",
+                    data: salesValues,
+                    borderColor: "#28a745",
+                    backgroundColor: "#28a74526",
+                    fill: false,
+                    tension: 0.3
+                },
+                {
+                    label: "Expense",
+                    data: expenseValues,
+                    borderColor: "#dc3545",
+                    backgroundColor: "#dc354526",
+                    fill: false,
+                    tension: 0.3
+                },
+            ]
             },
             options: {
                 responsive: true,

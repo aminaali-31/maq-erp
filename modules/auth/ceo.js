@@ -137,15 +137,18 @@ exports.dashboard = async (req, res) => {
             `);
     // In your controller
         const [profits] = await pool.query(`
-           SELECT
+            SELECT
                 s.year,
                 s.month,
-                COALESCE(s.sales_profit,0) - COALESCE(e.expense,0) AS profit
+                COALESCE(s.sales_revenue, 0) AS sales_revenue,
+                COALESCE(e.expense, 0) AS expense,
+                COALESCE(s.sales_profit, 0) - COALESCE(e.expense, 0) AS profit
             FROM
             (
                 SELECT
                     YEAR(date) AS year,
                     MONTH(date) AS month,
+                    SUM(total_amount) AS sales_revenue,
                     SUM(profit) AS sales_profit
                 FROM sales_orders
                 GROUP BY YEAR(date), MONTH(date)
@@ -163,7 +166,7 @@ exports.dashboard = async (req, res) => {
                 GROUP BY YEAR(j.date), MONTH(j.date)
             ) e
             ON s.year = e.year AND s.month = e.month
-            ORDER BY s.year, s.month;
+            ORDER BY s.year, s.month
         `);
         const [rows] = await pool.execute(
             `SELECT COUNT(*) AS count
