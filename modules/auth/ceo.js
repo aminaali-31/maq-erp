@@ -1,13 +1,13 @@
 const pool = require("../../config/db");
 
 exports.dashboard = async (req, res) => {
-  try {
-    const userId = req.session.user.role_id;
-    /* =========================
-       Revenue / Expense / Profit
-    ========================= */
+    try {
+        const userId = req.session.user.role_id;
+        /* =========================
+           Revenue / Expense / Profit
+        ========================= */
 
-    const [finance] = await pool.query(`
+        const [finance] = await pool.query(`
       SELECT
         SUM(CASE WHEN a.name='Sales Revenue' THEN je.credit-je.debit ELSE 0 END) AS revenue,
         SUM(CASE WHEN a.name='expense' THEN je.debit-je.credit ELSE 0 END) AS expenses
@@ -18,40 +18,40 @@ exports.dashboard = async (req, res) => {
         AND YEAR(j.date) = YEAR(CURDATE())
     `);
 
-    const revenue = finance[0].revenue || 0;
-    const expenses = finance[0].expenses || 0;
-    const [[orderProfit]] = await pool.query(`
+        const revenue = finance[0].revenue || 0;
+        const expenses = finance[0].expenses || 0;
+        const [[orderProfit]] = await pool.query(`
         SELECT COALESCE(SUM(profit),0) AS total_profit
         FROM sales_orders
         WHERE MONTH(date)=MONTH(CURDATE())
         AND YEAR(date)=YEAR(CURDATE())
         `);
-    const profit = orderProfit.total_profit - expenses;
-    /* =========================
-       KPI Counters
-    ========================= */
+        const profit = orderProfit.total_profit - expenses;
+        /* =========================
+           KPI Counters
+        ========================= */
 
-    const [[customers]] = await pool.query(
-      "SELECT COUNT(*) total FROM customers"
-    );
+        const [[customers]] = await pool.query(
+            "SELECT COUNT(*) total FROM customers"
+        );
 
-    const [[vendors]] = await pool.query(
-      "SELECT COUNT(*) total FROM vendors"
-    );
+        const [[vendors]] = await pool.query(
+            "SELECT COUNT(*) total FROM vendors"
+        );
 
-    const [[products]] = await pool.query(
-      "SELECT COUNT(*) total FROM products"
-    );
+        const [[products]] = await pool.query(
+            "SELECT COUNT(*) total FROM products"
+        );
 
-    const [[orders]] = await pool.query(
-      "SELECT COUNT(*) total FROM sales_orders"
-    );
+        const [[orders]] = await pool.query(
+            "SELECT COUNT(*) total FROM sales_orders"
+        );
 
-    /* =========================
-       Financial Risks
-    ========================= */
+        /* =========================
+           Financial Risks
+        ========================= */
 
-    const [[receivables]] = await pool.execute(`
+        const [[receivables]] = await pool.execute(`
             SELECT 
                 COALESCE(SUM(je.debit - je.credit),0) AS balance
             FROM customers c
@@ -62,14 +62,14 @@ exports.dashboard = async (req, res) => {
             WHERE a.type = 'asset';
         `);
 
-    const [[payables]] = await pool.execute(`
+        const [[payables]] = await pool.execute(`
         SELECT COALESCE(SUM(je.credit - je.debit),0) AS balance
         FROM journal_entries je
         WHERE je.account_id IN (
             SELECT account_id FROM vendors WHERE account_id IS NOT NULL
         )
     `);
-    const [[lowStock]] = await pool.query(`
+        const [[lowStock]] = await pool.query(`
         SELECT p.reorder_level, il.quantity AS total
         FROM products p
         JOIN inventory_level il ON il.product_id = p.id
@@ -77,18 +77,18 @@ exports.dashboard = async (req, res) => {
         HAVING SUM(il.quantity) < p.reorder_level;
     `);
 
-    const [[complaints]] = await pool.query(`
+        const [[complaints]] = await pool.query(`
       SELECT COUNT(*) total
       FROM complaints
       WHERE status='pending'
     `);
 
 
-    /* =========================
-       Top Customers
-    ========================= */
+        /* =========================
+           Top Customers
+        ========================= */
 
-    const [topCustomers] = await pool.query(`
+        const [topCustomers] = await pool.query(`
       SELECT c.name, SUM(so.total_amount) revenue
       FROM sales_orders so
       JOIN customers c ON c.id=so.customer_id
@@ -97,11 +97,11 @@ exports.dashboard = async (req, res) => {
       LIMIT 5
     `);
 
-    /* =========================
-       Top Products
-    ========================= */
+        /* =========================
+           Top Products
+        ========================= */
 
-    const [topProducts] = await pool.query(`
+        const [topProducts] = await pool.query(`
       SELECT p.name, SUM(oi.quantity) sold
       FROM so_items oi
       JOIN products p ON p.id=oi.p_id
@@ -110,11 +110,11 @@ exports.dashboard = async (req, res) => {
       LIMIT 5
     `);
 
-    /* =========================
-       Top Vendors
-    ========================= */
+        /* =========================
+           Top Vendors
+        ========================= */
 
-    const [topVendors] = await pool.query(`
+        const [topVendors] = await pool.query(`
       SELECT v.name, SUM(po.total_amount) purchases
       FROM purchase_orders po
       JOIN vendors v ON v.id=po.vendor_id
@@ -122,20 +122,35 @@ exports.dashboard = async (req, res) => {
       ORDER BY purchases DESC
       LIMIT 5
     `);
-    const [chart] = await pool.query(`
+        const [chart] = await pool.query(`
             SELECT
-                MONTH(j.date) AS month,
-                SUM(CASE WHEN a.name = 'Sales Revenue' THEN je.credit - je.debit ELSE 0 END) AS sales,
-                SUM(CASE WHEN a.name = 'Stocks' THEN je.debit - je.credit ELSE 0 END) AS purchases
-            FROM journal_entries je
-            JOIN accounts a ON je.account_id = a.id
-            JOIN journal j ON je.journal_id = j.id
-            WHERE j.date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
-            GROUP BY  month
+                month,
+                SUM(sales) AS sales,
+                SUM(purchases) AS purchases
+            FROM (
+                SELECT
+                    MONTH(date) AS month,
+                    SUM(total_amount) AS sales,
+                    0 AS purchases
+                FROM sales_orders
+                WHERE date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+                GROUP BY MONTH(date)
+
+                UNION ALL
+
+                SELECT
+                    MONTH(date) AS month,
+                    0 AS sales,
+                    SUM(total_amount) AS purchases
+                FROM purchase_orders
+                WHERE date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+                GROUP BY MONTH(date)
+            ) t
+            GROUP BY month
             ORDER BY month
             LIMIT 12;
             `);
-    // In your controller
+        // In your controller
         const [profits] = await pool.query(`
     SELECT
         year,
@@ -178,7 +193,7 @@ exports.dashboard = async (req, res) => {
         );
         const not = rows[0].count
 
-         const [notifications] = await pool.execute(
+        const [notifications] = await pool.execute(
             `SELECT *
              FROM notifications
              WHERE user_id = ?
@@ -188,32 +203,32 @@ exports.dashboard = async (req, res) => {
             [userId]
         );
 
-    res.render("ceo/dashboard", {
-      revenue,
-      expenses,
-      orderProfit,
-      profit,
-      profits,
-      customers: customers.total,
-      vendors: vendors.total,
-      products: products.total,
-      orders: orders.total,
-      receivables: receivables.balance || 0,
-      payables: payables.balance || 0,
-      lowStock: lowStock.total,
-      complaints: complaints.total,
-      chart,
-      topCustomers,
-      topProducts,
-      topVendors,
-      not,
-      notifications,
-    });
+        res.render("ceo/dashboard", {
+            revenue,
+            expenses,
+            orderProfit,
+            profit,
+            profits,
+            customers: customers.total,
+            vendors: vendors.total,
+            products: products.total,
+            orders: orders.total,
+            receivables: receivables.balance || 0,
+            payables: payables.balance || 0,
+            lowStock: lowStock.total,
+            complaints: complaints.total,
+            chart,
+            topCustomers,
+            topProducts,
+            topVendors,
+            not,
+            notifications,
+        });
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
-  }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
 };
 
 
@@ -259,7 +274,7 @@ exports.createJobForm = async (req, res) => {
             SELECT id, name, 'vendor' AS type FROM vendors
             UNION ALL
             SELECT id, name, 'contractor' AS type FROM contractors;`
-            );
+        );
 
         res.render('jobs/create', {
             users,
@@ -299,10 +314,10 @@ exports.createJob = async (req, res) => {
 };
 
 
-exports.showAllJobs = async (req,res) => {
-  try {
+exports.showAllJobs = async (req, res) => {
+    try {
 
-    const [jobs] = await pool.execute(`
+        const [jobs] = await pool.execute(`
         SELECT
             j.*,
 
@@ -336,11 +351,11 @@ exports.showAllJobs = async (req,res) => {
         END;
         `);
 
-    res.render('jobs/all', {jobs, success:req.query.success, error: req.query.error});
-  } catch (e) {
-       console.error(e);
-      res.status(500).send("Database Error");
-  }
+        res.render('jobs/all', { jobs, success: req.query.success, error: req.query.error });
+    } catch (e) {
+        console.error(e);
+        res.status(500).send("Database Error");
+    }
 }
 
 exports.changeJobStatus = async (req, res) => {
@@ -382,7 +397,7 @@ exports.setJobComment = async (req, res) => {
             `UPDATE jobs SET comment = ? WHERE id = ?`,
             [comment, job_id]
         );
-            // 2️⃣ Notify CEO (example user_id = 1)
+        // 2️⃣ Notify CEO (example user_id = 1)
         await pool.execute(
             `INSERT INTO notifications (user_id, title, message, link)
              VALUES (?, ?, ?, ?)`,
