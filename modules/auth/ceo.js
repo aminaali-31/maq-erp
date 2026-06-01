@@ -137,37 +137,39 @@ exports.dashboard = async (req, res) => {
             `);
     // In your controller
         const [profits] = await pool.query(`
-            SELECT
-                s.year,
-                s.month,
-                COALESCE(s.sales_revenue, 0) AS sales_revenue,
-                COALESCE(e.expense, 0) AS expense,
-                COALESCE(s.sales_profit, 0) - COALESCE(e.expense, 0) AS profit
-            FROM
-            (
-                SELECT
-                    YEAR(date) AS year,
-                    MONTH(date) AS month,
-                    SUM(total_amount) AS sales_revenue,
-                    SUM(profit) AS sales_profit
-                FROM sales_orders
-                GROUP BY YEAR(date), MONTH(date)
-            ) s
-            LEFT JOIN
-            (
-                SELECT
-                    YEAR(j.date) AS year,
-                    MONTH(j.date) AS month,
-                    SUM(je.debit) AS expense
-                FROM journal_entries je
-                JOIN accounts a ON je.account_id = a.id
-                JOIN journal j ON je.journal_id = j.id
-                WHERE a.name = 'expense'
-                GROUP BY YEAR(j.date), MONTH(j.date)
-            ) e
-            ON s.year = e.year AND s.month = e.month
-            ORDER BY s.year, s.month
-        `);
+    SELECT
+        year,
+        month,
+        SUM(sales_revenue) AS sales_revenue,
+        SUM(expense) AS expense,
+        SUM(sales_profit) - SUM(expense) AS profit
+    FROM (
+        SELECT
+            YEAR(date) AS year,
+            MONTH(date) AS month,
+            SUM(total_amount) AS sales_revenue,
+            SUM(profit) AS sales_profit,
+            0 AS expense
+        FROM sales_orders
+        GROUP BY YEAR(date), MONTH(date)
+
+        UNION ALL
+
+        SELECT
+            YEAR(j.date) AS year,
+            MONTH(j.date) AS month,
+            0 AS sales_revenue,
+            0 AS sales_profit,
+            SUM(je.debit) AS expense
+        FROM journal_entries je
+        JOIN accounts a ON je.account_id = a.id
+        JOIN journal j ON je.journal_id = j.id
+        WHERE a.name = 'expense'
+        GROUP BY YEAR(j.date), MONTH(j.date)
+    ) t
+    GROUP BY year, month
+    ORDER BY year, month
+`);
         const [rows] = await pool.execute(
             `SELECT COUNT(*) AS count
              FROM notifications
